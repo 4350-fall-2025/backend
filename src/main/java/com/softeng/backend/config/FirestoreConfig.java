@@ -22,7 +22,7 @@ public class FirestoreConfig {
     @Value("${FIRESTORE_EMULATOR_HOST:}")
     private String emulatorHost;
 
-    @Value("${FIREBASE_PROJECT_ID:default-project}")
+    @Value("${FIREBASE_PROJECT_ID:qdog-6aca2}")
     private String projectId;
 
     @Bean
