@@ -1,17 +1,11 @@
 spring:
-  h2:
-    console:
-      enabled: true
-  datasource:
-    url: jdbc:h2:mem:testdb
-    driverClassName: org.h2.Driver
-  jpa:
-    show-sql: true
-    hibernate:
-      ddl-auto: create-drop
+  cloud:
+    gcp:
+      firestore:
+        emulator:
+          enabled: true
   application:
     name: backend
-
 server:
   port: 3000
   compression:
