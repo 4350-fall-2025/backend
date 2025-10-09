@@ -4,6 +4,7 @@ spring:
       firestore:
         emulator:
           enabled: true
+        project-id: qdog-6aca2
   application:
     name: backend
 server:
