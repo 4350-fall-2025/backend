@@ -6,6 +6,8 @@ import com.softeng.backend.models.Vet;
 
 import java.util.List;
 
+// Reference: was asking ChatGPT for basic Service setup (for testing) when making this
+
 @Service
 public class VetService {
 
@@ -20,7 +22,7 @@ public class VetService {
     }
 
     public List<Vet> getVetsByName(String name) {
-        return vetRepository.findByName(name);
+        return vetRepository.getByName(name);
     }
 
 }
