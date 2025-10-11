@@ -14,7 +14,8 @@
 *IntelliJ Menu -> Build, Execution, Deploymnet -> Compiler -> 
 Annotation Processors -> Enable annotation processing*
 8) Set up Firestore authentication:
-   a) For graders/Lauren, you will be provided the auth file as communicated. Refer to step 
+
+   a) For graders/Lauren, you will be provided the auth file as communicated. Refer to step 9
 
    b) For devs: 
 
@@ -24,7 +25,7 @@ Annotation Processors -> Enable annotation processing*
      iii) Click on Service Accounts tab
 
      iv) Click "Generate new private key" - this will download a private key for you to use.
-     
+
      v) Rename the file to "firebase-admin.json", and I recommend moving it to:
         ```
         backend/src/main/resources
