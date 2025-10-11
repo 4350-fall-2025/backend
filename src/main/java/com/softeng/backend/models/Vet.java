@@ -14,6 +14,7 @@ public class Vet {
 
     @Id
     private String id;
-    private String name;
+    private String firstName;
+    private String lastName;
 
 }

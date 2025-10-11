@@ -31,8 +31,10 @@ Annotation Processors -> Enable annotation processing*
          ```
          backend/src/main/resources
          ```
-9) Update environment variables (create new .env file in project root if you don't have a .env file. Ensure git does not pick it up for commits!):
-   - GOOGLE_APPLICATION_CREDENTIALS - set to the absolute path to the firebase-admin.json file
+9) Update or create environment properties file, with filename ".properties" in ```src/main/resources```. If you don't have a .properties file, create one in the aforementioned directory.
+
+   *Add these environment variables*:
+   - GOOGLE_APPLICATION_CREDENTIALS - set to the *absolute path* to the firebase-admin.json file
 
    - APP_ENV: local (only option currently)
    
