@@ -5,7 +5,7 @@ import com.google.cloud.firestore.Firestore;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.cloud.FirestoreClient;
-import com.softeng.backend.exception.FirebaseInitializeException;
+import com.softeng.backend.exception.config.FirebaseInitializeException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -32,12 +32,13 @@ public class FirebaseConfig {
 
         Firestore app;
         try {
-
             FileInputStream serviceAccount = new FileInputStream(appCredentialsPath);
             FirebaseOptions options = new FirebaseOptions.Builder()
                     .setCredentials(GoogleCredentials.fromStream(serviceAccount))
                     .build();
-            FirebaseApp.initializeApp(options);
+            if (FirebaseApp.getApps().isEmpty()) {
+                FirebaseApp.initializeApp(options);
+            }
             return FirestoreClient.getFirestore();
 
         } catch(IOException e) {

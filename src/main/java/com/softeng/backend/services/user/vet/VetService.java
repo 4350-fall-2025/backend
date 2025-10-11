@@ -1,12 +1,13 @@
-package com.softeng.backend.services;
+package com.softeng.backend.services.user.vet;
 
 import org.springframework.stereotype.Service;
-import com.softeng.backend.repository.VetRepository;
-import com.softeng.backend.models.Vet;
+import com.softeng.backend.repository.user.vet.VetRepository;
+import com.softeng.backend.models.user.vet.Vet;
 
 import java.util.List;
 
 // Reference: was asking ChatGPT for basic Service setup (for testing) when making this
+// TODO: needs to be implemented
 
 @Service
 public class VetService {

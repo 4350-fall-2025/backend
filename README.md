@@ -19,23 +19,28 @@ Annotation Processors -> Enable annotation processing*
 
    b) For devs: 
 
-      i) Ask Victoria to be added to the Firebase project, send her the gmail account that you wish to use.
+   >>  i) Ask Victoria to be added to the Firebase project, send her the gmail account that you wish to use.
 
-      ii) Navigate to project settings icon on the top left, click on Project Settings
+   >> ii) Navigate to project settings icon on the top left, click on Project Settings
       
-      iii) Click on Service Accounts tab
+   >>  iii) Click on Service Accounts tab
 
-      iv) Click "Generate new private key" - this will download a private key for you to use.
+   >>   iv) Click "Generate new private key" - this will download a private key for you to use.
 
-      v) Rename the file to "firebase-admin.json", and I recommend moving it to:
+   >>   v) Rename the file to "firebase-admin.json"
+
+9) Move/Copy the "firebase-admin.json" file to the following directory in the project:
+         
          ```
          backend/src/main/resources
          ```
-9) Update or create environment properties file, with filename ".properties" in ```src/main/resources```. If you don't have a .properties file, create one in the aforementioned directory.
+
+10) Update or create environment properties file, with filename ".properties" in ```src/main/resources```. If you don't have a .properties file, create one in the aforementioned directory.
 
    *Add these environment variables*:
-   - GOOGLE_APPLICATION_CREDENTIALS - set to the *absolute path* to the firebase-admin.json file
 
-   - APP_ENV: local (only option currently)
+   - GOOGLE_APPLICATION_CREDENTIALS=the absolute path to the firebase-admin.json file
+
+   - APP_ENV=local (only option currently)
    
-10) Run the application by executing BackendApplication.java
+11) Run the application by executing BackendApplication.java by clicking the "Run Appplication" button in IntelliJ.
