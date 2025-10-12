@@ -1,6 +1,6 @@
 package com.softeng.backend.repository.user.owner;
 
-import com.softeng.backend.models.pet.Pet;
+import com.softeng.backend.dto.OwnerDTO;
 import com.softeng.backend.models.user.owner.Owner;
 
 import java.util.Map;
@@ -11,16 +11,16 @@ public interface IOwnerRepository {
     /*****************************************************************************
      * CREATE
      ******************************************************************************/
-    public String createOwner(Owner owner) throws ExecutionException, InterruptedException;
+    OwnerDTO createOwner(Owner owner) throws ExecutionException, InterruptedException;
 
     /*****************************************************************************
      * READ
      ******************************************************************************/
-    public Owner getOwnerByEmail(String email) throws ExecutionException, InterruptedException;
-    public Owner getOwnerById(String id) throws ExecutionException, InterruptedException;
+    OwnerDTO getOwnerByEmail(String email) throws ExecutionException, InterruptedException;
+    OwnerDTO getOwnerById(String id) throws ExecutionException, InterruptedException;
 
     /*****************************************************************************
      * UPDATE
      ******************************************************************************/
-    public Owner updateOwner(String id, Map<String, Object> updateFields) throws ExecutionException, InterruptedException;
+    OwnerDTO updateOwner(String id, Map<String, Object> updateFields) throws ExecutionException, InterruptedException;
 }

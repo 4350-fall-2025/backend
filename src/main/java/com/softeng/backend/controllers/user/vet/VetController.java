@@ -8,7 +8,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-// Reference: was asking ChatGPT for basic Controller setup (for testing) when making this
+//  The following code was copied from OpenAI's ChatGPT (https://chat.openai.com)
+//  - Asked ChatGPT for basic Controller setup (for testing) when making this
 // TODO: needs to be implemented
 
 @RestController

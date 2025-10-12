@@ -5,8 +5,7 @@ public class PetController {
      /* TODO
 
     // CREATE:
-
-    // generated using chatGPT
+    // The following code was copied from OpenAI's ChatGPT (https://chat.openai.com)
     @PostMapping("/{id}/pets")
     public ResponseEntity<Pet> createPet(@PathVariable String id, @RequestBody Pet pet) {
         Pet updated = petService.createPet(id, pet);
@@ -17,7 +16,7 @@ public class PetController {
 
     // UPDATE:
 
-    // generated using chatGPT
+    // The following code was copied from OpenAI's ChatGPT (https://chat.openai.com)
     @PutMapping("/{ownerId}/pets")
     public ResponseEntity<Pet> updatePet(@PathVariable String ownerId, @RequestBody Pet pet) {
         Owner updated = ownerService.updatePet(ownerId, pet);
@@ -27,7 +26,7 @@ public class PetController {
 
     // DELETE:
 
-    // generated using chatGPT
+    // The following code was copied from OpenAI's ChatGPT (https://chat.openai.com)
     @DeleteMapping("/{ownerId}/pets/{petId}")
     public ResponseEntity<Owner> removePet(@PathVariable String ownerId, @PathVariable String petId) {
         Owner updated = ownerService.removePet(ownerId, petName);

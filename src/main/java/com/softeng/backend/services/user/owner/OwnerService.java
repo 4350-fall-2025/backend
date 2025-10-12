@@ -1,5 +1,6 @@
 package com.softeng.backend.services.user.owner;
 
+import com.softeng.backend.dto.OwnerDTO;
 import com.softeng.backend.models.user.owner.Owner;
 import com.softeng.backend.repository.user.owner.OwnerRepository;
 import org.slf4j.Logger;
@@ -9,6 +10,9 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
+
+// Portions of the following CRUD methods were guided by OpenAI's ChatGPT (GPT-5), Oct. 12, 2025.
+// The implementation and adaptation were done by the author.
 
 @Service
 public class OwnerService implements IOwnerService {
@@ -24,44 +28,41 @@ public class OwnerService implements IOwnerService {
     /*****************************************************************************
      * CREATE
      ******************************************************************************/
-    public String createOwner(Owner owner) throws ExecutionException, InterruptedException {
-        String response = "";
-
-            if (owner == null || owner.checkInvalidUser()) {
-                logger.debug("DEBUG LOG: Owner service detected invalid user for creation: " +
+    public OwnerDTO createOwner(Owner owner) throws ExecutionException, InterruptedException {
+        OwnerDTO dto = null;
+        if (owner == null || owner.checkInvalidUser()) {
+            logger.debug("DEBUG LOG: Owner service detected invalid user for creation: " +
                         (owner == null ? null : owner.getEmail()));
-            } else if (getOwnerByEmail(owner.getEmail()).checkInvalidUser()) {
-                logger.debug("DEBUG LOG: Owner service detected user that already exists: " + owner.getEmail());
-            }
-            response = ownerRepository.createOwner(owner);
-
-
-        return response;
+            dto = new OwnerDTO();
+        } else if (getOwnerByEmail(owner.getEmail()).getId() != null) {
+            logger.debug("DEBUG LOG: Owner service detected user that already exists: " + owner.getEmail());
+            dto = new OwnerDTO();
+        } else {
+            dto = ownerRepository.createOwner(owner);
+        }
+        return dto;
     }
 
     /*****************************************************************************
      * READ
      ******************************************************************************/
-    public Owner getOwnerByEmail(String email) throws ExecutionException, InterruptedException {
-
+    public OwnerDTO getOwnerByEmail(String email) throws ExecutionException, InterruptedException {
         return ownerRepository.getOwnerByEmail(email);
     }
 
-    public Owner getOwnerById(String id) throws ExecutionException, InterruptedException {
-
-            return ownerRepository.getOwnerByEmail(id);
+    public OwnerDTO getOwnerById(String id) throws ExecutionException, InterruptedException {
+        return ownerRepository.getOwnerById(id);
     }
 
     /*****************************************************************************
      * UPDATE
      ******************************************************************************/
 
-    // https://firebase.google.com/docs/firestore/manage-data/add-data#set_a_document
-    public Owner updateOwner(String id, Owner owner) throws ExecutionException, InterruptedException {
+    // https://firebase.google.com/docs/firestore/manage-data/add-data#update-data
+    public OwnerDTO updateOwner(String id, Owner owner) throws ExecutionException, InterruptedException {
 
-        Owner updatedOwner = new Owner();
         if (owner.checkEmptyUser()) {
-            return updatedOwner;
+            return new OwnerDTO();
         }
 
         Map<String, Object> updateFields = new HashMap<>();
@@ -77,7 +78,6 @@ public class OwnerService implements IOwnerService {
         if (owner.getPassword() != null) {
             updateFields.put("password", owner.getPassword());
         }
-        updatedOwner = ownerRepository.updateOwner(id, updateFields);
-        return updatedOwner;
+        return ownerRepository.updateOwner(id, updateFields);
     }
 }

@@ -35,12 +35,17 @@ Annotation Processors -> Enable annotation processing*
          backend/src/main/resources
          ```
 
-10) Update or create environment properties file, with filename ".properties" in ```src/main/resources```. If you don't have a .properties file, create one in the aforementioned directory.
+10) In IntelliJ, Click the "Run->Edit Configurations" and in the Run/Debug Configurations, under "Environment Variables" enter the following environment variable:
 
-   *Add these environment variables*:
+GOOGLE_APPLICATION_CREDENTIALS=*enter your absolute path to the firebase-admin.json file here*
 
-   - GOOGLE_APPLICATION_CREDENTIALS=the absolute path to the firebase-admin.json file
+Then click "Apply", then "Ok".
 
-   - APP_ENV=local (only option currently)
-   
 11) Run the application by executing BackendApplication.java by clicking the "Run Appplication" button in IntelliJ.
+
+# Sources
+
+Some portions of this project, specifically guidance on implementing Firestore CRUD operations for Owner objects in Spring Boot, were informed by OpenAI’s ChatGPT (GPT-5) on multiple occasions between October 10 and October 12 2025.
+
+Inline comments indicate where AI guidance was referenced or code was used. 
+For reference, OpenAI ChatGPT is available at: https://chat.openai.com 

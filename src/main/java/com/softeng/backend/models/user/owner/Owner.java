@@ -13,18 +13,18 @@ public class Owner extends User implements IOwner {
 
     private ArrayList<Pet> pets;
 
-    public Owner(String id, String firstName, String lastName, String email, String password) {
-        super(id, firstName, lastName, email, password);
+    public Owner(String firstName, String lastName, String email, String password) {
+        super(firstName, lastName, email, password);
         pets = new ArrayList<>();
     }
 
-    public Owner(String id, String firstName, String lastName, String email, String password, ArrayList<Pet> pets) {
-        super(id, firstName, lastName, email, password);
+    public Owner(String firstName, String lastName, String email, String password, ArrayList<Pet> pets) {
+        super(firstName, lastName, email, password);
         this.pets = pets;
     }
 
     /// ////////////////////////////////////////////////////
-    /// Pets
+    ///TODO: implement pet CRUD
     /// ///////////////////////////////////////////////////
 
     @Override
@@ -39,7 +39,6 @@ public class Owner extends User implements IOwner {
 
     @Override
     public boolean updatePet(Pet pet) {
-        //TODO
         return false;
     }
 

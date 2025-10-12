@@ -4,8 +4,8 @@ import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
+import com.softeng.backend.dto.OwnerDTO;
 import com.softeng.backend.models.pet.Pet;
-import com.softeng.backend.models.user.owner.Owner;
 import com.softeng.backend.repository.user.owner.OwnerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -29,17 +29,17 @@ public class PetRepository implements IPetRepository {
     public Pet createPet(String ownerId, Pet pet) {
         Pet result = new Pet();
         try {
-            Owner owner = ownerRepository.getOwnerById(ownerId);
+            OwnerDTO owner = ownerRepository.getOwnerById(ownerId);
             if(owner != null) {
 
-                // reference: got the following code to read-after insert from ChatGPT (how to access object after inserting)
+                // The following code was copied/developed with guidance from OpenAI's ChatGPT (https://chat.openai.com)
                 ApiFuture<DocumentReference> addedDocRef = firestore.collection("pets").add(pet);
                 DocumentReference reference = addedDocRef.get();
                 DocumentSnapshot snapshot= reference.get().get();
 
                 if (snapshot.exists()) {
                     pet = snapshot.toObject(Pet.class);
-                    owner.createPet(pet);
+                    owner.getOwner().createPet(pet);
                 }
             }
         } catch(ExecutionException | InterruptedException e) {

@@ -7,9 +7,6 @@ spring:
         emulator:
           enabled: true
         project-id: qdog-6aca2
-  config:
-    import: optional:classpath:.properties
-
 logging:
   level:
     root: INFO

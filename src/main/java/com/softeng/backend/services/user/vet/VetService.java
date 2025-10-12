@@ -6,6 +6,7 @@ import com.softeng.backend.models.user.vet.Vet;
 
 import java.util.List;
 
+// // The following code was copied with guidance from OpenAI's ChatGPT (https://chat.openai.com)
 // Reference: was asking ChatGPT for basic Service setup (for testing) when making this
 // TODO: needs to be implemented
 

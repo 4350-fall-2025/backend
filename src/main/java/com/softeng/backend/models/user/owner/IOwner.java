@@ -10,22 +10,22 @@ public interface IOwner {
      * @param pet to add
      * @return true if successful
      */
-    public boolean createPet(Pet pet);
+    boolean createPet(Pet pet);
 
     /**
      * @param pet to remove
      * @return true if successful
      */
-    public boolean removePet(Pet pet);
+    boolean removePet(Pet pet);
 
     /**
      * @param pet to update
      * @return true if successful
      */
-    public boolean updatePet(Pet pet);
+    boolean updatePet(Pet pet);
 
     /**
      * @return the owner's pets, otherwise empty list
      */
-    public ArrayList<Pet> getPets();
+    ArrayList<Pet> getPets();
 }

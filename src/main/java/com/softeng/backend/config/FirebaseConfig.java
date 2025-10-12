@@ -18,7 +18,9 @@ import java.io.IOException;
  * Used the following video when setting this up:
  * https://youtu.be/TkoKdO5Knhk?si=vTl2eMINMJVVmM3q
  * https://firebase.google.com/docs/firestore/quickstart#initialize
- * Asked chatgpt for how to set up using environment variables (appCredentialsPath)
+ * The following code was developed with guidance from OpenAI's ChatGPT (https://chat.openai.com)
+ * - Asked chatgpt for how to set up using environment variables (appCredentialsPath)
+ * - Troubleshooted connection issues with ChatGPT when database connection didn't work
  */
 
 @Configuration
