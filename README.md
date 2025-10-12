@@ -22,8 +22,12 @@ Annotation Processors -> Enable annotation processing*
    >>  i) Ask Victoria to be added to the Firebase project, send her the gmail account that you wish to use.
 
    >> ii) Navigate to project settings icon on the top left, click on Project Settings
+   >> <img width="427" height="239" alt="projectsettings" src="https://github.com/user-attachments/assets/0f25b607-cb43-4160-9885-bd36a5afef7f" />
+
       
    >>  iii) Click on Service Accounts tab
+   >> <img width="750" height="145" alt="serviceaccounts" src="https://github.com/user-attachments/assets/7598102a-2bec-40e1-8474-59c69dea1627" />
+
 
    >>   iv) Click "Generate new private key" - this will download a private key for you to use.
 
@@ -38,6 +42,8 @@ Annotation Processors -> Enable annotation processing*
 10) In IntelliJ, Click the "Run->Edit Configurations" and in the Run/Debug Configurations, under "Environment Variables" enter the following environment variable:
 
 GOOGLE_APPLICATION_CREDENTIALS=*enter your absolute path to the firebase-admin.json file here*
+
+https://github.com/user-attachments/assets/b3f54cc6-95ac-450b-8c32-04437eeebb50
 
 Then click "Apply", then "Ok".
 
