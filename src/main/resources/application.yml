@@ -1,12 +1,14 @@
 spring:
+  application:
+    name: backend
   cloud:
     gcp:
       firestore:
         emulator:
           enabled: true
         project-id: qdog-6aca2
-  application:
-    name: backend
+  config:
+    import: optional:classpath:.properties
 server:
   port: 3000
   compression:

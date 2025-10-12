@@ -3,6 +3,7 @@ package com.softeng.backend.repository;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.*;
 import com.softeng.backend.models.Vet;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
@@ -12,7 +13,8 @@ import java.util.concurrent.ExecutionException;
 @Repository
 public class VetRepository {
 
-    private final Firestore firestore;
+    @Autowired
+    private Firestore firestore;
 
     public VetRepository(Firestore firestore) {
         this.firestore = firestore;
@@ -22,28 +24,24 @@ public class VetRepository {
     // https://firebase.google.com/docs/firestore/query-data/get-data#get_all_documents_in_a_collection
     public List<Vet> getAllVets() {
 
-        CollectionReference vetsRef = firestore.collection("vets");
-        ApiFuture<QuerySnapshot> future = vetsRef.get();
         List<Vet> vets = new ArrayList<>();
-
         try {
-            QuerySnapshot collection = future.get();
-            if (collection != null) {
-                for (DocumentSnapshot doc : collection.getDocuments()) {
-                    Vet vet = doc.toObject(Vet.class);
-                    vets.add(vet);
-                }
+            ApiFuture<QuerySnapshot> future = firestore.collection("vets").get();
+            List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+            for (QueryDocumentSnapshot document : documents) {
+                System.out.println(document.getId() + " => " + document.toObject(Vet.class));
+                vets.add(document.toObject(Vet.class));
             }
+
         } catch (InterruptedException | ExecutionException e) {
-            // TODO implement better error handling
-            e.printStackTrace();
+            System.out.println("Query failed: " + e.getMessage());
         }
         return vets;
     }
 
     // Referred to Firebase documentation:
     // https://firebase.google.com/docs/firestore/query-data/get-data?#get_multiple_documents_from_a_collection
-    public List<Vet> findByName(String name) {
+    public List<Vet> getByName(String name) {
 
         ApiFuture<QuerySnapshot> future = firestore.collection("vets").whereEqualTo("name", name).get();
         List<Vet> vets = new ArrayList<>();
@@ -54,7 +52,7 @@ public class VetRepository {
             }
         } catch (InterruptedException | ExecutionException e) {
             // TODO implement better error handling
-            e.printStackTrace();
+            System.out.println("Query failed: " + e.getMessage());
         }
         return vets;
     }

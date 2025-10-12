@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+// Reference: was asking ChatGPT for basic Controller setup (for testing) when making this
+
 @RestController
 @RequestMapping("/api/vets")
 public class VetController {
@@ -24,7 +26,6 @@ public class VetController {
         return ResponseEntity.ok(vetService.getAllVets());
     }
 
-    // TODO: we will need to update this endpoint and add more, 
     // this is just to see how firestore emulator works
     @GetMapping("/search")
     public ResponseEntity<List<Vet>> getVetsByName(@RequestParam String name) {
