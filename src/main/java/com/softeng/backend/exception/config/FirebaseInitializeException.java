@@ -1,4 +1,4 @@
-package com.softeng.backend.exception;
+package com.softeng.backend.exception.config;
 
 import java.io.IOException;
 

@@ -19,23 +19,33 @@ Annotation Processors -> Enable annotation processing*
 
    b) For devs: 
 
-      i) Ask Victoria to be added to the Firebase project, send her the gmail account that you wish to use.
+   >>  i) Ask Victoria to be added to the Firebase project, send her the gmail account that you wish to use.
 
-      ii) Navigate to project settings icon on the top left, click on Project Settings
+   >> ii) Navigate to project settings icon on the top left, click on Project Settings
       
-      iii) Click on Service Accounts tab
+   >>  iii) Click on Service Accounts tab
 
-      iv) Click "Generate new private key" - this will download a private key for you to use.
+   >>   iv) Click "Generate new private key" - this will download a private key for you to use.
 
-      v) Rename the file to "firebase-admin.json", and I recommend moving it to:
+   >>   v) Rename the file to "firebase-admin.json"
+
+9) Move/Copy the "firebase-admin.json" file to the following directory in the project:
+         
          ```
          backend/src/main/resources
          ```
-9) Update or create environment properties file, with filename ".properties" in ```src/main/resources```. If you don't have a .properties file, create one in the aforementioned directory.
 
-   *Add these environment variables*:
-   - GOOGLE_APPLICATION_CREDENTIALS - set to the *absolute path* to the firebase-admin.json file
+10) In IntelliJ, Click the "Run->Edit Configurations" and in the Run/Debug Configurations, under "Environment Variables" enter the following environment variable:
 
-   - APP_ENV: local (only option currently)
-   
-10) Run the application by executing BackendApplication.java
+GOOGLE_APPLICATION_CREDENTIALS=*enter your absolute path to the firebase-admin.json file here*
+
+Then click "Apply", then "Ok".
+
+11) Run the application by executing BackendApplication.java by clicking the "Run Appplication" button in IntelliJ.
+
+# Sources
+
+Some portions of this project, specifically guidance on implementing Firestore CRUD operations for Owner objects in Spring Boot, were informed by OpenAI’s ChatGPT (GPT-5) on multiple occasions between October 10 and October 12 2025.
+
+Inline comments indicate where AI guidance was referenced or code was used. 
+For reference, OpenAI ChatGPT is available at: https://chat.openai.com 

@@ -1,8 +1,8 @@
-package com.softeng.backend.repository;
+package com.softeng.backend.repository.user.vet;
 
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.*;
-import com.softeng.backend.models.Vet;
+import com.softeng.backend.models.user.vet.Vet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -10,11 +10,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+// TODO: needs to be implemented
 @Repository
 public class VetRepository {
 
     @Autowired
     private Firestore firestore;
+    private final String collectionName = "vets";
 
     public VetRepository(Firestore firestore) {
         this.firestore = firestore;
@@ -43,7 +45,7 @@ public class VetRepository {
     // https://firebase.google.com/docs/firestore/query-data/get-data?#get_multiple_documents_from_a_collection
     public List<Vet> getByName(String name) {
 
-        ApiFuture<QuerySnapshot> future = firestore.collection("vets").whereEqualTo("name", name).get();
+        ApiFuture<QuerySnapshot> future = firestore.collection(collectionName).whereEqualTo("name", name).get();
         List<Vet> vets = new ArrayList<>();
         try {
             List<QueryDocumentSnapshot> documents = future.get().getDocuments();
