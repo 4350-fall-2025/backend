@@ -47,7 +47,9 @@ https://github.com/user-attachments/assets/b3f54cc6-95ac-450b-8c32-04437eeebb50
 
 Then click "Apply", then "Ok".
 
-11) Run the application by executing BackendApplication.java by clicking the "Run Appplication" button in IntelliJ.
+11) Run the application by executing BackendApplication.java by clicking the "Run Appplication" button in IntelliJ:
+    <img width="482" height="77" alt="build-run" src="https://github.com/user-attachments/assets/dbaad99a-ee1b-4703-aac5-a25df9590b5d" />
+
 
 # Sources
 
