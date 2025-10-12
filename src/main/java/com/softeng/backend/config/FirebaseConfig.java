@@ -32,13 +32,12 @@ public class FirebaseConfig {
 
         Firestore app;
         try {
+
             FileInputStream serviceAccount = new FileInputStream(appCredentialsPath);
             FirebaseOptions options = new FirebaseOptions.Builder()
                     .setCredentials(GoogleCredentials.fromStream(serviceAccount))
                     .build();
-            if (FirebaseApp.getApps().isEmpty()) {
-                FirebaseApp.initializeApp(options);
-            }
+            FirebaseApp.initializeApp(options);
             return FirestoreClient.getFirestore();
 
         } catch(IOException e) {

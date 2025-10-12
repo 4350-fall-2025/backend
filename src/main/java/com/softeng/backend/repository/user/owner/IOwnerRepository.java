@@ -11,13 +11,13 @@ public interface IOwnerRepository {
     /*****************************************************************************
      * CREATE
      ******************************************************************************/
-    public String createOwner(Owner owner);
+    public String createOwner(Owner owner) throws ExecutionException, InterruptedException;
 
     /*****************************************************************************
      * READ
      ******************************************************************************/
-    public Owner getOwnerByEmail(String email);
-    public Owner getOwnerById(String id);
+    public Owner getOwnerByEmail(String email) throws ExecutionException, InterruptedException;
+    public Owner getOwnerById(String id) throws ExecutionException, InterruptedException;
 
     /*****************************************************************************
      * UPDATE

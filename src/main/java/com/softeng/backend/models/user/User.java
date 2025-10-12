@@ -1,6 +1,9 @@
 package com.softeng.backend.models.user;
 
+import com.softeng.backend.controllers.user.owner.OwnerController;
 import lombok.NoArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @NoArgsConstructor
 public abstract class User implements IUser {
@@ -10,6 +13,7 @@ public abstract class User implements IUser {
     protected String firstName;
     protected String lastName;
     protected String password;
+    private static final Logger logger = LoggerFactory.getLogger(User.class);
 
     public User(String id, String firstName, String lastName, String email, String password) {
         this.id = id;
@@ -43,11 +47,11 @@ public abstract class User implements IUser {
         return lastName;
     }
 
-    public boolean isNullUser() {
-        return id == null || email == null || id.isEmpty() || email.isBlank();
+    public boolean checkInvalidUser() {
+        return email == null || email.isBlank();
     }
 
-    public boolean isEmptyUser() {
+    public boolean checkEmptyUser() {
         return ( email == null || email.isBlank() ) &&
                 ( lastName == null || lastName.isBlank() )  &&
                 ( firstName == null || firstName.isBlank() ) &&

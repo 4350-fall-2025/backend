@@ -1,8 +1,8 @@
 package com.softeng.backend.services.user.owner;
 
-import com.softeng.backend.exception.user.CreateUserException;
-import com.softeng.backend.exception.user.UserNotFoundException;
 import com.softeng.backend.models.user.owner.Owner;
+
+import java.util.concurrent.ExecutionException;
 
 /*
 * General References:
@@ -14,16 +14,16 @@ public interface IOwnerService {
     /*****************************************************************************
      * CREATE
      ******************************************************************************/
-    public String createOwner(Owner owner) throws CreateUserException;
+    public String createOwner(Owner owner) throws ExecutionException, InterruptedException;
 
     /*****************************************************************************
      * READ
      ******************************************************************************/
-    public Owner getOwnerByEmail(String email)  throws UserNotFoundException;
-    public Owner getOwnerById(String id) throws UserNotFoundException;
+    public Owner getOwnerByEmail(String email)  throws ExecutionException, InterruptedException;
+    public Owner getOwnerById(String id) throws ExecutionException, InterruptedException;
 
     /*****************************************************************************
      * UPDATE
      ******************************************************************************/
-    public Owner updateOwner(String id, Owner owner);
+    public Owner updateOwner(String id, Owner owner) throws ExecutionException, InterruptedException;
 }
