@@ -27,4 +27,9 @@ public interface IOwnerService {
      * UPDATE
      ******************************************************************************/
     OwnerDTO updateOwner(String id, Owner owner) throws ExecutionException, InterruptedException;
+
+    /*****************************************************************************
+     * DELETE
+     ******************************************************************************/
+    boolean deleteOwner(String id);
 }

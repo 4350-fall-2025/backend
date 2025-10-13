@@ -19,8 +19,8 @@ import java.util.concurrent.ExecutionException;
  * <a href="https://masteringbackend.com/posts/spring-boot">...</a>
  * <a href="https://firebase.google.com/docs/firestore/manage-data/add-data">...</a>
  * <p>
- * 
- * The following code was developed with guidance from OpenAI's ChatGPT (https://chat.openai.com)
+ *
+ * The following code was developed with guidance from OpenAI's ChatGPT (<a href="https://chat.openai.com">...</a>)
  * I consulted ChatGPT when I ran into syntax bugs or was unsure how a spring boot or firestore
  * class/method worked.
  */
@@ -61,7 +61,7 @@ public class OwnerRepository implements IOwnerRepository {
             Owner owner = documents.getFirst().toObject(Owner.class);
             return new OwnerDTO(documents.getFirst().getId(), owner);
         } else {
-            logger.info("DEBUG LOG: No documents found for email " + email);
+            logger.info("DEBUG LOG: No documents found for email {}", email);
             return new OwnerDTO();
         }
     }
@@ -96,4 +96,20 @@ public class OwnerRepository implements IOwnerRepository {
         return new OwnerDTO(snapshot.getId(), owner);
     }
 
+    /*****************************************************************************
+     * DELETE
+     ******************************************************************************/
+
+    // https://firebase.google.com/docs/firestore/manage-data/delete-data
+    public boolean deleteOwner(String id) {
+        try {
+            ApiFuture<WriteResult> future = firestore.collection(collectionName).document(id).delete();
+            WriteResult result = future.get(); // waits for completion
+            logger.info("DEBUG LOG: Delete successfully at{}", result.getUpdateTime());
+            return true;
+        } catch (Exception e) {
+            logger.error("ERROR LOG: Owner deleteOwner failed for id {} with error: {}", id, e.getMessage());
+            return false;
+        }
+    }
 }
