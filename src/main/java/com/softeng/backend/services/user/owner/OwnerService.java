@@ -18,7 +18,7 @@ import java.util.concurrent.ExecutionException;
 public class OwnerService implements IOwnerService {
 
     private final OwnerRepository ownerRepository;
-    private static final Logger logger = LoggerFactory.getLogger(OwnerRepository.class);
+    private static final Logger logger = LoggerFactory.getLogger(OwnerService.class);
 
     public OwnerService(OwnerRepository ownerRepository) {
         this.ownerRepository = ownerRepository;
@@ -29,13 +29,12 @@ public class OwnerService implements IOwnerService {
      * CREATE
      ******************************************************************************/
     public OwnerDTO createOwner(Owner owner) throws ExecutionException, InterruptedException {
-        OwnerDTO dto = null;
+        OwnerDTO dto;
         if (owner == null || owner.checkInvalidUser()) {
-            logger.debug("DEBUG LOG: Owner service detected invalid user for creation: " +
-                        (owner == null ? null : owner.getEmail()));
+            logger.debug("DEBUG LOG: Owner service detected invalid user for creation: {}", owner == null ? null : owner.getEmail());
             dto = new OwnerDTO();
         } else if (getOwnerByEmail(owner.getEmail()).getId() != null) {
-            logger.debug("DEBUG LOG: Owner service detected user that already exists: " + owner.getEmail());
+            logger.debug("DEBUG LOG: Owner service detected user that already exists: {}", owner.getEmail());
             dto = new OwnerDTO();
         } else {
             dto = ownerRepository.createOwner(owner);
@@ -75,9 +74,13 @@ public class OwnerService implements IOwnerService {
         if (owner.getEmail() != null) {
             updateFields.put("email", owner.getEmail());
         }
-        if (owner.getPassword() != null) {
-            updateFields.put("password", owner.getPassword());
-        }
         return ownerRepository.updateOwner(id, updateFields);
+    }
+
+    /*****************************************************************************
+     * DELETE
+     ******************************************************************************/
+    public boolean deleteOwner(String id) {
+        return ownerRepository.deleteOwner(id);
     }
 }

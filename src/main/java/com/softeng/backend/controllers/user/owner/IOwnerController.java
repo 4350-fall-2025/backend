@@ -6,7 +6,8 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.Map;
 
 public interface IOwnerController {
 
@@ -18,12 +19,16 @@ public interface IOwnerController {
     /*****************************************************************************
      * READ
      ******************************************************************************/
-    ResponseEntity<OwnerDTO> ownerLogin(@Valid @RequestParam String email, @Valid @RequestParam String password);
-    ResponseEntity<OwnerDTO> getOwnerByEmail(@Valid @RequestParam String email);
-    ResponseEntity<OwnerDTO> getOwnerById(@Valid @RequestParam String id);
+    ResponseEntity<OwnerDTO> ownerLogin(@RequestBody Map<String, String> loginRequest);
+    ResponseEntity<OwnerDTO> getOwnerById(@PathVariable String id);
 
     /*****************************************************************************
      * UPDATE
      ******************************************************************************/
     ResponseEntity<OwnerDTO> updateOwner(@PathVariable String id, @Valid @RequestBody Owner owner);
+
+    /*****************************************************************************
+     * DELETE
+     ******************************************************************************/
+    ResponseEntity<String> deleteOwner(@PathVariable String id);
 }
