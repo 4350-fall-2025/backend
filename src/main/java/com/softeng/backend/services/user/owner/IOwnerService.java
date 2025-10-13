@@ -3,7 +3,6 @@ package com.softeng.backend.services.user.owner;
 import com.softeng.backend.dto.OwnerDTO;
 import com.softeng.backend.models.user.owner.Owner;
 
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 /*

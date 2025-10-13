@@ -36,11 +36,10 @@ public class OwnerController implements IOwnerController {
     }
 
     /*****************************************************************************
-     * CREATE
+     * SIGNUP/CREATE
      ******************************************************************************/
 
-    //implement but not used, use signup endpoint instead
-    @PostMapping("/create")
+    @PostMapping("/signup")
     public ResponseEntity<OwnerDTO> createOwner(@Valid @RequestBody Owner owner) {
         ResponseEntity<OwnerDTO> response;
         try {
@@ -79,37 +78,6 @@ public class OwnerController implements IOwnerController {
     /*****************************************************************************
      * UPDATE
      ******************************************************************************/
-
-    // Login
-    @PostMapping("/auth/login")
-    public ResponseEntity<OwnerDTO> ownerLogin(@RequestBody Map<String, String> loginRequest) {
-        String email = loginRequest.get("email");
-        String password = loginRequest.get("password");
-        ResponseEntity<OwnerDTO> response;
-        OwnerDTO dto;
-
-        try {
-            dto = ownerService.getOwnerByEmail(email);
-        } catch (ExecutionException | InterruptedException e) {
-            logger.debug("DEBUG LOG: Owner /aut/login failed: {}", Arrays.toString(e.getStackTrace()));
-            return ResponseEntity.internalServerError().build();
-        }
-
-        if (dto == null || dto.getId() == null) {
-
-            logger.debug("DEBUG LOG: Owner auth/login endpoint not found for email: {}", email);
-            response = ResponseEntity.notFound().build();
-
-        } else {
-            // TODO: improve security when auth set up
-            if (!dto.getOwner().getPassword().equals(password)) {
-                response = ResponseEntity.badRequest().build();
-            } else {
-                response = ResponseEntity.ok(dto);
-            }
-        }
-        return response;
-    }
 
     @PutMapping("/{id}")
     public ResponseEntity<OwnerDTO> updateOwner(@PathVariable String id, @Valid @RequestBody Owner owner) {

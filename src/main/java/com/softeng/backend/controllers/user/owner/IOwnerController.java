@@ -19,7 +19,6 @@ public interface IOwnerController {
     /*****************************************************************************
      * READ
      ******************************************************************************/
-    ResponseEntity<OwnerDTO> ownerLogin(@RequestBody Map<String, String> loginRequest);
     ResponseEntity<OwnerDTO> getOwnerById(@PathVariable String id);
 
     /*****************************************************************************
