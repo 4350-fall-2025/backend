@@ -49,7 +49,7 @@ public class AuthController {
                 if (!dto.getOwner().getPassword().equals(password)) {
                     response = ResponseEntity.status(400).body(Map.of("error", "Incorrect Credential", "detail", "Password is incorrect"));
                 } else {
-                    response = ResponseEntity.status(200).body(Map.of("user", dto, "token", "dummy-jwt-token"));
+                    response = ResponseEntity.status(200).body(dto.toMap());
                 }
             }
         } catch (Exception e) {

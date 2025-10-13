@@ -14,20 +14,20 @@ public interface IOwnerController {
     /*****************************************************************************
      * CREATE
      ******************************************************************************/
-    ResponseEntity<OwnerDTO> createOwner(@Valid @RequestBody Owner owner);
+    ResponseEntity<Map<String, Object>> createOwner(@Valid @RequestBody Owner owner);
 
     /*****************************************************************************
      * READ
      ******************************************************************************/
-    ResponseEntity<OwnerDTO> getOwnerById(@PathVariable String id);
+    ResponseEntity<Map<String, Object>> getOwnerById(@PathVariable String id);
 
     /*****************************************************************************
      * UPDATE
      ******************************************************************************/
-    ResponseEntity<OwnerDTO> updateOwner(@PathVariable String id, @Valid @RequestBody Owner owner);
+    ResponseEntity<Map<String, Object>> updateOwner(@PathVariable String id, @Valid @RequestBody Owner owner);
 
     /*****************************************************************************
      * DELETE
      ******************************************************************************/
-    ResponseEntity<String> deleteOwner(@PathVariable String id);
+    ResponseEntity<Map<String, Object>> deleteOwner(@PathVariable String id);
 }
