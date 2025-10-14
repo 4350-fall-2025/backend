@@ -16,13 +16,12 @@ import java.util.concurrent.ExecutionException;
 @Repository
 public class PetRepository implements IPetRepository {
 
-    @Autowired
-    private Firestore firestore;
-    @Autowired
-    private OwnerRepository ownerRepository;
+    private final Firestore firestore;
+    private final OwnerRepository ownerRepository;
 
     private final String PET_COLLECTION = "pets";
 
+    @Autowired
     public PetRepository(Firestore firestore, OwnerRepository ownerRepository) {
         this.firestore = firestore;
         this.ownerRepository  = ownerRepository;
@@ -35,18 +34,23 @@ public class PetRepository implements IPetRepository {
     @Override
     public Pet createPet(String ownerId, Pet pet) throws ExecutionException, InterruptedException {
         OwnerDTO owner = ownerRepository.getOwnerById(ownerId);
-        if(owner != null) {
+        if (owner != null) {
 
             // The following code was copied/developed with guidance from OpenAI's ChatGPT (https://chat.openai.com)
             ApiFuture<DocumentReference> addedDocRef = firestore.collection(PET_COLLECTION).add(pet);
             DocumentReference reference = addedDocRef.get();
-//            DocumentSnapshot snapshot= reference.get().get();
+            DocumentSnapshot snapshot= reference.get().get();
 
-//            if (snapshot.exists()) {
-//                pet = snapshot.toObject(Pet.class);
-//                pet.setOwnerId(ownerId);
-//                owner.getOwner().createPet(pet);
-//            }
+            if (snapshot.exists()) {
+                pet = snapshot.toObject(Pet.class);
+                if (pet != null) {
+                    // Ensure the pet has the correct ID and ownerId
+                    pet.setId(reference.getId());
+                    pet.setOwnerId(ownerId);
+                    owner.getOwner().addPet(new PetLite(reference.getId(), pet.getName(), pet.getBreed()));
+                    // todo: add PetLite to owner document in firestore
+                }
+            }
         }
         return pet;
     }

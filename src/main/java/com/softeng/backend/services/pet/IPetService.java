@@ -9,11 +9,11 @@ import java.util.List;
 public interface IPetService {
     PetDTO createPet(String ownerId, Pet pet);
 
-    PetDTO getPetById(String petId);
+    Pet getPetById(String petId);
 
     List<PetLiteDTO> getPetsByOwnerId(String ownerId);
 
-    PetDTO updatePet(String petId, Pet pet);
+    Pet updatePet(String petId, Pet pet);
 
-    PetDTO deletePet(String petId);
+    Pet deletePet(String petId);
 }

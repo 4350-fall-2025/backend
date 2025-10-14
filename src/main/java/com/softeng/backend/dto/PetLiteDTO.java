@@ -20,8 +20,7 @@ public class PetLiteDTO {
         return Map.of(
                 "id", id,
                 "name", petLite.getName(),
-                "ownerId", petLite.getOwnerId(),
-                "species", petLite.getSpecies()
+                "breed", petLite.getBreed()
         );
     }
 

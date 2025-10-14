@@ -29,18 +29,18 @@ public class PetService implements IPetService {
     // =========================
     @Override
     public PetDTO createPet(String ownerId, Pet pet) {
-        PetDTO dto = new PetDTO();
+        Pet result = new Pet();
 
         try {
+            // TODO validate pet and ownerId
             if (pet == null) {
                 logger.debug("PetService.createPet: pet reference is null");
             } else {
-                Pet result = petRepository.createPet(ownerId, pet);
+                result = petRepository.createPet(ownerId, pet);
                 logger.info("PetService.createPet: created pet with id {}", result.getId());
-                dto = new PetDTO(result.getId(), result);
             }
 
-            return dto;
+            return new PetDTO(result.getId(), result);
         } catch (ExecutionException | InterruptedException e) {
             throw new RuntimeException(e);
         }
@@ -50,7 +50,7 @@ public class PetService implements IPetService {
     // READ
     // =========================
     @Override
-    public PetDTO getPetById(String petId) {
+    public Pet getPetById(String petId) {
 //        try {
 //            return repository.getPetById(petId);
 //        } catch (ExecutionException | InterruptedException e) {
@@ -74,7 +74,7 @@ public class PetService implements IPetService {
     // UPDATE
     // =========================
     @Override
-    public PetDTO updatePet(String petId, Pet pet) {
+    public Pet updatePet(String petId, Pet pet) {
 //        try {
 //            return repository.updatePet(petId, pet);
 //        } catch (ExecutionException | InterruptedException e) {
@@ -87,7 +87,7 @@ public class PetService implements IPetService {
     // DELETE
     // =========================
     @Override
-    public PetDTO deletePet(String petId) {
+    public Pet deletePet(String petId) {
 //        try {
 //            return repository.deletePet(petId);
 //        } catch (ExecutionException | InterruptedException e) {

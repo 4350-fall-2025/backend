@@ -20,12 +20,10 @@ public class PetController {
 
     // CREATE:
     // The following code was copied from OpenAI's ChatGPT (https://chat.openai.com)
-    @PostMapping("/{id}/pets")
-    public ResponseEntity<PetDTO> createPet(@PathVariable String id, @RequestBody PetDTO petDTO) {
-        Pet pet = petDTO.getPet();
-        PetDTO result = petService.createPet(id, pet);
-
-        if (result.getId() != null) {
+    @PostMapping("/{ownerId}/pets")
+    public ResponseEntity<PetDTO> createPet(@PathVariable String ownerId, @RequestBody Pet pet) {
+        PetDTO result = petService.createPet(ownerId, pet);
+        if (result.getPet().getId() != null) {
             return ResponseEntity.ok(result);
         }
 

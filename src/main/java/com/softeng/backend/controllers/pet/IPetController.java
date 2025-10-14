@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 public interface IPetController {
 
     // CREATE
-    ResponseEntity<Pet> createPet(@PathVariable String id, @RequestBody Pet pet);
+    ResponseEntity<Pet> createPet(@PathVariable String ownerId, @RequestBody Pet pet);
 
     // READ
 

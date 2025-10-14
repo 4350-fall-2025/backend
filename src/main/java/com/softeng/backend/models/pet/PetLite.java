@@ -13,6 +13,5 @@ public class PetLite implements IPet {
     @Id
     private String id;
     private String name;
-    private String species;
-    private String ownerId;
+    private String breed;
 }
