@@ -57,7 +57,7 @@ public class OwnerController implements IOwnerController {
             response = ResponseEntity.status(201).location(URI.create("/api/v1/owners/" + dto.getId())).body(dto.toMap());
         } catch (ExecutionException | InterruptedException e) {
             logger.debug("DEBUG LOG: Owner /create endpoint not found for owner: {}/n stack trace: {}", owner.getEmail(), Arrays.toString(e.getStackTrace()));
-            response = ResponseEntity.badRequest().build();
+            response = ResponseEntity.internalServerError().build();
         }
         return response;
     }

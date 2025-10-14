@@ -55,7 +55,7 @@ public class VetController implements IVetController {
             response = ResponseEntity.status(201).location(URI.create("/api/v1/vets/" + dto.getId())).body(dto.toMap());
         } catch (ExecutionException | InterruptedException e) {
             logger.debug("DEBUG LOG: Vet /create endpoint not found for vet: {}/n stack trace: {}", vet.getEmail(), Arrays.toString(e.getStackTrace()));
-            response = ResponseEntity.badRequest().build();
+            response = ResponseEntity.internalServerError().build();
         }
         return response;
     }

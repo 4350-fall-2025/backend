@@ -23,4 +23,9 @@ public interface IOwnerRepository {
      * UPDATE
      ******************************************************************************/
     OwnerDTO updateOwner(String id, Map<String, Object> updateFields) throws ExecutionException, InterruptedException;
+
+    /*****************************************************************************
+     * DELETE
+     ******************************************************************************/
+    public boolean deleteOwner(String id);
 }

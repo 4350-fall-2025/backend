@@ -24,4 +24,9 @@ public interface IVetRepository {
      * UPDATE
      ******************************************************************************/
     VetDTO updateVet(String id, Map<String, Object> updateFields) throws ExecutionException, InterruptedException;
+
+    /*****************************************************************************
+     * DELETE
+     ******************************************************************************/
+    public boolean deleteVet(String id);
 }
