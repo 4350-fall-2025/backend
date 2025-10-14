@@ -3,7 +3,6 @@ package com.softeng.backend.services.pet;
 import com.softeng.backend.dto.PetDTO;
 import com.softeng.backend.dto.PetLiteDTO;
 import com.softeng.backend.models.pet.Pet;
-import com.softeng.backend.repository.pet.IPetRepository;
 import com.softeng.backend.repository.pet.PetRepository;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,22 +50,13 @@ public class PetService implements IPetService {
     // =========================
     @Override
     public Pet getPetById(String petId) {
-//        try {
-//            return repository.getPetById(petId);
-//        } catch (ExecutionException | InterruptedException e) {
-//            throw new RuntimeException(e);
-//        }
+        //TODO
         return null;
     }
 
     @Override
     public List<PetLiteDTO> getPetsByOwnerId(String ownerId) {
-//        try {
-//            return repository.getPetsByOwnerId(ownerId);
-//        } catch (ExecutionException | InterruptedException e) {
-//            throw new RuntimeException(e);
-//        }
-
+        //TODO
         return null;
     }
 
@@ -75,11 +65,7 @@ public class PetService implements IPetService {
     // =========================
     @Override
     public Pet updatePet(String petId, Pet pet) {
-//        try {
-//            return repository.updatePet(petId, pet);
-//        } catch (ExecutionException | InterruptedException e) {
-//            throw new RuntimeException(e);
-//        }
+        //TODO
         return null;
     }
 
@@ -88,12 +74,7 @@ public class PetService implements IPetService {
     // =========================
     @Override
     public Pet deletePet(String petId) {
-//        try {
-//            return repository.deletePet(petId);
-//        } catch (ExecutionException | InterruptedException e) {
-//            throw new RuntimeException(e);
-//        }
-
+        //TODO
         return null;
     }
 }
