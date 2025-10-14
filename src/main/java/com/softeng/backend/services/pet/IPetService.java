@@ -1,14 +1,19 @@
 package com.softeng.backend.services.pet;
 
+import com.softeng.backend.dto.PetDTO;
+import com.softeng.backend.dto.PetLiteDTO;
 import com.softeng.backend.models.pet.Pet;
 
+import java.util.List;
+
 public interface IPetService {
+    PetDTO createPet(String ownerId, Pet pet);
 
-    /* TODO:
-    // Update:
-    public Pet updatePet(String ownerId, Pet pet);
+    PetDTO getPetById(String petId);
 
-    // Delete:
-    public Pet removePet(String ownerId, Pet pet);
-    */
+    List<PetLiteDTO> getPetsByOwnerId(String ownerId);
+
+    PetDTO updatePet(String petId, Pet pet);
+
+    PetDTO deletePet(String petId);
 }

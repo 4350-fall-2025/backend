@@ -3,6 +3,7 @@ package com.softeng.backend.models.user.owner;
 import com.google.cloud.spring.data.firestore.Document;
 import com.softeng.backend.models.pet.Pet;
 import com.softeng.backend.models.user.User;
+import com.softeng.backend.services.pet.IPetService;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
