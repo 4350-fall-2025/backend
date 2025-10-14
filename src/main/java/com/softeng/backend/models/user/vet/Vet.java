@@ -2,15 +2,17 @@ package com.softeng.backend.models.user.vet;
 
 import com.google.cloud.spring.data.firestore.Document;
 import com.softeng.backend.models.user.User;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-// TODO: needs to be implemented
-@Data
+@Getter
 @NoArgsConstructor
 @Document(collectionName = "vets")
-public class Vet extends User {
-    public Vet(String firstName, String lastName, String email, String password) {
+public class Vet extends User implements IVet {
+    private String certification;
+
+    public Vet(String firstName, String lastName, String email, String password, String certification) {
         super(firstName, lastName, email, password);
+        this.certification = certification;
     }
 }

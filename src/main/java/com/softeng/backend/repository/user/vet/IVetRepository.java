@@ -1,31 +1,32 @@
-package com.softeng.backend.repository.user.owner;
+package com.softeng.backend.repository.user.vet;
 
 import com.softeng.backend.dto.OwnerDTO;
-import com.softeng.backend.models.user.owner.Owner;
+import com.softeng.backend.dto.VetDTO;
+import com.softeng.backend.models.user.vet.Vet;
 
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
-public interface IOwnerRepository {
+public interface IVetRepository {
 
     /*****************************************************************************
      * CREATE
      ******************************************************************************/
-    OwnerDTO createOwner(Owner owner) throws ExecutionException, InterruptedException;
+    VetDTO createVet(Vet vet) throws ExecutionException, InterruptedException;
 
     /*****************************************************************************
      * READ
      ******************************************************************************/
-    OwnerDTO getOwnerByEmail(String email) throws ExecutionException, InterruptedException;
-    OwnerDTO getOwnerById(String id) throws ExecutionException, InterruptedException;
+    VetDTO getVetByEmail(String email) throws ExecutionException, InterruptedException;
+    VetDTO getVetById(String id) throws ExecutionException, InterruptedException;
 
     /*****************************************************************************
      * UPDATE
      ******************************************************************************/
-    OwnerDTO updateOwner(String id, Map<String, Object> updateFields) throws ExecutionException, InterruptedException;
+    VetDTO updateVet(String id, Map<String, Object> updateFields) throws ExecutionException, InterruptedException;
 
     /*****************************************************************************
      * DELETE
      ******************************************************************************/
-    public boolean deleteOwner(String id);
+    public boolean deleteVet(String id);
 }
