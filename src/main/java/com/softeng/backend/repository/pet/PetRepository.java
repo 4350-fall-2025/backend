@@ -48,7 +48,6 @@ public class PetRepository implements IPetRepository {
                     pet.setId(reference.getId());
                     pet.setOwnerId(ownerId);
                     owner.getOwner().addPet(new PetLite(reference.getId(), pet.getName(), pet.getBreed()));
-                    // todo: add PetLite to owner document in firestore
                 }
             }
         }
