@@ -27,7 +27,7 @@ public class AuthController {
     private final VetService vetService;
 
     @Autowired
-    public AuthController(OwnerService ownerService, VetService vetService, VetService VetService) {
+    public AuthController(OwnerService ownerService, VetService vetService) {
         this.ownerService = ownerService;
         this.vetService = vetService;
     }
