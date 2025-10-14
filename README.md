@@ -39,7 +39,7 @@ Annotation Processors -> Enable annotation processing*
     backend/src/main/resources
 ```
 
-10) In IntelliJ, Click the "Run->Edit Configurations" and in the Run/Debug Configurations, under "Environment Variables" enter the following environment variable:
+10) (See *Note below if you do not see an enviornment variables option). In IntelliJ, Click the "Run->Edit Configurations" and in the Run/Debug Configurations, under "Environment Variables" enter the following environment variables:
 
 GOOGLE_APPLICATION_CREDENTIALS=*enter your ABSOLUTE path to the firebase-admin.json file here*
 
@@ -53,6 +53,11 @@ GOOGLE_APPLICATION_CREDENTIALS=/Users/you/docs/project/backend/src/etc/firebase-
 Then click "Apply", then "Ok".
 
 https://github.com/user-attachments/assets/b3f54cc6-95ac-450b-8c32-04437eeebb50
+
+Note*: If you do not see a section in edit configurations as outlined above, you just need to click "Modify Options->Enviornment Variables" as seen below:
+
+https://github.com/user-attachments/assets/893d32ed-f8fe-478d-a5e7-d923d1dcd9b7
+
 
 11) Run the application by executing BackendApplication.java by clicking the "Run Appplication" button in IntelliJ:
     <img width="482" height="77" alt="build-run" src="https://github.com/user-attachments/assets/dbaad99a-ee1b-4703-aac5-a25df9590b5d" />
