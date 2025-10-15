@@ -48,7 +48,7 @@ public class VetController implements IVetController {
                 Map<String, String> detail = Map.of("email", "Email already exists");
                 return ResponseEntity.status(409).body(Map.of("error", "Conflict fields", "detail", detail));
             }
-            response = ResponseEntity.status(201).location(URI.create("/api/v1/vets/" + dto.getId())).body(dto.toMap());
+            response = ResponseEntity.created(URI.create("/api/v1/vets/" + dto.getId())).body(dto.toMap());
         } catch (ExecutionException | InterruptedException e) {
             logger.debug("DEBUG LOG: Vet /create endpoint not found for vet: {}/n stack trace: {}", vet.getEmail(), Arrays.toString(e.getStackTrace()));
             response = ResponseEntity.internalServerError().build();
