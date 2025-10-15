@@ -55,18 +55,21 @@ public class PetRepository implements IPetRepository {
         PetDTO result = new PetDTO();
 
         if (owner != null && pet.isValid()) {
+            pet.setOwnerId(ownerId);
             // The following code was copied/developed with guidance from OpenAI's ChatGPT (https://chat.openai.com)
             ApiFuture<DocumentReference> addedDocRef = firestore.collection(PET_COLLECTION)
                                                                 .add(pet);
             DocumentReference reference = addedDocRef.get();
-            DocumentSnapshot snapshot = reference.get().get();
+            String generatedId = reference.getId();
+            pet.setId(generatedId);
+            ApiFuture<WriteResult> writeResult = reference.set(pet);
+            writeResult.get();
 
+            DocumentSnapshot snapshot = reference.get().get();
             if (snapshot.exists()) {
                 pet = snapshot.toObject(Pet.class);
                 if (pet != null && pet.isValid()) {
                     //TODO: The pet owner should also add a pet subdocument to their internal list of pets
-                    pet.setId(reference.getId());
-                    pet.setOwnerId(ownerId);
                     result = new PetDTO(pet.getId(), pet);
                 }
             }
@@ -157,6 +160,8 @@ public class PetRepository implements IPetRepository {
             if (!documents.isEmpty()) {
                 DocumentReference docRef = documents.getFirst().getReference();
                 // Set the new pet data
+                pet.setId(petId);
+                pet.setOwnerId(ownerId);
                 ApiFuture<WriteResult> writeResult = docRef.set(pet);
                 writeResult.get();
 

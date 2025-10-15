@@ -79,11 +79,11 @@ public class OwnerService implements IOwnerService {
     }
 
     public OwnerDTO updatePet(String ownerId, Pet pet) {
-        return null;
+        return new OwnerDTO(ownerId, null);
     }
 
     public OwnerDTO removePet(String ownerId, String petId) {
-        return null;
+        return new OwnerDTO(ownerId, null);
     }
 
     /*****************************************************************************

@@ -105,6 +105,7 @@ public class PetController implements IPetController {
 
         try {
             updated = ownerService.updatePet(ownerId, pet);
+            petService.updatePet(ownerId, petId, pet);
         } catch (ExecutionException | InterruptedException e) {
             log.error("ERROR LOG: Endpoint failed: {}", Arrays.toString(e.getStackTrace()));
             return ResponseEntity.internalServerError().build();
