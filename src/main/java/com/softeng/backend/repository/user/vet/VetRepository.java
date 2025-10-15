@@ -40,7 +40,6 @@ public class VetRepository implements IVetRepository {
      ******************************************************************************/
     // https://firebase.google.com/docs/firestore/query-data/get-data
     public VetDTO getVetByEmail(String email) throws ExecutionException, InterruptedException {
-
         ApiFuture<QuerySnapshot> future = firestore.collection(collectionName).whereEqualTo("email", email).get();
         List<QueryDocumentSnapshot> documents = future.get().getDocuments();
         if (!documents.isEmpty()) {

@@ -34,15 +34,10 @@ public class OwnerController implements IOwnerController {
     public OwnerController(OwnerService ownerService) {
         this.ownerService = ownerService;
     }
-    
-    private static boolean isInvalidDTO(OwnerDTO dto) {
-        return dto == null || dto.getId() == null || dto.getId().isBlank();
-    }
 
     /*****************************************************************************
      * SIGNUP/CREATE
      ******************************************************************************/
-
     @PostMapping("/signup")
     public ResponseEntity<Map<String, Object>> createOwner(@Valid @RequestBody Owner owner) {
         ResponseEntity<Map<String, Object>> response;
@@ -54,7 +49,7 @@ public class OwnerController implements IOwnerController {
         }
         try {
             OwnerDTO dto = ownerService.createOwner(owner);
-            if (isInvalidDTO(dto)) {
+            if (dto == null || dto.isEmpty()) {
                 logger.debug("DEBUG LOG: Owner with email: {} already exists", owner.getEmail());
                 Map<String, String> detail = Map.of("email", "Email already exists");
                 return ResponseEntity.status(409).body(Map.of("error", "Conflict fields", "detail", detail));
@@ -70,11 +65,9 @@ public class OwnerController implements IOwnerController {
     /*****************************************************************************
      * READ
      ******************************************************************************/
-
     //get owner by id
     @GetMapping("/{id}")
     public ResponseEntity<Map<String, Object>> getOwnerById(@PathVariable String id) {
-        ResponseEntity<Map<String, Object>> response;
         OwnerDTO dto;
         try {
             dto = ownerService.getOwnerById(id);
@@ -83,7 +76,7 @@ public class OwnerController implements IOwnerController {
             return ResponseEntity.internalServerError().build();
         }
 
-        if (isInvalidDTO(dto)) {
+        if (dto == null || dto.isEmpty()) {
             logger.debug("DEBUG LOG: Owner /id endpoint hit with id: {} not found", id);
             return ResponseEntity.notFound().build();
         }
@@ -94,7 +87,6 @@ public class OwnerController implements IOwnerController {
     /*****************************************************************************
      * UPDATE
      ******************************************************************************/
-
     @PutMapping("/{id}")
     public ResponseEntity<Map<String, Object>> updateOwner(@PathVariable String id, @Valid @RequestBody Owner owner) {
 
@@ -111,7 +103,7 @@ public class OwnerController implements IOwnerController {
             return ResponseEntity.internalServerError().build();
         }
 
-        if (isInvalidDTO(dto)) {
+        if (dto == null || dto.isEmpty()) {
             logger.debug("DEBUG LOG: Owner update /id endpoint not found for id: {}", id);
             return ResponseEntity.notFound().build();
         }
@@ -129,7 +121,7 @@ public class OwnerController implements IOwnerController {
         } catch (ExecutionException | InterruptedException e) {
             return ResponseEntity.internalServerError().build();
         }
-        if (isInvalidDTO(dto)) {
+        if (dto == null || dto.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
 

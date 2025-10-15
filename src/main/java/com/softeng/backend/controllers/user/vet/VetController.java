@@ -30,10 +30,6 @@ public class VetController implements IVetController {
         this.vetService = vetService;
     }
 
-    private static boolean isInvalidDTO(VetDTO dto) {
-        return dto == null || dto.getId() == null || dto.getId().isBlank();
-    }
-
     /*****************************************************************************
      * SIGNUP/CREATE
      ******************************************************************************/
@@ -47,7 +43,7 @@ public class VetController implements IVetController {
         }
         try {
             VetDTO dto = vetService.createVet(vet);
-            if (isInvalidDTO(dto)) {
+            if (dto == null || dto.isEmpty()) {
                 logger.debug("DEBUG LOG: Vet with email: {} already exists", vet.getEmail());
                 Map<String, String> detail = Map.of("email", "Email already exists");
                 return ResponseEntity.status(409).body(Map.of("error", "Conflict fields", "detail", detail));
@@ -74,7 +70,7 @@ public class VetController implements IVetController {
             return ResponseEntity.internalServerError().build();
         }
 
-        if (isInvalidDTO(dto)) {
+        if (dto == null || dto.isEmpty()) {
             logger.debug("DEBUG LOG: Vet /id endpoint hit with id: {} not found", id);
             return ResponseEntity.notFound().build();
         }
@@ -101,7 +97,7 @@ public class VetController implements IVetController {
             return ResponseEntity.internalServerError().build();
         }
 
-        if (isInvalidDTO(dto)) {
+        if (dto == null || dto.isEmpty()) {
             logger.debug("DEBUG LOG: Vet update /id endpoint not found for id: {}", id);
             return ResponseEntity.notFound().build();
         }
@@ -119,7 +115,7 @@ public class VetController implements IVetController {
         } catch (ExecutionException | InterruptedException e) {
             return ResponseEntity.internalServerError().build();
         }
-        if (isInvalidDTO(dto)) {
+        if (dto == null || dto.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
 
