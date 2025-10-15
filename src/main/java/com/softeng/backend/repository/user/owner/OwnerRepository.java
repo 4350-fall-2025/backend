@@ -43,21 +43,17 @@ public class OwnerRepository implements IOwnerRepository {
     /*****************************************************************************
      * CREATE
      ******************************************************************************/
-
     // reference: https://firebase.google.com/docs/firestore/manage-data/add-data#add_a_document
     public OwnerDTO createOwner(Owner owner) throws ExecutionException, InterruptedException {
         ApiFuture<DocumentReference> addedDocRef = firestore.collection(collectionName).add(owner);
         return new OwnerDTO(addedDocRef.get().getId(), owner);
     }
 
-
     /*****************************************************************************
      * READ
      ******************************************************************************/
-
     // https://firebase.google.com/docs/firestore/query-data/get-data
     public OwnerDTO getOwnerByEmail(String email) throws ExecutionException, InterruptedException {
-
         ApiFuture<QuerySnapshot> future = firestore.collection(collectionName).whereEqualTo("email", email).get();
         List<QueryDocumentSnapshot> documents = future.get().getDocuments();
         if (!documents.isEmpty()) {
@@ -85,10 +81,8 @@ public class OwnerRepository implements IOwnerRepository {
     /*****************************************************************************
      * UPDATE
      ******************************************************************************/
-
     // https://firebase.google.com/docs/firestore/manage-data/add-data#update-data
     public OwnerDTO updateOwner(String id, Map<String, Object> updateFields) throws ExecutionException, InterruptedException {
-
         DocumentReference docRef = firestore.collection(collectionName).document(id);
         docRef.update(updateFields).get();
 
@@ -208,7 +202,6 @@ public class OwnerRepository implements IOwnerRepository {
     /*****************************************************************************
      * DELETE
      ******************************************************************************/
-
     // https://firebase.google.com/docs/firestore/manage-data/delete-data
     public boolean deleteOwner(String id) {
         try {

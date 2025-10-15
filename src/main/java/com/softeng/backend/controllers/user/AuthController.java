@@ -21,7 +21,7 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("/api/v1/auth")
-public class AuthController {
+public class AuthController implements IAuthController {
     private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
     private final OwnerService ownerService;
     private final VetService vetService;
@@ -33,8 +33,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    ResponseEntity<Map<String, Object>> Login(@RequestBody Map<String, String> loginRequest) {
-        ResponseEntity<Map<String, Object>> response;
+    public ResponseEntity<Map<String, Object>> Login(@RequestBody Map<String, String> loginRequest) {
         String email = loginRequest.get("email");
         String password = loginRequest.get("password");
         try {
@@ -42,27 +41,27 @@ public class AuthController {
             ownerDTO = ownerService.getOwnerByEmail(email);
             VetDTO vetDTO;
             vetDTO = vetService.getVetByEmail(email);
-            if ((ownerDTO == null || ownerDTO.getId() == null) && (vetDTO == null || vetDTO.getId() == null)) {
-                logger.debug("DEBUG LOG: auth/login endpoint not found for email: {}", email);
-                response = ResponseEntity.status(400).body(Map.of("error", "Incorrect Credential", "detail", "Email does not exist"));
-            } else {
-                // TODO: improve security when auth set up
-                if (vetDTO.getVet() != null && vetDTO.getId() != null) {
-                    if (!vetDTO.getVet().getPassword().equals(password)) {
-                        response = ResponseEntity.status(400).body(Map.of("error", "Incorrect Credential", "detail", "Password is incorrect"));
-                    } else {
-                        response = ResponseEntity.status(200).body(vetDTO.toMap());
-                    }
-                } else if (!ownerDTO.getOwner().getPassword().equals(password)) {
-                    response = ResponseEntity.status(400).body(Map.of("error", "Incorrect Credential", "detail", "Password is incorrect"));
+
+            // TODO: improve security when auth set up
+            if (vetDTO != null && !vetDTO.isEmpty()) {
+                if (!vetDTO.getVet().getPassword().equals(password)) {
+                    return ResponseEntity.badRequest().body(Map.of("error", "Incorrect Credential", "detail", "Password is incorrect"));
                 } else {
-                    response = ResponseEntity.status(200).body(ownerDTO.toMap());
+                    return ResponseEntity.ok().body(vetDTO.toMap());
                 }
             }
+            if (ownerDTO != null && !ownerDTO.isEmpty()) {
+                if (!ownerDTO.getOwner().getPassword().equals(password)) {
+                    return ResponseEntity.badRequest().body(Map.of("error", "Incorrect Credential", "detail", "Password is incorrect"));
+                } else {
+                    return ResponseEntity.ok().body(ownerDTO.toMap());
+                }
+            }
+            logger.debug("DEBUG LOG: auth/login endpoint not found for email: {}", email);
+            return ResponseEntity.badRequest().body(Map.of("error", "Incorrect Credential", "detail", "Email does not exist"));
         } catch (Exception e) {
             logger.debug("DEBUG LOG: Auth /login endpoint error for email: {}/n stack trace: {}", email, Arrays.toString(e.getStackTrace()));
-            response = ResponseEntity.status(500).body(Map.of("error", "Internal server error"));
+            return ResponseEntity.internalServerError().body(Map.of("error", "Internal server error"));
         }
-        return response;
     }
 }

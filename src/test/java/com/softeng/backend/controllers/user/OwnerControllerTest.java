@@ -1,7 +1,6 @@
 package com.softeng.backend.controllers.user;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.cloud.firestore.Firestore;
 import com.softeng.backend.controllers.user.owner.OwnerController;
 import com.softeng.backend.dto.OwnerDTO;
 import com.softeng.backend.models.user.owner.Owner;
@@ -26,7 +25,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 /**
  * UserControllerTest
  * Test cases written by Victoria Iskandar.
- *
  * Reference: OpenAI ChatGPT GPT-5Mini (<a href="https://chat.openai.com">...</a>)
  * Some JSON formatting and MockMvc syntax guidance was copied from ChatGPT, which
  * are referenced in line.
@@ -50,7 +48,7 @@ public class OwnerControllerTest {
     private static final String mockDocId = "mockDocId";
 
     //TODO: remove when we set up auth
-    private static String mockPass = "MockTokenForNow";
+    private static final String mockToken = "MockTokenForNow";
 
     @Test
     void testCreateOwnerCreated() throws Exception {
@@ -65,7 +63,7 @@ public class OwnerControllerTest {
                 .andExpect(jsonPath("$.firstName").value("Victoria"))
                 .andExpect(jsonPath("$.lastName").value("MadeThisTest1"))
                 .andExpect(jsonPath("$.email").value("123@gmail.com"))
-                .andExpect(jsonPath("$.token").value(mockPass));
+                .andExpect(jsonPath("$.token").value(mockToken));
     }
 
     @Test
@@ -147,7 +145,7 @@ public class OwnerControllerTest {
                 .andExpect(jsonPath("$.firstName").value("Victoria"))
                 .andExpect(jsonPath("$.lastName").value("MadeThisTest1"))
                 .andExpect(jsonPath("$.email").value("123@gmail.com"))
-                .andExpect(jsonPath("$.token").value(mockPass));
+                .andExpect(jsonPath("$.token").value(mockToken));
     }
 
     @Test
@@ -178,8 +176,6 @@ public class OwnerControllerTest {
 
     @Test
     void testGetOwnerByIdServerError() throws Exception {
-        Owner owner = new Owner("Victoria", "MadeThisTest1", "email@email.com", "VerySecure123");
-
         // this when/thenThrow statement was copied from ChatGPT:
         when(ownerService.getOwnerById(mockDocId))
                 .thenThrow(new InterruptedException("Operation was interrupted"));
@@ -189,7 +185,7 @@ public class OwnerControllerTest {
 
         // this when/thenThrow statement was copied from ChatGPT:
         when(ownerService.getOwnerById(any(String.class)))
-                .thenAnswer(invocation -> {
+                .thenAnswer(_ -> {
                     throw new ExecutionException(new RuntimeException("Firestore failure"));
                 });
 
@@ -211,7 +207,7 @@ public class OwnerControllerTest {
                 .andExpect(jsonPath("$.firstName").value("NewName"))
                 .andExpect(jsonPath("$.lastName").value(""))
                 .andExpect(jsonPath("$.email").value(""))
-                .andExpect(jsonPath("$.token").value(mockPass));
+                .andExpect(jsonPath("$.token").value(mockToken));
     }
 
     @Test
@@ -261,7 +257,7 @@ public class OwnerControllerTest {
 
         // this when/thenThrow statement was copied from ChatGPT:
         when(ownerService.updateOwner(any(String.class), any(Owner.class)))
-                .thenAnswer(invocation -> {
+                .thenAnswer(_ -> {
                     throw new ExecutionException(new RuntimeException("Firestore failure"));
                 });
 
@@ -287,7 +283,6 @@ public class OwnerControllerTest {
 
     @Test
     void testDeleteOwnerNotFound() throws Exception {
-
         // null ID
         Owner owner = new Owner("NewName", "NewName", "new@name.com", "VerySecure123");
         when(ownerService.getOwnerById(any(String.class)))
@@ -319,8 +314,6 @@ public class OwnerControllerTest {
 
     @Test
     void testDeleteOwnerServerError() throws Exception {
-        Owner owner = new Owner("Victoria", "MadeThisTest1", "email@email.com", "VerySecure123");
-
         // this when/thenThrow statement was copied from ChatGPT:
         when(ownerService.getOwnerById(mockDocId))
                 .thenThrow(new InterruptedException("Operation was interrupted"));
@@ -330,7 +323,7 @@ public class OwnerControllerTest {
 
         // this when/thenThrow statement was copied from ChatGPT:
         when(ownerService.getOwnerById(any(String.class)))
-                .thenAnswer(invocation -> {
+                .thenAnswer(_ -> {
                     throw new ExecutionException(new RuntimeException("Firestore failure"));
                 });
 

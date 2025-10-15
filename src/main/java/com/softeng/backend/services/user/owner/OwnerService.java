@@ -26,7 +26,6 @@ public class OwnerService implements IOwnerService {
         this.ownerRepository = ownerRepository;
     }
 
-
     /*****************************************************************************
      * CREATE
      ******************************************************************************/
@@ -61,7 +60,6 @@ public class OwnerService implements IOwnerService {
     /*****************************************************************************
      * UPDATE
      ******************************************************************************/
-
     // https://firebase.google.com/docs/firestore/manage-data/add-data#update-data
     public OwnerDTO updateOwner(String id, Owner owner) throws ExecutionException, InterruptedException {
 

@@ -100,7 +100,9 @@ public class OwnerServiceTest {
                 .thenReturn(new OwnerDTO());
 
         OwnerDTO dto = ownerService.getOwnerByEmail(null);
-        assertEquals(null, dto.getOwner());
+        assertNotNull(dto);
+        assertNotNull(dto.getOwner());
+        assert(dto.isEmpty());
     }
 
     /**

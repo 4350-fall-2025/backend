@@ -1,13 +1,9 @@
 package com.softeng.backend.dto;
 
-import com.softeng.backend.models.pet.Pet;
 import com.softeng.backend.models.user.owner.Owner;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-
-import java.util.ArrayList;
 import java.util.Map;
+import java.util.Objects;
 
 /*
 Because firestore handles/auto creates document ids, it was a bit awkward storing an "id" field
@@ -19,18 +15,23 @@ The following code was developed with guidance from OpenAI's ChatGPT (https://ch
     to the front end clients, and include the document id without coupling it to the 
     User domain object.
  */
-@AllArgsConstructor
-@NoArgsConstructor
 @Getter
 public class OwnerDTO {
 
-    private String id = "";
-    private Owner owner;
+    private final String id;
+    private final Owner owner;
+
+    public OwnerDTO(String id, Owner owner) {
+        this.id = Objects.requireNonNullElse(id, "");
+        this.owner = Objects.requireNonNullElse(owner, new Owner());
+    }
+
+    public OwnerDTO() {
+        this.id = "";
+        this.owner = new Owner();
+    }
 
     public Map<String, Object> toMap() {
-        if(owner == null)
-            owner = new Owner();
-
         return Map.of(
                 "id", id,
                 "firstName", owner.getFirstName(),
@@ -38,5 +39,9 @@ public class OwnerDTO {
                 "email", owner.getEmail(),
                 "token", "MockTokenForNow"
         );
+    }
+
+    public boolean isEmpty() {
+        return id.isBlank() || owner.checkEmptyUser();
     }
 }

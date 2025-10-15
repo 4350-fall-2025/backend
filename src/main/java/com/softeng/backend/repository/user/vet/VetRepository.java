@@ -9,10 +9,21 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
+
+/**
+ * Owners Endpoint
+ * General References:
+ * <a href="https://masteringbackend.com/posts/spring-boot">...</a>
+ * <a href="https://firebase.google.com/docs/firestore/manage-data/add-data">...</a>
+ * <p>
+ *
+ * The following code was developed with guidance from OpenAI's ChatGPT (<a href="https://chat.openai.com">...</a>)
+ * I consulted ChatGPT when I ran into syntax bugs or was unsure how a spring boot or firestore
+ * class/method worked.
+ */
 
 @Repository
 public class VetRepository implements IVetRepository {
@@ -40,7 +51,6 @@ public class VetRepository implements IVetRepository {
      ******************************************************************************/
     // https://firebase.google.com/docs/firestore/query-data/get-data
     public VetDTO getVetByEmail(String email) throws ExecutionException, InterruptedException {
-
         ApiFuture<QuerySnapshot> future = firestore.collection(collectionName).whereEqualTo("email", email).get();
         List<QueryDocumentSnapshot> documents = future.get().getDocuments();
         if (!documents.isEmpty()) {

@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import java.util.Map;
 
 public interface IAuthController {
+
     /*****************************************************************************
      * LOGIN
      ******************************************************************************/
