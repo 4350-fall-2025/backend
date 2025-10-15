@@ -21,7 +21,7 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("/api/v1/auth")
-public class AuthController {
+public class AuthController implements IAuthController {
     private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
     private final OwnerService ownerService;
     private final VetService vetService;
@@ -33,7 +33,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    ResponseEntity<Map<String, Object>> Login(@RequestBody Map<String, String> loginRequest) {
+    public ResponseEntity<Map<String, Object>> Login(@RequestBody Map<String, String> loginRequest) {
         String email = loginRequest.get("email");
         String password = loginRequest.get("password");
         try {

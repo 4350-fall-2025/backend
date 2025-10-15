@@ -13,10 +13,10 @@ import java.util.concurrent.ExecutionException;
 
 // // The following code was copied with guidance from OpenAI's ChatGPT (https://chat.openai.com)
 // Reference: was asking ChatGPT for basic Service setup (for testing) when making this
-// TODO: needs to be implemented
 
 @Service
 public class VetService implements IVetService {
+
     private final VetRepository vetRepository;
     private static final Logger logger = LoggerFactory.getLogger(VetService.class);
 

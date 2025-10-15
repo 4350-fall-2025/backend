@@ -46,7 +46,6 @@ public class OwnerRepository implements IOwnerRepository {
         return new OwnerDTO(addedDocRef.get().getId(), owner);
     }
 
-
     /*****************************************************************************
      * READ
      ******************************************************************************/

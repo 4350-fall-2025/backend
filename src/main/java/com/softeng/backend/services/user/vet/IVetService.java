@@ -6,6 +6,7 @@ import com.softeng.backend.models.user.vet.Vet;
 import java.util.concurrent.ExecutionException;
 
 public interface IVetService {
+
     /*****************************************************************************
      * CREATE
      ******************************************************************************/

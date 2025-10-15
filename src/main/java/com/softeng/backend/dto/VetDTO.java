@@ -8,6 +8,7 @@ import java.util.Objects;
 
 @Getter
 public class VetDTO {
+
     private final String id;
     private final Vet vet;
 

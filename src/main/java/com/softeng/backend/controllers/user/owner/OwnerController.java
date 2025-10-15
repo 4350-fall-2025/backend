@@ -96,6 +96,8 @@ public class OwnerController implements IOwnerController {
             return ResponseEntity.badRequest().build();
         }
 
+        //TODO: check invalid user
+
         try {
             dto = ownerService.updateOwner(id, owner);
         } catch (ExecutionException | InterruptedException e) {
@@ -121,6 +123,7 @@ public class OwnerController implements IOwnerController {
         } catch (ExecutionException | InterruptedException e) {
             return ResponseEntity.internalServerError().build();
         }
+
         if (dto == null || dto.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
