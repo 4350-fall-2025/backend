@@ -96,7 +96,9 @@ public class VetServiceTest {
                 .thenReturn(new VetDTO());
 
         VetDTO dto = vetService.getVetByEmail(null);
+        assertNotNull(dto);
         assertNotNull(dto.getVet());
+        assert(dto.isEmpty());
     }
 
     /**
