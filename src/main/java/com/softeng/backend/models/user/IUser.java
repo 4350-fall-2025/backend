@@ -7,9 +7,8 @@ public interface IUser {
     String getLastName();
 
     /**
-     * Logic to detect if this user is a default/null user (no email/id)
-     * eg. user = new User() or new Owner()
-     * @return true if identifying fields are empty/null
+     * Logic to detect if this user is invalid
+     * @return true if any fields are null
      */
     boolean checkInvalidUser();
 

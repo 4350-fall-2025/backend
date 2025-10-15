@@ -1,17 +1,14 @@
 package com.softeng.backend.models.user;
 
 import lombok.NoArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @NoArgsConstructor
 public abstract class User implements IUser {
 
-    protected String email;
-    protected String firstName;
-    protected String lastName;
-    protected String password; // TODO: remove this once we set up actual secure auth
-    private static final Logger logger = LoggerFactory.getLogger(User.class);
+    protected String email = "";
+    protected String firstName = "";
+    protected String lastName = "";
+    protected String password = ""; // TODO: remove this once we set up actual secure auth
 
     public User(String firstName, String lastName, String email, String password) {
         this.firstName = firstName;
@@ -33,7 +30,10 @@ public abstract class User implements IUser {
     }
 
     public boolean checkInvalidUser() {
-        return email == null || email.isBlank();
+        return ( email == null || email.isBlank() ) ||
+                ( lastName == null || lastName.isBlank() )  ||
+                ( firstName == null || firstName.isBlank() ) ||
+                ( password == null || password.isBlank() );
     }
 
     public boolean checkEmptyUser() {
