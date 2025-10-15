@@ -3,9 +3,11 @@ package com.softeng.backend.repository.pet;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.*;
 import com.softeng.backend.dto.OwnerDTO;
+import com.softeng.backend.dto.PetDTO;
 import com.softeng.backend.models.pet.Pet;
 import com.softeng.backend.models.pet.PetLite;
 import com.softeng.backend.repository.user.owner.OwnerRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -13,6 +15,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+/*
+ * The following class was partially developed with
+ * IntelliJ autocomplete and Copilot (GPT-4.1)
+ */
+
+@Slf4j
 @Repository
 public class PetRepository implements IPetRepository {
 
@@ -24,94 +32,177 @@ public class PetRepository implements IPetRepository {
     @Autowired
     public PetRepository(Firestore firestore, OwnerRepository ownerRepository) {
         this.firestore = firestore;
-        this.ownerRepository  = ownerRepository;
+        this.ownerRepository = ownerRepository;
     }
 
     // =========================
     // CREATE
     // =========================
     // reference: https://firebase.google.com/docs/firestore/manage-data/add-data#add_a_document
-    @Override
-    public Pet createPet(String ownerId, Pet pet) throws ExecutionException, InterruptedException {
-        OwnerDTO owner = ownerRepository.getOwnerById(ownerId);
-        if (owner != null) {
 
+    /**
+     *
+     * @param ownerId Document ID of the pet owner
+     * @param pet <code>Pet</code> object to insert into database
+     * @return A DTO of the created pet. The content may be empty if <code>pet</code>
+     * is invalid
+     * @throws ExecutionException if computation threw an exception
+     * @throws InterruptedException if the current thread was interrupted
+     */
+    @Override
+    public PetDTO createPet(String ownerId, Pet pet) throws ExecutionException, InterruptedException {
+        OwnerDTO owner = ownerRepository.getOwnerById(ownerId);
+        PetDTO result = new PetDTO();
+
+        if (owner != null && pet.isValid()) {
             // The following code was copied/developed with guidance from OpenAI's ChatGPT (https://chat.openai.com)
-            ApiFuture<DocumentReference> addedDocRef = firestore.collection(PET_COLLECTION).add(pet);
+            ApiFuture<DocumentReference> addedDocRef = firestore.collection(PET_COLLECTION)
+                                                                .add(pet);
             DocumentReference reference = addedDocRef.get();
-            DocumentSnapshot snapshot= reference.get().get();
+            DocumentSnapshot snapshot = reference.get().get();
 
             if (snapshot.exists()) {
                 pet = snapshot.toObject(Pet.class);
-                if (pet != null) {
-                    // Ensure the pet has the correct ID and ownerId
+                if (pet != null && pet.isValid()) {
+                    //TODO: The pet owner should also add a pet subdocument to their internal list of pets
                     pet.setId(reference.getId());
                     pet.setOwnerId(ownerId);
-                    owner.getOwner().addPet(new PetLite(reference.getId(), pet.getName(), pet.getBreed()));
+                    result = new PetDTO(pet.getId(), pet);
                 }
             }
         }
-        return pet;
+        return result;
     }
 
     // =========================
     // READ
     // =========================
-    @Override
-    public Pet getPetById(String petId) throws ExecutionException, InterruptedException {
-        Pet result = new Pet();
 
-        ApiFuture<DocumentSnapshot> future = firestore.collection(PET_COLLECTION).document(petId).get();
-        DocumentSnapshot doc = future.get();
+    /**
+     * @param ownerId Document ID of the pet owner
+     * @param petId Document ID of the pet to retrieve
+     * @return A DTO of the pet. The content may be empty if no pet with
+     * <code>petId</code> exists
+     * @throws ExecutionException if computation threw an exception
+     * @throws InterruptedException if the current thread was interrupted
+     */
+    @Override
+    public List<PetDTO> getPetById(String ownerId, String petId) throws ExecutionException, InterruptedException {
+        List<PetDTO> result = new ArrayList<>();
+
+        ApiFuture<QuerySnapshot> future = firestore.collection(PET_COLLECTION)
+                .whereEqualTo("ownerId", ownerId).whereEqualTo("id", petId).get();
+
+        QueryDocumentSnapshot doc = future.get().getDocuments().getFirst();
 
         if (doc.exists()) {
-            result = doc.toObject(Pet.class);
+            Pet pet = doc.toObject(Pet.class);
+            if (pet.isValid()) {
+                result.add(new PetDTO(pet.getId(), pet));
+            }
         }
 
         return result;
     }
 
+    /**
+     *
+     * @param ownerId Document ID of the pet owner
+     * @return A list of lightweight pet objects owned by the owner with
+     * <code>ownerId</code>.
+     * @throws ExecutionException   if computation threw an exception
+     * @throws InterruptedException if the current thread was interrupted
+     */
     @Override
-    public List<PetLite> getPetsByOwnerId(String ownerId) throws ExecutionException, InterruptedException {
-        List<PetLite> pets = new ArrayList<>();
+    public List<PetDTO> getPetsByOwnerId(String ownerId) throws ExecutionException, InterruptedException {
+        List<PetDTO> result = new ArrayList<>();
 
-        ApiFuture<QuerySnapshot> future = firestore.collection(PET_COLLECTION).whereEqualTo("owner", ownerId).get();
+        ApiFuture<QuerySnapshot> future = firestore.collection(PET_COLLECTION)
+                .whereEqualTo("ownerId", ownerId).get();
 
-        List<QueryDocumentSnapshot> documents = future.get().getDocuments();
-        for (DocumentSnapshot doc : documents) {
-            pets.add(doc.toObject(PetLite.class));
+        List<QueryDocumentSnapshot> docs = future.get().getDocuments();
+
+        for (QueryDocumentSnapshot doc: docs) {
+            Pet pet = doc.toObject(Pet.class);
+            result.add(new PetDTO(pet.getId(), pet));
         }
 
-        return pets;
+        return result;
     }
 
 
     // =========================
     // UPDATE
-    // Generated with GTP-4.1
     // =========================
-    @Override
-    public Pet updatePet(String petId, Pet pet) throws ExecutionException, InterruptedException {
-        ApiFuture<WriteResult> writeResult = firestore.collection(PET_COLLECTION).document(petId).set(pet);
-        writeResult.get(); // Wait for completion, throws if failed
 
-        return pet;
+    /**
+     * @param ownerId Document ID of the pet owner
+     * @param petId Document ID of the pet to update
+     * @param pet   <code>Pet</code> object containing updated information
+     * @return The updated <code>Pet</code> object
+     * @throws ExecutionException   if computation threw an exception
+     * @throws InterruptedException if the current thread was interrupted
+     */
+    @Override
+    public PetDTO updatePet(String ownerId, String petId, Pet pet) throws ExecutionException, InterruptedException {
+        PetDTO result = new PetDTO();
+
+        if (pet != null && pet.isValid()) {
+            ApiFuture<QuerySnapshot> future = firestore.collection(PET_COLLECTION)
+                    .whereEqualTo("ownerId", ownerId)
+                    .whereEqualTo("id", petId)
+                    .get();
+
+            List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+            if (!documents.isEmpty()) {
+                DocumentReference docRef = documents.getFirst().getReference();
+                // Set the new pet data
+                ApiFuture<WriteResult> writeResult = docRef.set(pet);
+                writeResult.get();
+
+                // Update owner's pet list
+                ownerRepository.updatePet(ownerId,
+                    new PetLite(petId, pet.getName(), pet.getBreed()));
+
+                result = new PetDTO(pet.getId(), pet);
+            }
+        }
+
+        return result;
     }
 
     // =========================
     // DELETE OPERATION
-    // Generated with GTP-4.1
     // =========================
+
+    /**
+     * @param petId Document ID of the pet to delete
+     * @return The deleted <code>Pet</code> object. If no pet with
+     * <code>petId</code> exists, an empty <code>Pet</code> object is returned
+     * @throws ExecutionException   if computation threw an exception
+     * @throws InterruptedException if the current thread was interrupted
+     */
     @Override
-    public Pet deletePet(String petId) throws ExecutionException, InterruptedException {
-        Pet deletedPet = new Pet();
-        ApiFuture<DocumentSnapshot> getFuture = firestore.collection(PET_COLLECTION).document(petId).get();
-        DocumentSnapshot doc = getFuture.get();
-        if (doc.exists()) {
-            deletedPet = doc.toObject(Pet.class);
-            ApiFuture<WriteResult> deleteFuture = firestore.collection(PET_COLLECTION).document(petId).delete();
-            deleteFuture.get(); // Wait for completion
+    public PetDTO deletePet(String ownerId, String petId) throws ExecutionException, InterruptedException {
+        PetDTO result = new PetDTO();
+
+        ApiFuture<QuerySnapshot> future = firestore.collection(PET_COLLECTION)
+                .whereEqualTo("ownerId", ownerId)
+                .whereEqualTo("id", petId)
+                .get();
+
+        List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+        if (!documents.isEmpty()) {
+            DocumentReference docRef = documents.getFirst().getReference();
+            DocumentSnapshot doc = docRef.get().get();
+            if (doc.exists()) {
+                Pet deletedPet = doc.toObject(Pet.class);
+                if (deletedPet != null && deletedPet.isValid()) {
+                    result = new PetDTO(deletedPet.getId(), deletedPet);
+                    docRef.delete().get();
+                }
+            }
         }
-        return deletedPet;
+        return result;
     }
 }

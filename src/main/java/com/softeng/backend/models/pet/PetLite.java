@@ -14,4 +14,10 @@ public class PetLite implements IPet {
     private String id;
     private String name;
     private String breed;
+
+    @Override
+    public boolean isValid() {
+        return (name != null && !name.isEmpty()) &&
+                (breed != null &&!breed.isEmpty());
+    }
 }

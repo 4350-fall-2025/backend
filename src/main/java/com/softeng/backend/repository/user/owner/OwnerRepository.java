@@ -3,6 +3,7 @@ package com.softeng.backend.repository.user.owner;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.*;
 import com.softeng.backend.dto.OwnerDTO;
+import com.softeng.backend.models.pet.PetLite;
 import com.softeng.backend.models.user.owner.Owner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -95,6 +96,8 @@ public class OwnerRepository implements IOwnerRepository {
         Owner owner = snapshot.toObject(Owner.class);
         return new OwnerDTO(snapshot.getId(), owner);
     }
+
+    public OwnerDTO updatePet(String ownerId, PetLite subdocument) { return null; }
 
     /*****************************************************************************
      * DELETE

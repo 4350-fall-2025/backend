@@ -1,3 +1,5 @@
 package com.softeng.backend.models.pet;
 
-public interface IPet {}
+public interface IPet {
+    boolean isValid();
+}
