@@ -1,6 +1,7 @@
 package com.softeng.backend.models.user.owner;
 
 import com.softeng.backend.models.pet.Pet;
+import com.softeng.backend.models.pet.PetLite;
 
 import java.util.ArrayList;
 
@@ -10,7 +11,7 @@ public interface IOwner {
      * @param pet to add
      * @return true if successful
      */
-    boolean createPet(Pet pet);
+    boolean addPet(PetLite pet);
 
     /**
      * @param pet to remove

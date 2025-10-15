@@ -1,18 +1,20 @@
 package com.softeng.backend.repository.pet;
 
+import com.softeng.backend.dto.PetDTO;
+import com.softeng.backend.models.pet.Pet;
+
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+
 public interface IPetRepository {
 
-   /* TODO: need to implement
-    create:
-    public Pet createPet(String id, Pet pet);
+    PetDTO createPet(String ownerId, Pet pet) throws ExecutionException, InterruptedException;
 
-    read:
-    public Pet getPet(String id, Pet pet);
+    List<PetDTO> getPetById(String ownerId, String petId) throws ExecutionException, InterruptedException;
 
-    update:
-    public Pet updatePet(String id, Pet pet);
+    List<PetDTO> getPetsByOwnerId(String ownerId) throws ExecutionException, InterruptedException;
 
-    delete:
-    public Pet removePet(String id, Pet pet);
-    */
+    PetDTO updatePet(String ownerId, String petId, Pet pet) throws ExecutionException, InterruptedException;
+
+    PetDTO deletePet(String ownerId, String petId) throws ExecutionException, InterruptedException;
 }

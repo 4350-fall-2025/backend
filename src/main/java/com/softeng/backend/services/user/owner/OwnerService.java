@@ -1,6 +1,8 @@
 package com.softeng.backend.services.user.owner;
 
 import com.softeng.backend.dto.OwnerDTO;
+import com.softeng.backend.models.pet.Pet;
+import com.softeng.backend.models.pet.PetLite;
 import com.softeng.backend.models.user.owner.Owner;
 import com.softeng.backend.repository.user.owner.OwnerRepository;
 import org.slf4j.Logger;
@@ -78,6 +80,14 @@ public class OwnerService implements IOwnerService {
             updateFields.put("email", owner.getEmail());
         }
         return ownerRepository.updateOwner(id, updateFields);
+    }
+
+    public OwnerDTO updatePet(String ownerId, Pet pet) throws ExecutionException, InterruptedException {
+        return ownerRepository.updatePet(ownerId, new PetLite(pet.getId(), pet.getName(), pet.getBreed()));
+    }
+
+    public OwnerDTO removePet(String ownerId, String petId) throws ExecutionException, InterruptedException {
+        return ownerRepository.removePet(ownerId, petId);
     }
 
     /*****************************************************************************

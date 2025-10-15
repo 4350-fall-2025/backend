@@ -1,25 +1,68 @@
 package com.softeng.backend.models.pet;
 
-import com.google.cloud.Date;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.google.cloud.spring.data.firestore.Document;
+import com.softeng.backend.models.enums.PetSexType;
+import com.softeng.backend.models.enums.SterileStatus;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.data.annotation.Id;
 
+import java.util.Date;
+
 @Document(collectionName = "pets")
-@Data // TODO - need to update this class in a separate ticket instead of using all getters/setters
-@NoArgsConstructor
+@Getter
 @AllArgsConstructor
+@NoArgsConstructor
 public class Pet implements IPet {
 
-    @Id
+    @Id @Setter
     private String id;
     private String name;
-    private String ownerId;
-    private String breed;
-    private String sex;
-    private String species;
-    private Date birthDate;
 
+    @Setter
+    private String ownerId;
+    private String species;
+    private String breed;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private PetSexType sex;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    private Date birthdate;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private SterileStatus sterileStatus;
+
+    /**
+     * Validators generated with GPT-4.1
+     */
+    @Override
+    public boolean isValid() {
+
+        return isValidName() && isValidSpecies() && isValidBreed() &&
+                (sex != null) && isValidBirthDate() && (sterileStatus != null);
+    }
+
+    private boolean isValidName() {
+        return name != null && !name.trim().isEmpty() && name.length() <= 32 &&
+               name.matches("^[A-Za-z\\s\\-]+$");
+    }
+
+    private boolean isValidSpecies() {
+        return species != null && !species.trim().isEmpty() &&
+               species.length() <= 20 && species.matches("^[A-Za-z\\s]+$");
+    }
+
+    private boolean isValidBreed() {
+        return breed != null && !breed.trim().isEmpty() &&
+               breed.length() <= 32 && breed.matches("^[A-Za-z\\s\\-]+$");
+    }
+
+    private boolean isValidBirthDate() {
+        return birthdate != null && birthdate.before(new Date());
+    }
 }
+
