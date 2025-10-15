@@ -47,7 +47,7 @@ public class AuthController {
                 response = ResponseEntity.status(400).body(Map.of("error", "Incorrect Credential", "detail", "Email does not exist"));
             } else {
                 // TODO: improve security when auth set up
-                if (vetDTO != null && vetDTO.getId() != null) {
+                if (vetDTO.getVet() != null && vetDTO.getId() != null) {
                     if (!vetDTO.getVet().getPassword().equals(password)) {
                         response = ResponseEntity.status(400).body(Map.of("error", "Incorrect Credential", "detail", "Password is incorrect"));
                     } else {
