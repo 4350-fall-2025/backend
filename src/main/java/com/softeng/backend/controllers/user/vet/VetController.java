@@ -2,6 +2,8 @@ package com.softeng.backend.controllers.user.vet;
 
 import com.softeng.backend.dto.VetDTO;
 import com.softeng.backend.models.user.vet.Vet;
+import com.softeng.backend.models.user.vet.Vet;
+import com.softeng.backend.services.user.vet.VetService;
 import com.softeng.backend.services.user.vet.VetService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;

@@ -1,14 +1,19 @@
 package com.softeng.backend.services.pet;
 
+import com.softeng.backend.dto.PetDTO;
 import com.softeng.backend.models.pet.Pet;
 
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+
 public interface IPetService {
+    PetDTO createPet(String ownerId, Pet pet) throws ExecutionException, InterruptedException;
 
-    /* TODO:
-    // Update:
-    public Pet updatePet(String ownerId, Pet pet);
+    List<PetDTO> getPetById(String ownerId, String petId) throws ExecutionException, InterruptedException;
 
-    // Delete:
-    public Pet removePet(String ownerId, Pet pet);
-    */
+    List<PetDTO> getPetsByOwnerId(String ownerId) throws ExecutionException, InterruptedException;
+
+    PetDTO updatePet(String ownerId, String petId, Pet pet) throws ExecutionException, InterruptedException;
+
+    PetDTO deletePet(String ownerId, String petId) throws ExecutionException, InterruptedException;
 }
