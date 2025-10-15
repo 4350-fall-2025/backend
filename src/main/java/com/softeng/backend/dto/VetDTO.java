@@ -11,10 +11,12 @@ import java.util.Map;
 @NoArgsConstructor
 @Getter
 public class VetDTO {
-    private String id;
+    private String id = "";
     private Vet vet;
 
     public Map<String, Object> toMap() {
+        if(vet == null)
+            vet = new Vet();
         return Map.of(
                 "id", id,
                 "firstName", vet.getFirstName(),
