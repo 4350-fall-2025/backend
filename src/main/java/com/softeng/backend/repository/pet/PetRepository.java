@@ -69,7 +69,7 @@ public class PetRepository implements IPetRepository {
             if (snapshot.exists()) {
                 pet = snapshot.toObject(Pet.class);
                 if (pet != null && pet.isValid()) {
-                    //TODO: The pet owner should also add a pet subdocument to their internal list of pets
+                    ownerRepository.addPet(ownerId, new PetLite(generatedId, pet.getName(), pet.getBreed()));
                     result = new PetDTO(pet.getId(), pet);
                 }
             }
@@ -164,10 +164,6 @@ public class PetRepository implements IPetRepository {
                 pet.setOwnerId(ownerId);
                 ApiFuture<WriteResult> writeResult = docRef.set(pet);
                 writeResult.get();
-
-                // Update owner's pet list
-                ownerRepository.updatePet(ownerId,
-                    new PetLite(petId, pet.getName(), pet.getBreed()));
 
                 result = new PetDTO(pet.getId(), pet);
             }

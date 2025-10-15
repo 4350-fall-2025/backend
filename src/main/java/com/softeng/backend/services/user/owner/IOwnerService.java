@@ -31,7 +31,7 @@ public interface IOwnerService {
 
     OwnerDTO updatePet(String ownerId, Pet pet) throws ExecutionException, InterruptedException;
 
-    OwnerDTO removePet(String ownerId, String petId);
+    OwnerDTO removePet(String ownerId, String petId) throws ExecutionException, InterruptedException;
 
     /*****************************************************************************
      * DELETE

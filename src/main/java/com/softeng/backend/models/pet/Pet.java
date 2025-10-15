@@ -31,7 +31,7 @@ public class Pet implements IPet {
     private PetSexType sex;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private Date birthDate;
+    private Date birthdate;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private SterileStatus sterileStatus;
@@ -62,7 +62,7 @@ public class Pet implements IPet {
     }
 
     private boolean isValidBirthDate() {
-        return birthDate != null && birthDate.before(new Date());
+        return birthdate != null && birthdate.before(new Date());
     }
 }
 

@@ -104,6 +104,7 @@ public class PetController implements IPetController {
         }
 
         try {
+            pet.setId(petId);
             updated = ownerService.updatePet(ownerId, pet);
             petService.updatePet(ownerId, petId, pet);
         } catch (ExecutionException | InterruptedException e) {

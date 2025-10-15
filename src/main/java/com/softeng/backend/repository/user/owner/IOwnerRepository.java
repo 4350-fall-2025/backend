@@ -1,6 +1,7 @@
 package com.softeng.backend.repository.user.owner;
 
 import com.softeng.backend.dto.OwnerDTO;
+import com.softeng.backend.models.pet.PetLite;
 import com.softeng.backend.models.user.owner.Owner;
 
 import java.util.Map;
@@ -23,6 +24,8 @@ public interface IOwnerRepository {
      * UPDATE
      ******************************************************************************/
     OwnerDTO updateOwner(String id, Map<String, Object> updateFields) throws ExecutionException, InterruptedException;
+
+    OwnerDTO addPet(String ownerId, PetLite pet) throws ExecutionException, InterruptedException;
 
     /*****************************************************************************
      * DELETE

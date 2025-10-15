@@ -23,7 +23,7 @@ public class PetDTO {
                 "species", pet.getSpecies(),
                 "breed", pet.getBreed(),
                 "sex", pet.getSex().toString(),
-                "birthDate", pet.getBirthDate().toString(),
+                "birthDate", pet.getBirthdate().toString(),
                 "sterileStatus", pet.getSterileStatus().toString()
         );
     }
