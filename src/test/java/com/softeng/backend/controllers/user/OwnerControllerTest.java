@@ -50,7 +50,7 @@ public class OwnerControllerTest {
     private static final String mockDocId = "mockDocId";
 
     //TODO: remove when we set up auth
-    private static String mockPass = "MockTokenForNow";
+    private static String mockToken = "MockTokenForNow";
 
     @Test
     void testCreateOwnerCreated() throws Exception {
@@ -65,7 +65,7 @@ public class OwnerControllerTest {
                 .andExpect(jsonPath("$.firstName").value("Victoria"))
                 .andExpect(jsonPath("$.lastName").value("MadeThisTest1"))
                 .andExpect(jsonPath("$.email").value("123@gmail.com"))
-                .andExpect(jsonPath("$.token").value(mockPass));
+                .andExpect(jsonPath("$.token").value(mockToken));
     }
 
     @Test
@@ -147,7 +147,7 @@ public class OwnerControllerTest {
                 .andExpect(jsonPath("$.firstName").value("Victoria"))
                 .andExpect(jsonPath("$.lastName").value("MadeThisTest1"))
                 .andExpect(jsonPath("$.email").value("123@gmail.com"))
-                .andExpect(jsonPath("$.token").value(mockPass));
+                .andExpect(jsonPath("$.token").value(mockToken));
     }
 
     @Test
@@ -211,7 +211,7 @@ public class OwnerControllerTest {
                 .andExpect(jsonPath("$.firstName").value("NewName"))
                 .andExpect(jsonPath("$.lastName").value(""))
                 .andExpect(jsonPath("$.email").value(""))
-                .andExpect(jsonPath("$.token").value(mockPass));
+                .andExpect(jsonPath("$.token").value(mockToken));
     }
 
     @Test

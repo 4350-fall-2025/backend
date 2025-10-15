@@ -32,6 +32,14 @@ public class AuthController {
         this.vetService = vetService;
     }
 
+    private static boolean isInvalidOwnerDTO(OwnerDTO dto) {
+        return dto == null || dto.getId() == null || dto.getId().isBlank();
+    }
+
+    private static boolean isInvalidVetDTO(VetDTO dto) {
+        return dto == null || dto.getId() == null || dto.getId().isBlank();
+    }
+
     @PostMapping("/login")
     ResponseEntity<Map<String, Object>> Login(@RequestBody Map<String, String> loginRequest) {
         ResponseEntity<Map<String, Object>> response;
@@ -42,7 +50,7 @@ public class AuthController {
             ownerDTO = ownerService.getOwnerByEmail(email);
             VetDTO vetDTO;
             vetDTO = vetService.getVetByEmail(email);
-            if ((ownerDTO == null || ownerDTO.getId() == null) && (vetDTO == null || vetDTO.getId() == null)) {
+            if (isInvalidOwnerDTO(ownerDTO) && isInvalidVetDTO(vetDTO)) {
                 logger.debug("DEBUG LOG: auth/login endpoint not found for email: {}", email);
                 response = ResponseEntity.status(400).body(Map.of("error", "Incorrect Credential", "detail", "Email does not exist"));
             } else {
@@ -53,11 +61,12 @@ public class AuthController {
                     } else {
                         response = ResponseEntity.status(200).body(vetDTO.toMap());
                     }
-                } else if (!ownerDTO.getOwner().getPassword().equals(password)) {
-                    response = ResponseEntity.status(400).body(Map.of("error", "Incorrect Credential", "detail", "Password is incorrect"));
-                } else {
-                    response = ResponseEntity.status(200).body(ownerDTO.toMap());
-                }
+                } else
+                    if (!ownerDTO.getOwner().getPassword().equals(password)) {
+                        response = ResponseEntity.status(400).body(Map.of("error", "Incorrect Credential", "detail", "Password is incorrect"));
+                    } else {
+                        response = ResponseEntity.status(200).body(ownerDTO.toMap());
+                    }
             }
         } catch (Exception e) {
             logger.debug("DEBUG LOG: Auth /login endpoint error for email: {}/n stack trace: {}", email, Arrays.toString(e.getStackTrace()));
