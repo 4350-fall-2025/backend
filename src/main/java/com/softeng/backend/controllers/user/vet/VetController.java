@@ -1,10 +1,7 @@
 package com.softeng.backend.controllers.user.vet;
 
-import com.softeng.backend.controllers.user.vet.VetController;
 import com.softeng.backend.dto.VetDTO;
 import com.softeng.backend.models.user.vet.Vet;
-import com.softeng.backend.models.user.vet.Vet;
-import com.softeng.backend.services.user.vet.VetService;
 import com.softeng.backend.services.user.vet.VetService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -15,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
@@ -34,6 +30,10 @@ public class VetController implements IVetController {
         this.vetService = vetService;
     }
 
+    private static boolean isInvalidDTO(VetDTO dto) {
+        return dto == null || dto.getId() == null || dto.getId().isBlank();
+    }
+
     /*****************************************************************************
      * SIGNUP/CREATE
      ******************************************************************************/
@@ -47,7 +47,7 @@ public class VetController implements IVetController {
         }
         try {
             VetDTO dto = vetService.createVet(vet);
-            if (dto.getId() == null) {
+            if (isInvalidDTO(dto)) {
                 logger.debug("DEBUG LOG: Vet with email: {} already exists", vet.getEmail());
                 Map<String, String> detail = Map.of("email", "Email already exists");
                 return ResponseEntity.status(409).body(Map.of("error", "Conflict fields", "detail", detail));
@@ -66,7 +66,6 @@ public class VetController implements IVetController {
     //get vet by id
     @GetMapping("/{id}")
     public ResponseEntity<Map<String, Object>> getVetById(@PathVariable String id) {
-        ResponseEntity<Map<String, Object>> response;
         VetDTO dto;
         try {
             dto = vetService.getVetById(id);
@@ -75,7 +74,7 @@ public class VetController implements IVetController {
             return ResponseEntity.internalServerError().build();
         }
 
-        if (dto.getId() == null) {
+        if (isInvalidDTO(dto)) {
             logger.debug("DEBUG LOG: Vet /id endpoint hit with id: {} not found", id);
             return ResponseEntity.notFound().build();
         }
@@ -102,7 +101,7 @@ public class VetController implements IVetController {
             return ResponseEntity.internalServerError().build();
         }
 
-        if (dto == null || dto.getId() == null) {
+        if (isInvalidDTO(dto)) {
             logger.debug("DEBUG LOG: Vet update /id endpoint not found for id: {}", id);
             return ResponseEntity.notFound().build();
         }
@@ -120,8 +119,8 @@ public class VetController implements IVetController {
         } catch (ExecutionException | InterruptedException e) {
             return ResponseEntity.internalServerError().build();
         }
-        if (dto.getId() == null) {
-            return ResponseEntity.status(404).build();
+        if (isInvalidDTO(dto)) {
+            return ResponseEntity.notFound().build();
         }
 
         boolean deleted = vetService.deleteVet(id);

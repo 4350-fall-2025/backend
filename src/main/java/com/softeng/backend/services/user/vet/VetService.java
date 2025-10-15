@@ -32,11 +32,14 @@ public class VetService implements IVetService {
         if (vet == null || vet.checkInvalidUser()) {
             logger.debug("DEBUG LOG: Vet service detected invalid user for creation: {}", vet == null ? null : vet.getEmail());
             dto = new VetDTO();
-        } else if (getVetByEmail(vet.getEmail()).getId() != null) {
-            logger.debug("DEBUG LOG: Vet service detected user that already exists: {}", vet.getEmail());
-            dto = new VetDTO();
         } else {
-            dto = vetRepository.createVet(vet);
+            VetDTO existingVet = getVetByEmail(vet.getEmail());
+            if (existingVet != null && existingVet.getVet() != null && !existingVet.getVet().checkEmptyUser()) {
+                logger.debug("DEBUG LOG: Vet service detected user that already exists: {}", vet.getEmail());
+                dto = new VetDTO();
+            } else {
+                dto = vetRepository.createVet(vet);
+            }
         }
         return dto;
     }
