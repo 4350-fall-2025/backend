@@ -35,4 +35,4 @@ jobs:
         run: mvn clean package -DskipTests=true
 
       - name: Test with Maven
-        run: mvn test
+        run: mvn -B -q test -Dlogging.level.root=INFO # turn off debug logs for Logger, just show test resutls
