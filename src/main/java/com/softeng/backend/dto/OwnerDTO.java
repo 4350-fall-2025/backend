@@ -24,10 +24,13 @@ The following code was developed with guidance from OpenAI's ChatGPT (https://ch
 @Getter
 public class OwnerDTO {
 
-    private String id;
+    private String id = "";
     private Owner owner;
 
     public Map<String, Object> toMap() {
+        if(owner == null)
+            owner = new Owner();
+
         return Map.of(
                 "id", id,
                 "firstName", owner.getFirstName(),

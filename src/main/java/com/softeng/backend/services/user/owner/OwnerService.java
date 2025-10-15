@@ -34,11 +34,14 @@ public class OwnerService implements IOwnerService {
         if (owner == null || owner.checkInvalidUser()) {
             logger.debug("DEBUG LOG: Owner service detected invalid user for creation: {}", owner == null ? null : owner.getEmail());
             dto = new OwnerDTO();
-        } else if (getOwnerByEmail(owner.getEmail()).getId() != null) {
-            logger.debug("DEBUG LOG: Owner service detected user that already exists: {}", owner.getEmail());
-            dto = new OwnerDTO();
         } else {
-            dto = ownerRepository.createOwner(owner);
+            OwnerDTO existingOwner = getOwnerByEmail(owner.getEmail());
+            if (existingOwner != null && existingOwner.getOwner() != null && !existingOwner.getOwner().checkEmptyUser()) {
+                logger.debug("DEBUG LOG: Owner service detected user that already exists: {}", owner.getEmail());
+                dto = new OwnerDTO();
+            } else {
+                dto = ownerRepository.createOwner(owner);
+            }
         }
         return dto;
     }

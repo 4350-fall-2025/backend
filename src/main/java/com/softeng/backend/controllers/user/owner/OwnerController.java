@@ -34,6 +34,10 @@ public class OwnerController implements IOwnerController {
     public OwnerController(OwnerService ownerService) {
         this.ownerService = ownerService;
     }
+    
+    private static boolean isInvalidDTO(OwnerDTO dto) {
+        return dto == null || dto.getId() == null || dto.getId().isBlank();
+    }
 
     /*****************************************************************************
      * SIGNUP/CREATE
@@ -42,6 +46,7 @@ public class OwnerController implements IOwnerController {
     @PostMapping("/signup")
     public ResponseEntity<Map<String, Object>> createOwner(@Valid @RequestBody Owner owner) {
         ResponseEntity<Map<String, Object>> response;
+
         if (owner == null || owner.checkInvalidUser()) {
             Map<String, String> detail = Map.of("firstName", "Name cannot be empty", "lastName", "Name cannot be empty", "email", "Invalid email format", "password", "Must be at least 8 characters");
             logger.debug("DEBUG LOG: Owner /create endpoint detected null request");
@@ -49,7 +54,7 @@ public class OwnerController implements IOwnerController {
         }
         try {
             OwnerDTO dto = ownerService.createOwner(owner);
-            if (dto.getId() == null) {
+            if (isInvalidDTO(dto)) {
                 logger.debug("DEBUG LOG: Owner with email: {} already exists", owner.getEmail());
                 Map<String, String> detail = Map.of("email", "Email already exists");
                 return ResponseEntity.status(409).body(Map.of("error", "Conflict fields", "detail", detail));
@@ -78,7 +83,7 @@ public class OwnerController implements IOwnerController {
             return ResponseEntity.internalServerError().build();
         }
 
-        if (dto.getId() == null) {
+        if (isInvalidDTO(dto)) {
             logger.debug("DEBUG LOG: Owner /id endpoint hit with id: {} not found", id);
             return ResponseEntity.notFound().build();
         }
@@ -106,7 +111,7 @@ public class OwnerController implements IOwnerController {
             return ResponseEntity.internalServerError().build();
         }
 
-        if (dto == null || dto.getId() == null) {
+        if (isInvalidDTO(dto)) {
             logger.debug("DEBUG LOG: Owner update /id endpoint not found for id: {}", id);
             return ResponseEntity.notFound().build();
         }
@@ -124,8 +129,8 @@ public class OwnerController implements IOwnerController {
         } catch (ExecutionException | InterruptedException e) {
             return ResponseEntity.internalServerError().build();
         }
-        if (dto.getId() == null) {
-            return ResponseEntity.status(404).build();
+        if (isInvalidDTO(dto)) {
+            return ResponseEntity.notFound().build();
         }
 
         boolean deleted = ownerService.deleteOwner(id);
