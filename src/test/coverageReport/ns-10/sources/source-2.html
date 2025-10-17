@@ -1,0 +1,100 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > IVetRepository</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.softeng.backend.repository.user.vet</a>
+</div>
+
+<h1>Coverage Summary for Class: IVetRepository (com.softeng.backend.repository.user.vet)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">IVetRepository</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.softeng.backend.repository.user.vet;
+&nbsp;
+&nbsp;import com.softeng.backend.dto.OwnerDTO;
+&nbsp;import com.softeng.backend.dto.VetDTO;
+&nbsp;import com.softeng.backend.models.user.vet.Vet;
+&nbsp;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.concurrent.ExecutionException;
+&nbsp;
+&nbsp;public interface IVetRepository {
+&nbsp;
+&nbsp;    /*****************************************************************************
+&nbsp;     * CREATE
+&nbsp;     ******************************************************************************/
+&nbsp;    VetDTO createVet(Vet vet) throws ExecutionException, InterruptedException;
+&nbsp;
+&nbsp;    /*****************************************************************************
+&nbsp;     * READ
+&nbsp;     ******************************************************************************/
+&nbsp;    VetDTO getVetByEmail(String email) throws ExecutionException, InterruptedException;
+&nbsp;    VetDTO getVetById(String id) throws ExecutionException, InterruptedException;
+&nbsp;
+&nbsp;    /*****************************************************************************
+&nbsp;     * UPDATE
+&nbsp;     ******************************************************************************/
+&nbsp;    VetDTO updateVet(String id, Map&lt;String, Object&gt; updateFields) throws ExecutionException, InterruptedException;
+&nbsp;
+&nbsp;    /*****************************************************************************
+&nbsp;     * DELETE
+&nbsp;     ******************************************************************************/
+&nbsp;    public boolean deleteVet(String id);
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-10-17 01:31</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,95 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > IPetController</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.softeng.backend.controllers.pet</a>
+</div>
+
+<h1>Coverage Summary for Class: IPetController (com.softeng.backend.controllers.pet)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+</tr>
+<tr>
+  <td class="name">IPetController</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.softeng.backend.controllers.pet;
+&nbsp;
+&nbsp;import com.softeng.backend.dto.OwnerDTO;
+&nbsp;import com.softeng.backend.dto.PetDTO;
+&nbsp;import com.softeng.backend.models.pet.Pet;
+&nbsp;import org.springframework.http.ResponseEntity;
+&nbsp;import org.springframework.web.bind.annotation.*;
+&nbsp;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;
+&nbsp;public interface IPetController {
+&nbsp;
+&nbsp;    // CREATE
+&nbsp;    ResponseEntity&lt;PetDTO&gt; createPet(@PathVariable String ownerId, @RequestBody Pet pet);
+&nbsp;
+&nbsp;    // READ
+&nbsp;    @GetMapping(&quot;/{ownerId}/pets&quot;)
+&nbsp;    ResponseEntity&lt;List&lt;Map&lt;String, Object&gt;&gt;&gt; getPets(@PathVariable String ownerId, @RequestParam String petId);
+&nbsp;
+&nbsp;    // UPDATE
+&nbsp;    ResponseEntity&lt;OwnerDTO&gt; updatePet(@PathVariable String ownerId, @RequestParam String petId, @RequestBody Pet pet);
+&nbsp;
+&nbsp;    // DELETE
+&nbsp;    ResponseEntity&lt;OwnerDTO&gt; removePet(@PathVariable String ownerId, @RequestParam String petId);
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-10-17 01:31</div>
+</div>
+</body>
+</html>

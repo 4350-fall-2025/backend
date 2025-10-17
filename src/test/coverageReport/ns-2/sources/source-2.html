@@ -1,0 +1,169 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > FirebaseConfig</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.softeng.backend.config</a>
+</div>
+
+<h1>Coverage Summary for Class: FirebaseConfig (com.softeng.backend.config)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">FirebaseConfig</td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (1/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    12.5%
+  </span>
+  <span class="absValue">
+    (1/8)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">FirebaseConfig$$SpringCGLIB$$0</td>
+  </tr>
+  <tr>
+    <td class="name">FirebaseConfig$$SpringCGLIB$$FastClass$$0</td>
+  </tr>
+  <tr>
+    <td class="name">FirebaseConfig$$SpringCGLIB$$FastClass$$1</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    50%
+  </span>
+  <span class="absValue">
+    (1/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    12.5%
+  </span>
+  <span class="absValue">
+    (1/8)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.softeng.backend.config;
+&nbsp;
+&nbsp;import com.google.auth.oauth2.GoogleCredentials;
+&nbsp;import com.google.cloud.firestore.Firestore;
+&nbsp;import com.google.firebase.FirebaseApp;
+&nbsp;import com.google.firebase.FirebaseOptions;
+&nbsp;import com.google.firebase.cloud.FirestoreClient;
+&nbsp;import com.softeng.backend.exception.config.FirebaseInitializeException;
+&nbsp;import org.springframework.beans.factory.annotation.Value;
+&nbsp;import org.springframework.context.annotation.Bean;
+&nbsp;import org.springframework.context.annotation.Configuration;
+&nbsp;
+&nbsp;import java.io.FileInputStream;
+&nbsp;import java.io.IOException;
+&nbsp;
+&nbsp;/**
+&nbsp; * References:
+&nbsp; * Used the following video when setting this up:
+&nbsp; * https://youtu.be/TkoKdO5Knhk?si=vTl2eMINMJVVmM3q
+&nbsp; * https://firebase.google.com/docs/firestore/quickstart#initialize
+&nbsp; * The following code was developed with guidance from OpenAI&#39;s ChatGPT (https://chat.openai.com)
+&nbsp; * - Asked chatgpt for how to set up using environment variables (appCredentialsPath)
+&nbsp; * - Troubleshooted connection issues with ChatGPT when database connection didn&#39;t work
+&nbsp; */
+&nbsp;
+&nbsp;@Configuration
+<b class="fc">&nbsp;public class FirebaseConfig {</b>
+&nbsp;
+&nbsp;    @Value(&quot;${GOOGLE_APPLICATION_CREDENTIALS:}&quot;)
+&nbsp;    private String appCredentialsPath;
+&nbsp;
+&nbsp;    @Bean
+&nbsp;    public Firestore initializeApp() throws FirebaseInitializeException {
+&nbsp;
+&nbsp;        Firestore app;
+&nbsp;        try {
+&nbsp;
+<b class="nc">&nbsp;            FileInputStream serviceAccount = new FileInputStream(appCredentialsPath);</b>
+<b class="nc">&nbsp;            FirebaseOptions options = new FirebaseOptions.Builder()</b>
+<b class="nc">&nbsp;                    .setCredentials(GoogleCredentials.fromStream(serviceAccount))</b>
+<b class="nc">&nbsp;                    .build();</b>
+<b class="nc">&nbsp;            FirebaseApp.initializeApp(options);</b>
+<b class="nc">&nbsp;            return FirestoreClient.getFirestore();</b>
+&nbsp;
+&nbsp;        } catch(IOException e) {
+<b class="nc">&nbsp;            throw new FirebaseInitializeException();</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-10-17 01:31</div>
+</div>
+</body>
+</html>

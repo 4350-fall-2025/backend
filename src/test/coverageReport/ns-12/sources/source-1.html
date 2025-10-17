@@ -1,0 +1,213 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > OwnerService</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.softeng.backend.services.user.owner</a>
+</div>
+
+<h1>Coverage Summary for Class: OwnerService (com.softeng.backend.services.user.owner)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">OwnerService</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    77.8%
+  </span>
+  <span class="absValue">
+    (7/9)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    80%
+  </span>
+  <span class="absValue">
+    (16/20)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    92.6%
+  </span>
+  <span class="absValue">
+    (25/27)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.softeng.backend.services.user.owner;
+&nbsp;
+&nbsp;import com.softeng.backend.dto.OwnerDTO;
+&nbsp;import com.softeng.backend.models.pet.Pet;
+&nbsp;import com.softeng.backend.models.pet.PetLite;
+&nbsp;import com.softeng.backend.models.user.owner.Owner;
+&nbsp;import com.softeng.backend.repository.user.owner.OwnerRepository;
+&nbsp;import org.slf4j.Logger;
+&nbsp;import org.slf4j.LoggerFactory;
+&nbsp;import org.springframework.stereotype.Service;
+&nbsp;
+&nbsp;import java.util.HashMap;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.concurrent.ExecutionException;
+&nbsp;
+&nbsp;// Portions of the following CRUD methods were guided by OpenAI&#39;s ChatGPT (GPT-5), Oct. 12, 2025.
+&nbsp;// The implementation and adaptation were done by the author.
+&nbsp;
+&nbsp;@Service
+&nbsp;public class OwnerService implements IOwnerService {
+&nbsp;
+&nbsp;    private final OwnerRepository ownerRepository;
+<b class="fc">&nbsp;    private static final Logger logger = LoggerFactory.getLogger(OwnerService.class);</b>
+&nbsp;
+<b class="fc">&nbsp;    public OwnerService(OwnerRepository ownerRepository) {</b>
+<b class="fc">&nbsp;        this.ownerRepository = ownerRepository;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /*****************************************************************************
+&nbsp;     * CREATE
+&nbsp;     ******************************************************************************/
+&nbsp;    public OwnerDTO createOwner(Owner owner) throws ExecutionException, InterruptedException {
+&nbsp;        OwnerDTO dto;
+<b class="pc">&nbsp;        if (owner == null || owner.checkInvalidUser()) {</b>
+<b class="pc">&nbsp;            logger.debug(&quot;DEBUG LOG: Owner service detected invalid user for creation: {}&quot;, owner == null ? null : owner.getEmail());</b>
+<b class="fc">&nbsp;            dto = new OwnerDTO();</b>
+&nbsp;        } else {
+<b class="fc">&nbsp;            OwnerDTO existingOwner = getOwnerByEmail(owner.getEmail());</b>
+<b class="pc">&nbsp;            if (existingOwner != null &amp;&amp; existingOwner.getOwner() != null &amp;&amp; !existingOwner.getOwner().checkEmptyUser()) {</b>
+<b class="fc">&nbsp;                logger.debug(&quot;DEBUG LOG: Owner service detected user that already exists: {}&quot;, owner.getEmail());</b>
+<b class="fc">&nbsp;                dto = new OwnerDTO();</b>
+&nbsp;            } else {
+<b class="fc">&nbsp;                dto = ownerRepository.createOwner(owner);</b>
+&nbsp;            }
+&nbsp;        }
+<b class="fc">&nbsp;        return dto;</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /*****************************************************************************
+&nbsp;     * READ
+&nbsp;     ******************************************************************************/
+&nbsp;    public OwnerDTO getOwnerByEmail(String email) throws ExecutionException, InterruptedException {
+<b class="fc">&nbsp;        return ownerRepository.getOwnerByEmail(email);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public OwnerDTO getOwnerById(String id) throws ExecutionException, InterruptedException {
+<b class="fc">&nbsp;        return ownerRepository.getOwnerById(id);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /*****************************************************************************
+&nbsp;     * UPDATE
+&nbsp;     ******************************************************************************/
+&nbsp;    // https://firebase.google.com/docs/firestore/manage-data/add-data#update-data
+&nbsp;    public OwnerDTO updateOwner(String id, Owner owner) throws ExecutionException, InterruptedException {
+&nbsp;
+<b class="fc">&nbsp;        if (owner.checkEmptyUser()) {</b>
+<b class="fc">&nbsp;            return new OwnerDTO();</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        Map&lt;String, Object&gt; updateFields = new HashMap&lt;&gt;();</b>
+<b class="fc">&nbsp;        if (owner.getFirstName() != null) {</b>
+<b class="fc">&nbsp;            updateFields.put(&quot;firstName&quot;, owner.getFirstName());</b>
+&nbsp;        }
+<b class="pc">&nbsp;        if (owner.getLastName() != null) {</b>
+<b class="fc">&nbsp;            updateFields.put(&quot;lastName&quot;, owner.getLastName());</b>
+&nbsp;        }
+<b class="fc">&nbsp;        if (owner.getEmail() != null) {</b>
+<b class="fc">&nbsp;            updateFields.put(&quot;email&quot;, owner.getEmail());</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return ownerRepository.updateOwner(id, updateFields);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public OwnerDTO updatePet(String ownerId, Pet pet) throws ExecutionException, InterruptedException {
+<b class="nc">&nbsp;        return ownerRepository.updatePet(ownerId, new PetLite(pet.getId(), pet.getName(), pet.getBreed()));</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    public OwnerDTO removePet(String ownerId, String petId) throws ExecutionException, InterruptedException {
+<b class="nc">&nbsp;        return ownerRepository.removePet(ownerId, petId);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /*****************************************************************************
+&nbsp;     * DELETE
+&nbsp;     ******************************************************************************/
+&nbsp;    public boolean deleteOwner(String id) {
+<b class="fc">&nbsp;        return ownerRepository.deleteOwner(id);</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2025-10-17 01:31</div>
+</div>
+</body>
+</html>
