@@ -25,12 +25,12 @@ public class PetService implements IPetService {
     // CREATE
     // =========================
     @Override
-    public PetDTO createPet(String ownerId, Pet pet) throws ExecutionException, InterruptedException {
+    public PetDTO createPet(Pet pet) throws ExecutionException, InterruptedException {
         PetDTO result = new PetDTO();
         if (pet == null) {
             log.debug("PetService.createPet: pet reference is null");
         } else {
-            result = petRepository.createPet(ownerId, pet);
+            result = petRepository.createPet(pet);
             log.info("PetService.createPet: created pet with id {}", result.getId());
         }
         return result;
@@ -40,8 +40,8 @@ public class PetService implements IPetService {
     // READ
     // =========================
     @Override
-    public List<PetDTO> getPetById(String ownerId, String petId) throws ExecutionException, InterruptedException {
-        return petRepository.getPetById(ownerId, petId);
+    public PetDTO getPetById(String petId) throws ExecutionException, InterruptedException {
+        return petRepository.getPetById(petId);
     }
 
     @Override
@@ -53,11 +53,11 @@ public class PetService implements IPetService {
     // UPDATE
     // =========================
     @Override
-    public PetDTO updatePet(String ownerId, String petId, Pet pet) throws ExecutionException, InterruptedException {
+    public PetDTO updatePet(String petId, Pet pet) throws ExecutionException, InterruptedException {
         PetDTO result = new PetDTO();
 
         if (pet != null && pet.isValid()) {
-            result = petRepository.updatePet(ownerId, petId, pet);
+            result = petRepository.updatePet(petId, pet);
         }
 
         return result;
@@ -67,7 +67,7 @@ public class PetService implements IPetService {
     // DELETE
     // =========================
     @Override
-    public PetDTO deletePet(String ownerId, String petId) throws ExecutionException, InterruptedException {
-        return petRepository.deletePet(ownerId, petId);
+    public PetDTO deletePet(String petId) throws ExecutionException, InterruptedException {
+        return petRepository.deletePet(petId);
     }
 }

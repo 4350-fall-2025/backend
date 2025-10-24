@@ -42,7 +42,6 @@ public class PetRepository implements IPetRepository {
 
     /**
      *
-     * @param ownerId Document ID of the pet owner
      * @param pet <code>Pet</code> object to insert into database
      * @return A DTO of the created pet. The content may be empty if <code>pet</code>
      * is invalid
@@ -50,12 +49,11 @@ public class PetRepository implements IPetRepository {
      * @throws InterruptedException if the current thread was interrupted
      */
     @Override
-    public PetDTO createPet(String ownerId, Pet pet) throws ExecutionException, InterruptedException {
-        OwnerDTO owner = ownerRepository.getOwnerById(ownerId);
+    public PetDTO createPet(Pet pet) throws ExecutionException, InterruptedException {
+        OwnerDTO owner = ownerRepository.getOwnerById(pet.getOwnerId());
         PetDTO result = new PetDTO();
 
         if (owner != null && pet.isValid()) {
-            pet.setOwnerId(ownerId);
             // The following code was copied/developed with guidance from OpenAI's ChatGPT (https://chat.openai.com)
             ApiFuture<DocumentReference> addedDocRef = firestore.collection(PET_COLLECTION)
                                                                 .add(pet);
@@ -69,7 +67,7 @@ public class PetRepository implements IPetRepository {
             if (snapshot.exists()) {
                 pet = snapshot.toObject(Pet.class);
                 if (pet != null && pet.isValid()) {
-                    ownerRepository.addPet(ownerId, new PetLite(generatedId, pet.getName(), pet.getBreed()));
+                    ownerRepository.addPet(pet.getOwnerId(), new PetLite(generatedId, pet.getName(), pet.getBreed()));
                     result = new PetDTO(pet.getId(), pet);
                 }
             }
@@ -82,7 +80,6 @@ public class PetRepository implements IPetRepository {
     // =========================
 
     /**
-     * @param ownerId Document ID of the pet owner
      * @param petId Document ID of the pet to retrieve
      * @return A DTO of the pet. The content may be empty if no pet with
      * <code>petId</code> exists
@@ -90,19 +87,15 @@ public class PetRepository implements IPetRepository {
      * @throws InterruptedException if the current thread was interrupted
      */
     @Override
-    public List<PetDTO> getPetById(String ownerId, String petId) throws ExecutionException, InterruptedException {
-        List<PetDTO> result = new ArrayList<>();
+    public PetDTO getPetById(String petId) throws ExecutionException, InterruptedException {
+        PetDTO result = new PetDTO();
 
-        ApiFuture<QuerySnapshot> future = firestore.collection(PET_COLLECTION)
-                .whereEqualTo("ownerId", ownerId).whereEqualTo("id", petId).get();
+        ApiFuture<DocumentSnapshot> future = firestore.collection(PET_COLLECTION).document(petId).get();
+        DocumentSnapshot document = future.get();
 
-        QueryDocumentSnapshot doc = future.get().getDocuments().getFirst();
-
-        if (doc.exists()) {
-            Pet pet = doc.toObject(Pet.class);
-            if (pet.isValid()) {
-                result.add(new PetDTO(pet.getId(), pet));
-            }
+        if (document.exists()) {
+            Pet pet = document.toObject(Pet.class);
+            result = new PetDTO(petId, pet);
         }
 
         return result;
@@ -139,7 +132,6 @@ public class PetRepository implements IPetRepository {
     // =========================
 
     /**
-     * @param ownerId Document ID of the pet owner
      * @param petId Document ID of the pet to update
      * @param pet   <code>Pet</code> object containing updated information
      * @return The updated <code>Pet</code> object
@@ -147,12 +139,11 @@ public class PetRepository implements IPetRepository {
      * @throws InterruptedException if the current thread was interrupted
      */
     @Override
-    public PetDTO updatePet(String ownerId, String petId, Pet pet) throws ExecutionException, InterruptedException {
+    public PetDTO updatePet(String petId, Pet pet) throws ExecutionException, InterruptedException {
         PetDTO result = new PetDTO();
 
         if (pet != null && pet.isValid()) {
             ApiFuture<QuerySnapshot> future = firestore.collection(PET_COLLECTION)
-                    .whereEqualTo("ownerId", ownerId)
                     .whereEqualTo("id", petId)
                     .get();
 
@@ -161,7 +152,6 @@ public class PetRepository implements IPetRepository {
                 DocumentReference docRef = documents.getFirst().getReference();
                 // Set the new pet data
                 pet.setId(petId);
-                pet.setOwnerId(ownerId);
                 ApiFuture<WriteResult> writeResult = docRef.set(pet);
                 writeResult.get();
 
@@ -184,11 +174,10 @@ public class PetRepository implements IPetRepository {
      * @throws InterruptedException if the current thread was interrupted
      */
     @Override
-    public PetDTO deletePet(String ownerId, String petId) throws ExecutionException, InterruptedException {
+    public PetDTO deletePet(String petId) throws ExecutionException, InterruptedException {
         PetDTO result = new PetDTO();
 
         ApiFuture<QuerySnapshot> future = firestore.collection(PET_COLLECTION)
-                .whereEqualTo("ownerId", ownerId)
                 .whereEqualTo("id", petId)
                 .get();
 

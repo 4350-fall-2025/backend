@@ -6,13 +6,13 @@ import com.softeng.backend. models.pet.Pet;
 import com.softeng.backend.services.pet.IPetService;
 import com.softeng.backend.services.user.owner.IOwnerService;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 // The following class was partially developed with boilerplate and code
@@ -20,11 +20,11 @@ import java.util.concurrent.ExecutionException;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/owners")
+@RequestMapping("/api/v1/pets")
 public class PetController implements IPetController {
 
+    private static final Logger logger = LoggerFactory.getLogger(PetController.class);
     private final IOwnerService ownerService;
-
     private final IPetService petService;
 
 
@@ -37,16 +37,16 @@ public class PetController implements IPetController {
     /*****************************************************************************
      * CREATE
      ******************************************************************************/
-    @PostMapping("/{ownerId}/pets")
+    @PostMapping("")
     @Override
-    public ResponseEntity<PetDTO> createPet(@PathVariable String ownerId, @RequestBody Pet pet) {
+    public ResponseEntity<PetDTO> createPet(@RequestBody Pet pet) {
 
-        if (ownerId.isBlank() || pet == null || !pet.isValid()) {
+        if (pet == null || pet.getOwnerId().isBlank() || !pet.isValid()) {
             return ResponseEntity.badRequest().build();
         }
 
         try {
-            PetDTO result = petService.createPet(ownerId, pet);
+            PetDTO result = petService.createPet(pet);
 
             if (result.getPet().getId() != null) {
                 return ResponseEntity.ok().body(result);
@@ -61,54 +61,45 @@ public class PetController implements IPetController {
     /*****************************************************************************
      * READ
      ******************************************************************************/
-
-    @GetMapping("/{ownerId}/pets")
+    @GetMapping("/{petId}")
     @Override
-    public ResponseEntity<List<Map<String, Object>>> getPets(@PathVariable String ownerId, @RequestParam String petId) {
-        List<Map<String, Object>> result;
+    public ResponseEntity<PetDTO> getPet(@PathVariable String petId) {
 
-        List<PetDTO> pets;
-        try {
-            if (petId.isBlank()) {
-                pets = petService.getPetsByOwnerId(ownerId);
-            } else {
-                pets = petService.getPetById(ownerId, petId);
-            }
-
-            if (!petId.isBlank() && pets.isEmpty()) {
-                return ResponseEntity.notFound().build();
-            }
-
-            // Steam map generated with IntelliJ autocomplete
-            result = pets.stream().map(PetDTO::toMap).toList();
-
-        } catch (ExecutionException | InterruptedException e) {
-            log.error("ERROR LOG: Endpoint failed: {}", Arrays.toString(e.getStackTrace()));
-            return ResponseEntity.internalServerError().build();
+        if (petId == null || petId.isBlank()) {
+            return ResponseEntity.badRequest().build();
         }
 
-        return ResponseEntity.ok().body(result);
+        try {
+            PetDTO result = petService.getPetById(petId);
+
+            if (result.getPet().getId() != null) {
+                return ResponseEntity.ok().body(result);
+            }
+
+            return ResponseEntity.notFound().build();
+        } catch (ExecutionException | InterruptedException e) {
+            return ResponseEntity.internalServerError().build();
+        }
     }
 
     /*****************************************************************************
      * UPDATE
      ******************************************************************************/
-    @PutMapping("/{ownerId}/pets")
+    @PutMapping("/{petId}")
     @Override
-    public ResponseEntity<OwnerDTO> updatePet(@PathVariable String ownerId, @RequestParam String petId,
-                                              @RequestBody Pet pet) {
-        OwnerDTO updated;
-
-        if (ownerId.isBlank() || pet == null || !pet.isValid()) {
+    public ResponseEntity<PetDTO> updatePet(@PathVariable String petId, @RequestBody Pet pet) {
+        PetDTO updated;
+        //TODO implement partial update
+        if (petId == null || petId.isBlank() || pet == null || pet.getOwnerId().isBlank() || !pet.isValid()) {
             return ResponseEntity.badRequest().build();
         }
 
         try {
             pet.setId(petId);
-            updated = ownerService.updatePet(ownerId, pet);
-            petService.updatePet(ownerId, petId, pet);
+            ownerService.updatePet(pet.getOwnerId(), pet);
+            updated = petService.updatePet(petId, pet);
         } catch (ExecutionException | InterruptedException e) {
-            log.error("ERROR LOG: Endpoint failed: {}", Arrays.toString(e.getStackTrace()));
+            logger.error("ERROR LOG: Endpoint failed: {}", Arrays.toString(e.getStackTrace()));
             return ResponseEntity.internalServerError().build();
         }
 
@@ -122,17 +113,18 @@ public class PetController implements IPetController {
     /*****************************************************************************
      * DELETE
      ******************************************************************************/
-    @DeleteMapping("/{ownerId}/pets")
+    @DeleteMapping("/{petId}")
     @Override
-    public ResponseEntity<OwnerDTO> removePet(@PathVariable String ownerId, @RequestParam String petId) {
+    public ResponseEntity<OwnerDTO> removePet(@PathVariable String petId) {
         OwnerDTO updated;
 
-        if (ownerId.isBlank() || petId.isBlank()) {
+        if (petId.isBlank()) {
             return ResponseEntity.badRequest().build();
         }
 
         try {
-            PetDTO removed = petService.deletePet(ownerId, petId);
+            String ownerId = petService.getPetById(petId).getPet().getOwnerId();
+            PetDTO removed = petService.deletePet(petId);
 
             if (removed.getId() == null) {
                 return ResponseEntity.notFound().build();
