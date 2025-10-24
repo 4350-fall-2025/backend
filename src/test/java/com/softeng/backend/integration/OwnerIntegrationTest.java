@@ -4,7 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.softeng.backend.controllers.user.owner.OwnerController;
 import com.softeng.backend.dto.OwnerDTO;
 import com.softeng.backend.models.user.owner.Owner;
+import com.softeng.backend.repository.pet.PetRepository;
 import com.softeng.backend.repository.user.owner.OwnerRepository;
+import com.softeng.backend.services.pet.PetService;
 import com.softeng.backend.services.user.owner.OwnerService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,13 +27,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = OwnerController.class)
-@Import({OwnerService.class})
+@Import({OwnerService.class, PetService.class})
 public class OwnerIntegrationTest {
     @Autowired
     private MockMvc mockMvc;
 
     @MockitoBean
     private OwnerRepository ownerRepository;
+    @MockitoBean
+    private PetRepository petRepository;
 
     @Autowired
     private ObjectMapper objectMapper;

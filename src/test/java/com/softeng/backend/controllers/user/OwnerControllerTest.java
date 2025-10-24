@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.softeng.backend.controllers.user.owner.OwnerController;
 import com.softeng.backend.dto.OwnerDTO;
 import com.softeng.backend.models.user.owner.Owner;
+import com.softeng.backend.services.pet.PetService;
 import com.softeng.backend.services.user.owner.OwnerService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +42,8 @@ public class OwnerControllerTest {
 
     @MockitoBean
     private OwnerService ownerService;
+    @MockitoBean
+    private PetService petService;
 
     @Autowired
     private ObjectMapper objectMapper;
