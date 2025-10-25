@@ -9,8 +9,9 @@ import com.softeng.backend.exception.config.FirebaseInitializeException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.Resource;
 
-import java.io.FileInputStream;
+import java.io.InputStream;
 import java.io.IOException;
 
 /**
@@ -26,23 +27,26 @@ import java.io.IOException;
 @Configuration
 public class FirebaseConfig {
 
-    @Value("${GOOGLE_APPLICATION_CREDENTIALS:}")
-    private String appCredentialsPath;
+    @Value("${spring.cloud.gcp.project-id}")
+    private String projectId;
+
+    @Value("${spring.cloud.gcp.credentials.location}")
+    private Resource firebaseCredentials;
 
     @Bean
-    public Firestore initializeApp() throws FirebaseInitializeException {
-
-        Firestore app;
-        try {
-
-            FileInputStream serviceAccount = new FileInputStream(appCredentialsPath);
-            FirebaseOptions options = new FirebaseOptions.Builder()
+    public Firestore firestore() throws FirebaseInitializeException {
+        try (InputStream serviceAccount = firebaseCredentials.getInputStream()) {
+            FirebaseOptions options = FirebaseOptions.builder()
                     .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+                    .setProjectId(projectId)
                     .build();
-            FirebaseApp.initializeApp(options);
-            return FirestoreClient.getFirestore();
 
-        } catch(IOException e) {
+            if (FirebaseApp.getApps().isEmpty()) {
+                FirebaseApp.initializeApp(options);
+            }
+
+            return FirestoreClient.getFirestore();
+        } catch (IOException e) {
             throw new FirebaseInitializeException();
         }
     }
