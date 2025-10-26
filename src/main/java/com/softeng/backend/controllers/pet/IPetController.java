@@ -12,7 +12,7 @@ import java.util.Map;
 public interface IPetController {
 
     // CREATE
-    ResponseEntity<PetDTO> createPet(@PathVariable String ownerId, @RequestBody Pet pet);
+    ResponseEntity<Map<String, Object>> createPet(@PathVariable String ownerId, @RequestBody Pet pet);
 
     // READ
     @GetMapping("/{ownerId}/pets")
