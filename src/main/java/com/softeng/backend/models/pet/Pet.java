@@ -2,6 +2,7 @@ package com.softeng.backend.models.pet;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.google.cloud.spring.data.firestore.Document;
+import com.softeng.backend.models.enums.AnimalGroup;
 import com.softeng.backend.models.enums.PetSexType;
 import com.softeng.backend.models.enums.SterileStatus;
 import lombok.AllArgsConstructor;
@@ -26,6 +27,7 @@ public class Pet implements IPet {
     private String ownerId;
     private String species;
     private String breed;
+    private boolean estimatedBirthdate;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private PetSexType sex;
@@ -35,6 +37,9 @@ public class Pet implements IPet {
 
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private SterileStatus sterileStatus;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    private AnimalGroup animalGroup;
 
     /**
      * Validators generated with GPT-4.1
