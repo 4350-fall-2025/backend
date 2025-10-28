@@ -11,6 +11,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
+      GCP_CREDENTIALS_JSON: ${{ secrets.GCP_CREDENTIALS_JSON }}
       SPRING_PROFILES_ACTIVE: emulator
       FIRESTORE_EMULATOR_HOST: localhost:8080
       SPRING_CLOUD_GCP_PROJECT_ID: qdog-6aca2
@@ -56,4 +57,4 @@ jobs:
         run: mvn -B clean package -DskipTests
 
       - name: Run tests
-        run: mvn -B test
+        run: mvn test -Dspring.profiles.active=ci

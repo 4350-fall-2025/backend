@@ -1,4 +1,5 @@
 spring:
+  profiles: ci
   cloud:
     gcp:
       project-id: qdog-6aca2
@@ -6,7 +7,7 @@ spring:
         emulator:
           enabled: true
         credentials:
-          location:
+          location: ""
 
 logging:
   level:

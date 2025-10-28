@@ -10,8 +10,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.*;
 import org.springframework.core.io.Resource;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
 /**
  * References:
@@ -39,17 +41,27 @@ public class FirebaseConfig {
     @Bean
     public Firestore firestore() throws IOException {
         String emulatorHost = System.getenv("FIRESTORE_EMULATOR_HOST");
-
-        FirebaseOptions options;
-
         boolean isEmulator = emulatorHost != null && !emulatorHost.isBlank();
         boolean isCiProfile = "ci".equalsIgnoreCase(activeProfile);
 
+        FirebaseOptions options;
+
         if (isEmulator || isCiProfile) {
-            options = FirebaseOptions.builder()
-                    .setProjectId(projectId)
-                    .setCredentials(GoogleCredentials.create(null))
-                    .build();
+            String credsJson = System.getenv("GCP_CREDENTIALS_JSON");
+
+            if (credsJson != null && !credsJson.isBlank()) {
+                try (InputStream credsStream = new ByteArrayInputStream(credsJson.getBytes(StandardCharsets.UTF_8))) {
+                    options = FirebaseOptions.builder()
+                            .setProjectId(projectId)
+                            .setCredentials(GoogleCredentials.fromStream(credsStream))
+                            .build();
+                }
+            } else {
+                options = FirebaseOptions.builder()
+                        .setProjectId(projectId)
+                        .setCredentials(GoogleCredentials.create(null))
+                        .build();
+            }
         } else {
             try (InputStream serviceAccount = firebaseCredentials.getInputStream()) {
                 options = FirebaseOptions.builder()
