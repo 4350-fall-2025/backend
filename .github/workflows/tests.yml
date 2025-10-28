@@ -6,16 +6,14 @@ on:
     branches: [main]
   pull_request:
 
-env:
-  FIRESTORE_EMULATOR_HOST: localhost:8080
-
 jobs:
   build:
     runs-on: ubuntu-latest
 
-    defaults:
-      run:
-        working-directory: .
+    env:
+      FIRESTORE_EMULATOR_HOST: localhost:8080
+      FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      CI: true
 
     steps:
       - uses: actions/checkout@v4
@@ -34,21 +32,28 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
 
+      - name: Cache Firestore emulator
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/firebase/emulators
+          key: ${{ runner.os }}-firebase-emulators
+
       - name: Install Firebase CLI
         run: npm install -g firebase-tools
 
       - name: Start Firestore emulator
         run: |
+          mkdir -p $HOME/.cache/firebase/emulators
           firebase emulators:start \
             --only firestore \
-            --project=qdog-6aca2 \ &
-          # Give emulator time to start
+            --project qdog-6aca2 \
+            --import $HOME/.cache/firebase/emulators \
+            --export-on-exit $HOME/.cache/firebase/emulators &
           sleep 15
 
-      - name: Build (without tests)
+      - name: Build project
         run: mvn -B clean package -DskipTests
 
-      - name: Run Maven tests
-        env:
-          FIRESTORE_EMULATOR_HOST: "localhost:8080"
+      - name: Run tests
         run: mvn -B test
+
