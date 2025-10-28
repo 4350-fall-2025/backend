@@ -39,7 +39,7 @@ public class PetController implements IPetController {
      ******************************************************************************/
     @PostMapping("/{ownerId}/pets")
     @Override
-    public ResponseEntity<PetDTO> createPet(@PathVariable String ownerId, @RequestBody Pet pet) {
+    public ResponseEntity<Map<String, Object>> createPet(@PathVariable String ownerId, @RequestBody Pet pet) {
 
         if (ownerId.isBlank() || pet == null || !pet.isValid()) {
             return ResponseEntity.badRequest().build();
@@ -49,7 +49,7 @@ public class PetController implements IPetController {
             PetDTO result = petService.createPet(ownerId, pet);
 
             if (result.getPet().getId() != null) {
-                return ResponseEntity.ok().body(result);
+                return ResponseEntity.ok().body(result.toMap());
             }
 
             return ResponseEntity.notFound().build();
