@@ -4,9 +4,7 @@ import com.softeng.backend.models.user.owner.Owner;
 import com.softeng.backend.models.user.vet.Vet;
 import com.softeng.backend.repository.user.owner.OwnerRepository;
 import com.softeng.backend.repository.user.vet.VetRepository;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -31,11 +29,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 @SpringBootTest
 @AutoConfigureMockMvc
-@ActiveProfiles("test")
 public class AuthIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
+    @Autowired
+    private OwnerRepository ownerRepository;
+    @Autowired
+    private VetRepository vetRepository;
 
     private static final String mockToken = "MockTokenForNow";
 
@@ -45,8 +46,8 @@ public class AuthIntegrationTest {
     private static String vetId = "";
 
     // BeforeAll section was created with assistance from ChatGPT
-    @BeforeAll
-    static void setup(@Autowired OwnerRepository ownerRepository, @Autowired VetRepository vetRepository) throws Exception {
+    @BeforeEach
+    void setup() throws Exception {
         ownerId = ownerRepository.createOwner(owner).getId();
         vetId = vetRepository.createVet(vet).getId();
     }
@@ -109,8 +110,8 @@ public class AuthIntegrationTest {
                 .andExpect(jsonPath("$.detail").value("Password is incorrect"));
     }
 
-    @AfterAll
-    static void tearDown(@Autowired OwnerRepository ownerRepository, @Autowired VetRepository vetRepository) throws Exception {
+    @AfterEach
+    void tearDown() throws Exception {
         ownerRepository.deleteOwner(ownerId);
         vetRepository.deleteVet(vetId);
     }

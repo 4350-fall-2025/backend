@@ -3,9 +3,7 @@ package com.softeng.backend.integration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.softeng.backend.models.user.vet.Vet;
 import com.softeng.backend.repository.user.vet.VetRepository;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -33,7 +31,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@ActiveProfiles("test")
 public class VetIntegrationTest {
     @Autowired
     private MockMvc mockMvc;
@@ -51,17 +48,20 @@ public class VetIntegrationTest {
 
     private static String vetToGetId = "";
 
+    @Autowired
+    private VetRepository vetRepository;
+
     //TODO: remove when we set up auth
     private static final String mockPass = "MockTokenForNow";
 
-    @BeforeAll
-    static void setupVets(@Autowired VetRepository vetRepository) throws Exception {
+    @BeforeEach
+    void setupVets() throws Exception {
         vetToGetId = vetRepository.createVet(vetToGet).getId();
         vetToUpdateId = vetRepository.createVet(vetToUpdate).getId();
     }
 
     @Test
-    void testCreateVetCreated(@Autowired VetRepository vetRepository) throws Exception {
+    void testCreateVetCreated() throws Exception {
         Vet createdVet = new Vet("Arya", "Lancelot", "vet2@gmail.com", "StrongPass123!", mockCert);
         mockMvc.perform(post("/api/v1/vets/signup")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -175,8 +175,8 @@ public class VetIntegrationTest {
                 .andExpect(status().isNotFound());
     }
 
-    @AfterAll
-    static void tearDown(@Autowired VetRepository vetRepository) throws Exception {
+    @AfterEach
+    void tearDown() throws Exception {
         vetRepository.deleteVet(vetToGetId);
         vetRepository.deleteVet(vetToUpdateId);
     }

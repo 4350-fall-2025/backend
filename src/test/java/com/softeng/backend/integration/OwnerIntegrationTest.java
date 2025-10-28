@@ -3,9 +3,8 @@ package com.softeng.backend.integration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.softeng.backend.models.user.owner.Owner;
 import com.softeng.backend.repository.user.owner.OwnerRepository;
-import com.softeng.backend.repository.user.vet.VetRepository;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -31,7 +30,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@ActiveProfiles("test")
 public class OwnerIntegrationTest {
 
     @Autowired
@@ -50,14 +48,17 @@ public class OwnerIntegrationTest {
 
     private static String ownerToGetId = "";
 
-    @BeforeAll
-    static void setupOwner(@Autowired OwnerRepository ownerRepository) throws Exception {
+    @Autowired
+    private OwnerRepository ownerRepository;
+
+    @BeforeEach
+    void setupOwner() throws Exception {
         ownerToGetId = ownerRepository.createOwner(ownerToGet).getId();
         ownerToUpdateId = ownerRepository.createOwner(ownerToUpdate).getId();
     }
 
     @Test
-    void testCreateOwnerCreated(@Autowired OwnerRepository ownerRepository) throws Exception {
+    void testCreateOwnerCreated() throws Exception {
         Owner createdOwner = new Owner("Arya", "Lancelot", "email@gmail.com", "StrongPass123!");
         mockMvc.perform(post("/api/v1/owners/signup")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -172,8 +173,8 @@ public class OwnerIntegrationTest {
                 .andExpect(status().isNotFound());
     }
 
-    @AfterAll
-    static void tearDown(@Autowired OwnerRepository ownerRepository) throws Exception {
+    @AfterEach
+    void tearDown() throws Exception {
         ownerRepository.deleteOwner(ownerToGetId);
         ownerRepository.deleteOwner(ownerToUpdateId);
     }
