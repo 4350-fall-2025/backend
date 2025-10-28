@@ -2,6 +2,7 @@ package com.softeng.backend.repository.user.vet;
 
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.*;
+import com.softeng.backend.dto.OwnerDTO;
 import com.softeng.backend.dto.VetDTO;
 import com.softeng.backend.models.user.vet.Vet;
 import org.slf4j.Logger;
@@ -81,11 +82,18 @@ public class VetRepository implements IVetRepository {
     // https://firebase.google.com/docs/firestore/manage-data/add-data#update-data
     public VetDTO updateVet(String id, Map<String, Object> updateFields) throws ExecutionException, InterruptedException {
         DocumentReference docRef = firestore.collection(collectionName).document(id);
-        docRef.update(updateFields).get();
+        DocumentSnapshot snapshot = docRef.get().get();
 
+        // Asked ChatGPT how to handle specific exception that occurs when you call update on invalid doc id
+        if (!snapshot.exists()) {
+            return new VetDTO();
+        }
+
+
+        docRef.update(updateFields).get();
         // The following code was copied from OpenAI's ChatGPT (https://chat.openai.com))
         // I asked ChatGPT how we can get the updated result after writing,
-        DocumentSnapshot snapshot = docRef.get().get();
+        snapshot = docRef.get().get();
         Vet vet = snapshot.toObject(Vet.class);
         return new VetDTO(snapshot.getId(), vet);
     }
