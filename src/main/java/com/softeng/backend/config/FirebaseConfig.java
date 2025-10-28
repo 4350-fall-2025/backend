@@ -10,20 +10,19 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.*;
 import org.springframework.core.io.Resource;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 
 /**
  * References:
  * Used the following video when setting this up:
- * <a href="https://youtu.be/TkoKdO5Knhk?si=vTl2eMINMJVVmM3q">...</a>
- * <a href="https://firebase.google.com/docs/firestore/quickstart#initialize">...</a>
- * The following code was developed with guidance from OpenAI's ChatGPT (<a href="https://chat.openai.com">...</a>)
+ * https://youtu.be/TkoKdO5Knhk?si=vTl2eMINMJVVmM3q
+ * https://firebase.google.com/docs/firestore/quickstart#initialize
+ * The following code was developed with guidance from OpenAI's ChatGPT (https://chat.openai.com)
  * - Asked chatgpt for how to set up using environment variables (appCredentialsPath)
  * - Troubleshooted connection issues with ChatGPT when database connection didn't work
  */
+
 
 @Configuration
 public class FirebaseConfig {
@@ -34,42 +33,39 @@ public class FirebaseConfig {
     @Value("${spring.cloud.gcp.credentials.location:}")
     private Resource firebaseCredentials;
 
+    @Value("${spring.profiles.active:}")
+    private String activeProfile;
+
     @Bean
-    public Firestore firestore() throws FirebaseInitializeException {
-        try {
-            String emulatorHost = System.getenv("FIRESTORE_EMULATOR_HOST");
-            String ciSecret = System.getenv("FIREBASE_SERVICE_ACCOUNT"); // JSON from GitHub secret
+    public Firestore firestore() throws IOException {
+        String emulatorHost = System.getenv("FIRESTORE_EMULATOR_HOST");
 
-            FirebaseOptions options;
+        FirebaseOptions options;
 
-            if (emulatorHost != null && !emulatorHost.isBlank()) {
+        boolean isEmulator = emulatorHost != null && !emulatorHost.isBlank();
+        boolean isCiProfile = "ci".equalsIgnoreCase(activeProfile);
+
+        if (isEmulator || isCiProfile) {
+            options = FirebaseOptions.builder()
+                    .setProjectId(projectId)
+                    .setCredentials(GoogleCredentials.create(null))
+                    .build();
+        } else {
+            try (InputStream serviceAccount = firebaseCredentials.getInputStream()) {
                 options = FirebaseOptions.builder()
                         .setProjectId(projectId)
-                        .setCredentials(GoogleCredentials.create(null))
+                        .setCredentials(GoogleCredentials.fromStream(serviceAccount))
                         .build();
-            } else if (ciSecret != null && !ciSecret.isBlank()) {
-                try (InputStream serviceAccount = new ByteArrayInputStream(ciSecret.getBytes(StandardCharsets.UTF_8))) {
-                    options = FirebaseOptions.builder()
-                            .setProjectId(projectId)
-                            .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-                            .build();
-                }
-            } else {
-                try (InputStream serviceAccount = firebaseCredentials.getInputStream()) {
-                    options = FirebaseOptions.builder()
-                            .setProjectId(projectId)
-                            .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-                            .build();
-                }
             }
-
-            if (FirebaseApp.getApps().isEmpty()) {
-                FirebaseApp.initializeApp(options);
-            }
-
-            return FirestoreClient.getFirestore();
-        } catch (IOException e) {
-            throw new FirebaseInitializeException();
         }
+
+        FirebaseApp app;
+        if (FirebaseApp.getApps().isEmpty()) {
+            app = FirebaseApp.initializeApp(options);
+        } else {
+            app = FirebaseApp.getInstance();
+        }
+
+        return FirestoreClient.getFirestore(app);
     }
 }
