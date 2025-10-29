@@ -1,5 +1,7 @@
 spring:
-  profiles: ci
+  config:
+    activate:
+      on-profile: ci
   cloud:
     gcp:
       project-id: qdog-6aca2

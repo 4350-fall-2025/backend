@@ -35,7 +35,7 @@ public class FirebaseConfig {
     @Value("${spring.cloud.gcp.credentials.location:}")
     private Resource firebaseCredentials;
 
-    @Value("${spring.profiles.active:}")
+    @Value("${spring.config.activate.on-profile:}")
     private String activeProfile;
 
     @Bean
