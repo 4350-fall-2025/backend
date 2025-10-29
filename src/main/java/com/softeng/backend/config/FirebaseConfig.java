@@ -8,6 +8,8 @@ import com.google.firebase.cloud.FirestoreClient;
 import com.softeng.backend.exception.config.FirebaseInitializeException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.*;
+import org.springframework.core.env.Environment;
+import org.springframework.core.env.Profiles;
 import org.springframework.core.io.Resource;
 
 import java.io.ByteArrayInputStream;
@@ -35,14 +37,17 @@ public class FirebaseConfig {
     @Value("${spring.cloud.gcp.credentials.location:}")
     private Resource firebaseCredentials;
 
-    @Value("${spring.config.activate.on-profile:}")
-    private String activeProfile;
+    private final Environment environment;
+
+    public FirebaseConfig(Environment environment) {
+        this.environment = environment;
+    }
 
     @Bean
     public Firestore firestore() throws IOException {
         String emulatorHost = System.getenv("FIRESTORE_EMULATOR_HOST");
         boolean isEmulator = emulatorHost != null && !emulatorHost.isBlank();
-        boolean isCiProfile = "ci".equalsIgnoreCase(activeProfile);
+        boolean isCiProfile = environment.acceptsProfiles(Profiles.of("ci"));
 
         FirebaseOptions options;
 
@@ -63,6 +68,9 @@ public class FirebaseConfig {
                         .build();
             }
         } else {
+            if (firebaseCredentials == null || !firebaseCredentials.exists()) {
+                throw new FirebaseInitializeException();
+            }
             try (InputStream serviceAccount = firebaseCredentials.getInputStream()) {
                 options = FirebaseOptions.builder()
                         .setProjectId(projectId)
@@ -71,12 +79,9 @@ public class FirebaseConfig {
             }
         }
 
-        FirebaseApp app;
-        if (FirebaseApp.getApps().isEmpty()) {
-            app = FirebaseApp.initializeApp(options);
-        } else {
-            app = FirebaseApp.getInstance();
-        }
+        FirebaseApp app = FirebaseApp.getApps().isEmpty()
+                ? FirebaseApp.initializeApp(options)
+                : FirebaseApp.getInstance();
 
         return FirestoreClient.getFirestore(app);
     }
