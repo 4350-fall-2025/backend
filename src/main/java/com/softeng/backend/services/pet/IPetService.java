@@ -7,13 +7,13 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 public interface IPetService {
-    PetDTO createPet(String ownerId, Pet pet) throws ExecutionException, InterruptedException;
+    PetDTO createPet(Pet pet) throws ExecutionException, InterruptedException;
 
-    List<PetDTO> getPetById(String ownerId, String petId) throws ExecutionException, InterruptedException;
+    PetDTO getPetById(String petId) throws ExecutionException, InterruptedException;
 
     List<PetDTO> getPetsByOwnerId(String ownerId) throws ExecutionException, InterruptedException;
 
-    PetDTO updatePet(String ownerId, String petId, Pet pet) throws ExecutionException, InterruptedException;
+    PetDTO updatePet(String petId, Pet pet) throws ExecutionException, InterruptedException;
 
-    PetDTO deletePet(String ownerId, String petId) throws ExecutionException, InterruptedException;
+    PetDTO deletePet(String petId) throws ExecutionException, InterruptedException;
 }
