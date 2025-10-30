@@ -42,7 +42,7 @@ public class Pet implements IPet {
     @Override
     public boolean isValid() {
 
-        return isValidName() && isValidSpecies() && isValidBreed() &&
+        return isValidName() && isValidSpecies() && isValidBreed() && isValidOwnerId() &&
                 (sex != null) && isValidBirthDate() && (sterileStatus != null);
     }
 
@@ -63,6 +63,10 @@ public class Pet implements IPet {
 
     private boolean isValidBirthDate() {
         return birthdate != null && birthdate.before(new Date());
+    }
+
+    private boolean isValidOwnerId() {
+        return ownerId != null && !ownerId.trim().isEmpty();
     }
 }
 

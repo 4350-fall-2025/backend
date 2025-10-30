@@ -1,23 +1,25 @@
 package com.softeng.backend.controllers.pet;
 
-import com.softeng.backend.dto.OwnerDTO;
-import com.softeng.backend.dto.PetDTO;
 import com.softeng.backend.models.pet.Pet;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 public interface IPetController {
 
     // CREATE
-    ResponseEntity<PetDTO> createPet(@RequestBody Pet pet);
+    ResponseEntity<Map<String, Object>> createPet(@NotNull @RequestBody Pet pet);
 
     // READ
-    ResponseEntity<PetDTO> getPet(@PathVariable String petId);
+    ResponseEntity<Map<String, Object>> getPet(@NotNull @NotBlank @PathVariable String petId);
 
     // UPDATE
-    ResponseEntity<PetDTO> updatePet(@PathVariable String petId, @RequestBody Pet pet);
+    ResponseEntity<Map<String, Object>> updatePet(@NotNull @NotBlank @PathVariable String petId, @NotNull @RequestBody Pet pet);
 
     // DELETE
-    ResponseEntity<OwnerDTO> removePet(@PathVariable String petId);
+    ResponseEntity<Map<String, Object>> removePet(@NotNull @NotBlank @PathVariable String petId);
 
 }
