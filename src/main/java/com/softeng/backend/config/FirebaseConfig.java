@@ -9,15 +9,10 @@ import com.softeng.backend.exception.config.FirebaseInitializeException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.*;
 import org.springframework.core.env.Environment;
-import org.springframework.core.env.Profiles;
-import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 
-import java.io.ByteArrayInputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 
 /**
  * References:
@@ -37,65 +32,36 @@ public class FirebaseConfig {
     private String projectId;
 
     @Value("${spring.cloud.gcp.credentials.location:}")
-    private String firebaseCredentialsPath;
-
-    private final Environment environment;
-
-    public FirebaseConfig(Environment environment) {
-        this.environment = environment;
-    }
+    private Resource firebaseCredentials;
 
     @Bean
-    @Primary
-    public Firestore firestore() throws IOException {
+    public Firestore firestore() throws FirebaseInitializeException {
+        try {
+            String emulatorHost = System.getenv("FIRESTORE_EMULATOR_HOST");
+            FirebaseOptions options;
 
-        String emulatorHost = System.getenv("FIRESTORE_EMULATOR_HOST");
-        boolean isEmulator = emulatorHost != null && !emulatorHost.isBlank();
-        boolean isCiProfile = environment.acceptsProfiles(Profiles.of("ci"));
-        FirebaseOptions options = null;
-
-            if (isEmulator || isCiProfile)
-            {
-                System.err.println("EMULATORS YESSSS HERE");
+            if (emulatorHost != null && !emulatorHost.isBlank()) {
                 options = FirebaseOptions.builder()
                         .setProjectId(projectId)
                         .setCredentials(GoogleCredentials.create(null))
                         .build();
-
             } else {
-                String creds = System.getenv("GCP_CREDENTIALS_JSON");
-                if(creds != null && !creds.isBlank()) {
-
-                    if (creds.contains("firebase-admin.json")) {
-                        // it's a file path
-                       try {
-                            FileInputStream serviceAccount = new FileInputStream(creds);
-                            options = FirebaseOptions.builder()
-                                    .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-                                    .setProjectId(projectId)
-                                    .build();
-                       } catch(IOException e) {
-                            System.err.println("In the first if-block, it failed to open the file.");
-                       }
-                    } else {
-                        // it's the actual creds
-                        try{
-                            InputStream credsStream = new ByteArrayInputStream(creds.getBytes(StandardCharsets.UTF_8));
-                            options = FirebaseOptions.builder()
-                                    .setProjectId(projectId)
-                                    .setCredentials(GoogleCredentials.fromStream(credsStream))
-                                    .build();
-                        } catch(IOException e) {
-                            System.err.println("In the else-block, it failed to open the file.");
-                       }
-                    }
+                try (InputStream serviceAccount = firebaseCredentials.getInputStream()) {
+                    options = FirebaseOptions.builder()
+                            .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+                            .setProjectId(projectId)
+                            .build();
                 }
             }
 
-        FirebaseApp app = FirebaseApp.getApps().isEmpty()
-                ? FirebaseApp.initializeApp(options)
-                : FirebaseApp.getInstance();
+            if (FirebaseApp.getApps().isEmpty()) {
+                FirebaseApp.initializeApp(options);
+            }
 
-        return FirestoreClient.getFirestore(app);
+            return FirestoreClient.getFirestore();
+
+        } catch (IOException e) {
+            throw new FirebaseInitializeException();
+        }
     }
 }
