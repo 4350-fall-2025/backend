@@ -1,5 +1,5 @@
 # this CI script was copied from ChatGPT, GPT-5 
-name: Spring Boot CI
+name: Spring Boot CI manual run
 
 on:
   push:
