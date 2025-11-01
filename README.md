@@ -1,6 +1,6 @@
 # Backend REST API Server
 
-## Onboarding Instructions
+## Onboarding Instructions for Production
 1) Install Intellij IDEA
 2) Install [Java 25](https://www.oracle.com/ca-en/java/technologies/downloads/#java25) on Oracle website or through Intellij
 3) Install [Postman](https://www.postman.com/downloads/)
@@ -39,18 +39,28 @@ Annotation Processors -> Enable annotation processing*
     backend/src/main/resources
 ```
 
-10) (See *Note below if you do not see an enviornment variables option). In IntelliJ, Click the "Run->Edit Configurations" and in the Run/Debug Configurations, under "Environment Variables" enter the following environment variables:
+10) Run the application by executing BackendApplication.java by clicking the "Run Appplication" button in IntelliJ:
+    <img width="482" height="77" alt="build-run" src="https://github.com/user-attachments/assets/dbaad99a-ee1b-4703-aac5-a25df9590b5d" />
 
-GOOGLE_APPLICATION_CREDENTIALS=*enter your ABSOLUTE path to the firebase-admin.json file here*
+# Onboarding for Local Development:
 
-Eg: Windows: 
-GOOGLE_APPLICATION_CREDENTIALS=C:\Users\you\Docs\Project\backend\src\etc\firebase-admin.json
+The instructions are the same as above, but you need to configure the firebase emulators.
 
-Eg. Mac/Linux: 
-GOOGLE_APPLICATION_CREDENTIALS=/Users/you/docs/project/backend/src/etc/firebase-admin.json
+1. Install firebase CLI
+```bash
+curl -sL firebase.tools | bash
+```
+Other download options available on the [firebase website](https://firebase.google.com/docs/cli?authuser=2#install_the_firebase_cli) :
 
-*Tip: you can right-click the firebase-admin.json file in IntelliJ then copy the absolute path*
-Then click "Apply", then "Ok".
+2. Verify that in the project root directory there are the following files: 
+
+.firebaserc
+firebase.json
+
+
+3. Set up the environment variable required for emulators: (See *Note below if you do not see an enviornment variables option). In IntelliJ, Click the "Run->Edit Configurations" and in the Run/Debug Configurations, under "Environment Variables" enter the following environment variables:
+
+FIRESTORE_EMULATOR_HOST=localhost:8080
 
 https://github.com/user-attachments/assets/b3f54cc6-95ac-450b-8c32-04437eeebb50
 
@@ -58,9 +68,21 @@ Note*: If you do not see a section in edit configurations as outlined above, you
 
 https://github.com/user-attachments/assets/893d32ed-f8fe-478d-a5e7-d923d1dcd9b7
 
+3. Navigate to the correct directory in your terminal:
+```bash
+  cd src/main/java/com/softeng/backend
+```
+   
+4. run the emulators:
+```bash
+firebase emulators:start --import ../../../../../test/data
+```
 
-11) Run the application by executing BackendApplication.java by clicking the "Run Appplication" button in IntelliJ:
-    <img width="482" height="77" alt="build-run" src="https://github.com/user-attachments/assets/dbaad99a-ee1b-4703-aac5-a25df9590b5d" />
+*Note:* before you STOP the emulators, save test data by running in a different terminal:
+```bash
+cd src/main/java/com/softeng/backend
+firebase emulators:export ../../../../../test/data
+```
 
 # Sources
 

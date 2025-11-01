@@ -7,11 +7,12 @@ import com.google.firebase.FirebaseOptions;
 import com.google.firebase.cloud.FirestoreClient;
 import com.softeng.backend.exception.config.FirebaseInitializeException;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.*;
+import org.springframework.core.env.Environment;
+import org.springframework.core.io.Resource;
 
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * References:
@@ -23,26 +24,50 @@ import java.io.IOException;
  * - Troubleshooted connection issues with ChatGPT when database connection didn't work
  */
 
+
 @Configuration
 public class FirebaseConfig {
 
-    @Value("${GOOGLE_APPLICATION_CREDENTIALS:}")
-    private String appCredentialsPath;
+    @Value("${spring.cloud.gcp.project-id}")
+    private String projectId;
+
+    @Value("${spring.cloud.gcp.credentials.location:}")
+    private Resource firebaseCredentials;
+
+    private final Environment env;
+
+    public FirebaseConfig(Environment env) {
+        this.env = env;
+    }
 
     @Bean
-    public Firestore initializeApp() throws FirebaseInitializeException {
-
-        Firestore app;
+    public Firestore firestore() throws FirebaseInitializeException {
         try {
+            String emulatorHost = System.getenv("FIRESTORE_EMULATOR_HOST");
 
-            FileInputStream serviceAccount = new FileInputStream(appCredentialsPath);
-            FirebaseOptions options = new FirebaseOptions.Builder()
-                    .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-                    .build();
-            FirebaseApp.initializeApp(options);
+            FirebaseOptions options;
+
+            if (emulatorHost != null && !emulatorHost.isBlank()) {
+                options = FirebaseOptions.builder()
+                        .setProjectId(projectId)
+                        .setCredentials(GoogleCredentials.create(null))
+                        .build();
+            } else {
+                try (InputStream serviceAccount = firebaseCredentials.getInputStream()) {
+                    options = FirebaseOptions.builder()
+                            .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+                            .setProjectId(projectId)
+                            .build();
+                }
+            }
+
+            if (FirebaseApp.getApps().isEmpty()) {
+                FirebaseApp.initializeApp(options);
+            }
+
             return FirestoreClient.getFirestore();
 
-        } catch(IOException e) {
+        } catch (IOException e) {
             throw new FirebaseInitializeException();
         }
     }
