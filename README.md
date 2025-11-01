@@ -11,7 +11,7 @@
 5) Open the project in Intellij
 6) [Set up the project SDK](https://www.baeldung.com/intellij-change-java-version) to Java 25
 7) Enable Annotation Processing through the menu in IntelliJ: 
-*IntelliJ Menu -> Build, Execution, Deploymnet -> Compiler -> 
+*IntelliJ Menu -> Settings -> Build, Execution, Deploymnet -> Compiler -> 
 Annotation Processors -> Enable annotation processing*
 8) Set up Firestore authentication:
 
@@ -42,7 +42,7 @@ Annotation Processors -> Enable annotation processing*
 10) Run the application by executing BackendApplication.java by clicking the "Run Appplication" button in IntelliJ:
     <img width="482" height="77" alt="build-run" src="https://github.com/user-attachments/assets/dbaad99a-ee1b-4703-aac5-a25df9590b5d" />
 
-# Onboarding for Local Development:
+# Onboarding for Local Development & Testing:
 
 The instructions are the same as above, but you need to configure the firebase emulators.
 
@@ -54,11 +54,38 @@ Other download options available on the [firebase website](https://firebase.goog
 
 2. Verify that in the project root directory there are the following files: 
 
-.firebaserc
-firebase.json
+>> - .firebaserc
+
+>> - firebase.json
 
 
-3. Set up the environment variable required for emulators: (See *Note below if you do not see an enviornment variables option). In IntelliJ, Click the "Run->Edit Configurations" and in the Run/Debug Configurations, under "Environment Variables" enter the following environment variables:
+3. Set up the environment variable required for emulators: (See *Note below if you do not see an enviornment variables option).
+*There are two ways to set enviornment variables in the project*. You can pick whichever is easier for you:
+
+### Option 1: Set it in Intellij (you may need to set this configuration for each integration test file):
+
+1. (Optional) install maven (and then use mvn test instead of ./mvnw test below)
+
+2. Use the maven built in to the project to run maven commands in your terminal/command prompt:
+
+Mac/Linux:
+```bash
+FIRESTORE_EMULATOR_HOST=localhost:8080 ./mvnw test
+```
+
+Windows Command Prompt:
+```bash
+set FIRESTORE_EMULATOR_HOST=localhost:8080 && mvnw test
+```
+
+Windows Powershell:
+```bash
+$env:FIRESTORE_EMULATOR_HOST="localhost:8080"; ./mvnw test
+```
+
+### Option 2: Set it in Intellij (you may need to set this configuration for each integration test file):
+
+In IntelliJ, Click the "Run->Edit Configurations" and in the Run/Debug Configurations, under "Environment Variables" enter the following environment variables:
 
 FIRESTORE_EMULATOR_HOST=localhost:8080
 
