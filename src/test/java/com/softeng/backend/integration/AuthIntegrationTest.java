@@ -18,7 +18,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 /**
  * AuthIntegrationTest
- * Test cases written by AryaPhan.
+ * Test cases written by Minh Phan.
  * Reference: OpenAI ChatGPT GPT-5Mini (<a href="https://chat.openai.com">...</a>)
  * Some JSON formatting and MockMvc syntax guidance was copied from ChatGPT, which
  * are referenced in line.
