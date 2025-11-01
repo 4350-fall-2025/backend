@@ -34,12 +34,6 @@ public class FirebaseConfig {
     @Value("${spring.cloud.gcp.credentials.location:}")
     private Resource firebaseCredentials;
 
-    private final Environment env;
-
-    public FirebaseConfig(Environment env) {
-        this.env = env;
-    }
-
     @Bean
     public Firestore firestore() throws FirebaseInitializeException {
         try {

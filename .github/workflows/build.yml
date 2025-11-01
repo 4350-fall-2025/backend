@@ -1,0 +1,38 @@
+# this CI script was copied from ChatGPT, GPT-5 
+name: Spring Boot CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    env:
+      FIRESTORE_EMULATOR_HOST: localhost:8080
+      SPRING_CLOUD_GCP_PROJECT_ID: qdog-6aca2
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # Set up JDK
+      - name: Set up JDK 25
+        uses: actions/setup-java@v4
+        with:
+          java-version: 25
+          distribution: temurin
+
+      # Cache Maven dependencies
+      - name: Cache Maven packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      # Build project without tests
+      - name: Build project
+        run: mvn -B clean package -DskipTests
