@@ -26,6 +26,7 @@ public class DiaryDTO {
                 "id", id,
                 "contentType", diary.getContentType(),
                 "contentBody", diary.getContentType(),
+                "file", diary.getFiles(),
                 "createTimestamp", diary.getCreateTimestamp()
         );
     }

@@ -9,6 +9,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+
 @Document(collectionName = "diary")
 @Getter
 @AllArgsConstructor
@@ -18,6 +20,8 @@ public class Diary implements IDiary{
     private String contentType; //implement enum later if needed
     @NotNull(message = "contentBody is required")
     private String contentBody;
+    @NotNull(message = "file is required")
+    private ArrayList<String> files;
 
     @NotNull(message = "createTimestamp is required")
     @PastOrPresent(message = "createTimestamp cannot be in the future")
