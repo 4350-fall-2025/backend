@@ -29,6 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 @SpringBootTest
 @AutoConfigureMockMvc
+@ActiveProfiles("ci")
 public class AuthIntegrationTest {
 
     @Autowired
@@ -111,7 +112,7 @@ public class AuthIntegrationTest {
     }
 
     @AfterEach
-    void tearDown() throws Exception {
+    void tearDown() {
         ownerRepository.deleteOwner(ownerId);
         vetRepository.deleteVet(vetId);
     }

@@ -6,8 +6,6 @@ import com.softeng.backend.repository.pet.PetRepository;
 import com.softeng.backend.repository.user.owner.OwnerRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.AfterEach;
-import com.softeng.backend.services.pet.PetService;
-import com.softeng.backend.services.user.owner.OwnerService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -33,6 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@ActiveProfiles("ci")
 public class OwnerIntegrationTest {
 
     @Autowired
@@ -81,7 +80,7 @@ public class OwnerIntegrationTest {
     }
 
     @Test
-    void testCreateOwnerConflict() throws Exception {;
+    void testCreateOwnerConflict() throws Exception {
         mockMvc.perform(post("/api/v1/owners/signup")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(ownerToGet)))
@@ -180,7 +179,7 @@ public class OwnerIntegrationTest {
     }
 
     @AfterEach
-    void tearDown() throws Exception {
+    void tearDown() {
         ownerRepository.deleteOwner(ownerToGetId);
         ownerRepository.deleteOwner(ownerToUpdateId);
     }

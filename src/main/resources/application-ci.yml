@@ -1,0 +1,25 @@
+environment: local
+
+spring:
+  application:
+    name: backend
+  cloud:
+    gcp:
+      project-id: qdog-6aca2
+      firestore:
+        emulator:
+          enabled: false
+          emulator-host: localhost
+          emulator-port: 8080
+logging:
+  level:
+    root: INFO
+    com.softeng.backend: DEBUG # Change to INFO if you don't want debug logs
+
+server:
+  port: 3000
+  compression:
+    enabled: true
+  error:
+    include-message: always
+  shutdown: "graceful"
