@@ -3,7 +3,7 @@ name: Spring Boot CI
 
 on:
   push:
-    branches: [main]
+    branches: [ main ]
   pull_request:
 
 jobs:
@@ -44,27 +44,24 @@ jobs:
           key: ${{ runner.os }}-firebase-emulators
 
       # Install Firebase CLI
-      #- name: Install Firebase CLI
-        #run: npm install -g firebase-tools
+      - name: Install Firebase CLI
+        run: npm install -g firebase-tools
 
       # Start Firestore emulator
-      #- name: Start Firestore emulator
-       # run: |
-        #  mkdir -p $HOME/.cache/firebase/emulators
-        #  firebase emulators:start \
-          #  --only firestore \
-         #   --project qdog-6aca2 \
-        #    --import $HOME/.cache/firebase/emulators \
-         #   --export-on-exit $HOME/.cache/firebase/emulators &
-         # sleep 15
+      - name: Start Firestore emulator
+        run: |
+          mkdir -p $HOME/.cache/firebase/emulators
+          firebase emulators:start \
+            --only firestore \
+            --project qdog-6aca2 \
+            --import $HOME/.cache/firebase/emulators \
+            --export-on-exit $HOME/.cache/firebase/emulators &
+          sleep 15
 
       # Build project without tests
       - name: Build project
         run: mvn -B clean package -DskipTests
 
-      - name: Debug Spring profile
-        run: echo "spring.profiles.active=$SPRING_PROFILES_ACTIVE"
-
       # Run tests with CI profile
-      # - name: Run tests
-        #run: mvn test -Dspring.profiles.active=ci
+      - name: Run tests
+        run: mvn test -Dspring.profiles.active=ci

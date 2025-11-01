@@ -55,6 +55,7 @@ public class FirebaseConfig {
             String credsJson = System.getenv("GCP_CREDENTIALS_JSON");
 
             if (credsJson != null && !credsJson.isBlank()) {
+                System.err.println("CREDS FROM JSON WAS HERE");
                 try (InputStream credsStream = new ByteArrayInputStream(credsJson.getBytes(StandardCharsets.UTF_8))) {
                     options = FirebaseOptions.builder()
                             .setProjectId(projectId)
@@ -62,6 +63,7 @@ public class FirebaseConfig {
                             .build();
                 }
             } else {
+                System.err.println("EMULATORS YESSSS HERE");
                 options = FirebaseOptions.builder()
                         .setProjectId(projectId)
                         .setCredentials(GoogleCredentials.create(null))
@@ -72,6 +74,7 @@ public class FirebaseConfig {
                 throw new FirebaseInitializeException();
             }
             try (InputStream serviceAccount = firebaseCredentials.getInputStream()) {
+                System.err.println("CREDS FROM STREAM HERE");
                 options = FirebaseOptions.builder()
                         .setProjectId(projectId)
                         .setCredentials(GoogleCredentials.fromStream(serviceAccount))
