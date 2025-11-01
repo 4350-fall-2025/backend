@@ -1,12 +1,12 @@
 package com.softeng.backend.controllers.user.owner;
 
-import com.softeng.backend.dto.OwnerDTO;
 import com.softeng.backend.models.user.owner.Owner;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.util.List;
 import java.util.Map;
 
 public interface IOwnerController {
@@ -20,7 +20,7 @@ public interface IOwnerController {
      * READ
      ******************************************************************************/
     ResponseEntity<Map<String, Object>> getOwnerById(@PathVariable String id);
-
+    ResponseEntity<List<Map<String, Object>>> getOwnersPets(@PathVariable String ownerId);
     /*****************************************************************************
      * UPDATE
      ******************************************************************************/

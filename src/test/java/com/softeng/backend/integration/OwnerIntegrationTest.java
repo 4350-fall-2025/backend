@@ -2,9 +2,12 @@ package com.softeng.backend.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.softeng.backend.models.user.owner.Owner;
+import com.softeng.backend.repository.pet.PetRepository;
 import com.softeng.backend.repository.user.owner.OwnerRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.AfterEach;
+import com.softeng.backend.services.pet.PetService;
+import com.softeng.backend.services.user.owner.OwnerService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -34,7 +37,7 @@ public class OwnerIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
-
+  
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -50,6 +53,9 @@ public class OwnerIntegrationTest {
 
     @Autowired
     private OwnerRepository ownerRepository;
+  
+    @Autowired
+    private PetRepository petRepository;
 
     @BeforeEach
     void setupOwner() throws Exception {
