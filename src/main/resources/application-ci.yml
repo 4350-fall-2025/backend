@@ -2,14 +2,21 @@ spring:
   config:
     activate:
       on-profile: ci
+
+  autoconfigure:
+    exclude:
+      - com.google.cloud.spring.autoconfigure.firestore.GcpFirestoreAutoConfiguration
+
   cloud:
     gcp:
       project-id: qdog-6aca2
       firestore:
         emulator:
           enabled: true
-        credentials:
-          location: ""
+
+  credentials:
+    location:
+
 
 logging:
   level:

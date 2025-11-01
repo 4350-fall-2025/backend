@@ -10,9 +10,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.*;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.Profiles;
+import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 
 import java.io.ByteArrayInputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -35,7 +37,7 @@ public class FirebaseConfig {
     private String projectId;
 
     @Value("${spring.cloud.gcp.credentials.location:}")
-    private Resource firebaseCredentials;
+    private String firebaseCredentialsPath;
 
     private final Environment environment;
 
@@ -44,43 +46,51 @@ public class FirebaseConfig {
     }
 
     @Bean
+    @Primary
     public Firestore firestore() throws IOException {
+
         String emulatorHost = System.getenv("FIRESTORE_EMULATOR_HOST");
         boolean isEmulator = emulatorHost != null && !emulatorHost.isBlank();
         boolean isCiProfile = environment.acceptsProfiles(Profiles.of("ci"));
+        FirebaseOptions options = null;
 
-        FirebaseOptions options;
-
-        if (isEmulator || isCiProfile) {
-            String credsJson = System.getenv("GCP_CREDENTIALS_JSON");
-
-            if (credsJson != null && !credsJson.isBlank()) {
-                System.err.println("CREDS FROM JSON WAS HERE");
-                try (InputStream credsStream = new ByteArrayInputStream(credsJson.getBytes(StandardCharsets.UTF_8))) {
-                    options = FirebaseOptions.builder()
-                            .setProjectId(projectId)
-                            .setCredentials(GoogleCredentials.fromStream(credsStream))
-                            .build();
-                }
-            } else {
+            if (isEmulator || isCiProfile)
+            {
                 System.err.println("EMULATORS YESSSS HERE");
                 options = FirebaseOptions.builder()
                         .setProjectId(projectId)
                         .setCredentials(GoogleCredentials.create(null))
                         .build();
+
+            } else {
+                String creds = System.getenv("GCP_CREDENTIALS_JSON");
+                if(creds != null && !creds.isBlank()) {
+
+                    if (creds.contains("firebase-admin.json")) {
+                        // it's a file path
+                       try {
+                            FileInputStream serviceAccount = new FileInputStream(creds);
+                            options = FirebaseOptions.builder()
+                                    .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+                                    .setProjectId(projectId)
+                                    .build();
+                       } catch(IOException e) {
+                            System.err.println("In the first if-block, it failed to open the file.");
+                       }
+                    } else {
+                        // it's the actual creds
+                        try{
+                            InputStream credsStream = new ByteArrayInputStream(creds.getBytes(StandardCharsets.UTF_8));
+                            options = FirebaseOptions.builder()
+                                    .setProjectId(projectId)
+                                    .setCredentials(GoogleCredentials.fromStream(credsStream))
+                                    .build();
+                        } catch(IOException e) {
+                            System.err.println("In the else-block, it failed to open the file.");
+                       }
+                    }
+                }
             }
-        } else {
-            if (firebaseCredentials == null || !firebaseCredentials.exists()) {
-                throw new FirebaseInitializeException();
-            }
-            try (InputStream serviceAccount = firebaseCredentials.getInputStream()) {
-                System.err.println("CREDS FROM STREAM HERE");
-                options = FirebaseOptions.builder()
-                        .setProjectId(projectId)
-                        .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-                        .build();
-            }
-        }
 
         FirebaseApp app = FirebaseApp.getApps().isEmpty()
                 ? FirebaseApp.initializeApp(options)

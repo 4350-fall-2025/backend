@@ -36,13 +36,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
 
-      # Cache Firestore emulator
-      - name: Cache Firestore emulator
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/firebase/emulators
-          key: ${{ runner.os }}-firebase-emulators
-
       # Install Firebase CLI
       - name: Install Firebase CLI
         run: npm install -g firebase-tools
