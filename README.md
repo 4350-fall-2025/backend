@@ -41,13 +41,16 @@ Annotation Processors -> Enable annotation processing*
 
 10) Set the active profile for BackendApplication. In IntelliJ, Click the "Run->Edit Configurations" and in the Run/Debug Configurations, under "Active profiles" enter the following environment variables:
 
-`firebase`
+`firebase` - For using hosted database (Not recommended for running tests or profiling)
+`emulator` - You must run the emulator locally, this is used for local tests and profiling
 
-<insert image here>
+https://github.com/user-attachments/assets/66dc5e33-bb83-4bb8-abfa-5cf50776ab2b
 
 Note*: If you do not see a section in edit configurations as outlined above, you just need to click "Modify Options->Active profiles" as seen below:
 
-<insert image here>
+
+https://github.com/user-attachments/assets/54f69f0e-ac77-4339-8987-cf339f88b191
+
 
 11) Run the application by executing BackendApplication.java by clicking the "Run Appplication" button in IntelliJ:
     <img width="482" height="77" alt="build-run" src="https://github.com/user-attachments/assets/dbaad99a-ee1b-4703-aac5-a25df9590b5d" />
