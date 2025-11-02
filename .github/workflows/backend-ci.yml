@@ -57,4 +57,4 @@ jobs:
 
       # Run tests with emulator profile
       - name: Run tests
-        run: mvn test -Dspring.profiles.active=ci
+        run: mvn test
