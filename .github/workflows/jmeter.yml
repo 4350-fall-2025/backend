@@ -3,16 +3,20 @@
 name: Spring Boot CI manual run with DB emulator + profiling
 
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-
+  # Manual trigger for profiling runs
   workflow_dispatch:
     inputs:
       branch:
         description: 'Branch to run the workflow on'
         required: false
         default: 'develop'
+
+  # Automatically run only for PRs that affect relevant files and target main
+  pull_request:
+    paths:
+      - 'profiling/**'                # JMeter test plans
+      - '.github/workflows/jmeter.yml' # Workflow file itself
+      - 'pom.xml'                      # Maven build changes
 
 jobs:
   build:
@@ -65,10 +69,7 @@ jobs:
       # Start Spring Boot app with emulator profile
       - name: Start Spring Boot server
         run: |
-          # Start the app in the background
-          mvn spring-boot:run -P emulator &
-          
-          # Wait for the server to be up (adjust port if needed)
+          mvn spring-boot:run -Dspring-boot.run.profiles=emulator &
           echo "Waiting for Spring Boot server to start..."
           for i in {1..30}; do
             if curl -s http://localhost:8080/actuator/health | grep -q "UP"; then
@@ -81,9 +82,6 @@ jobs:
       # Run JMeter profiler against emulator
       - name: Run JMeter profiler
         run: |
-          # Remove old report folder
-          rm -rf report
-
           # Minimal logging to avoid secrets in logs
           export JVM_ARGS="-Dlog_level.jmeter=ERROR"
 
@@ -98,4 +96,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: jmeter-report
-          path: report/
+          path: profiling/report/
