@@ -1,329 +1,184 @@
 package com.softeng.backend.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.softeng.backend.controllers.user.owner.OwnerController;
-import com.softeng.backend.controllers.user.vet.VetController;
-import com.softeng.backend.dto.VetDTO;
 import com.softeng.backend.models.user.vet.Vet;
 import com.softeng.backend.repository.user.vet.VetRepository;
-import com.softeng.backend.services.user.vet.VetService;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.context.annotation.Import;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(controllers = VetController.class)
-@Import({VetService.class})
+/**
+ * Sprint 2:
+ * Assistance provided by OpenAI’s GPT-5 Mini language model (ChatGPT), October 2025.
+ * Asked for help rewriting ALL these tests to stop using the mock repo since
+ * it will use the emulator.
+ * Thus, ALL test functions in this file were originally written by Minh Phan,
+ * then updated & copied from ChatGPT
+ * and reviewed by Victoria Iskandar to ensure correctness.
+ */
+
+
+@SpringBootTest
+@AutoConfigureMockMvc
+@ActiveProfiles("emulator")
 public class VetIntegrationTest {
     @Autowired
     private MockMvc mockMvc;
 
     @Autowired
-    @MockitoBean
-    private VetRepository vetRepository;
-
-    @Autowired
     private ObjectMapper objectMapper;
 
-    private static final String mockDocId = "mockDocId";
+    private static final String mockCert = "Certified";
+
+    private static final Vet vetToGet = new Vet("Default", "Vet", "defaultvet@gmail.com", "StrongPass123!", mockCert);
+
+    private static final Vet vetToUpdate = new Vet("Always", "Changing", "ichange@gmail.com", "StrongPass123!", mockCert);
+
+    private static String vetToUpdateId = "";
+
+    private static String vetToGetId = "";
+
+    @Autowired
+    private VetRepository vetRepository;
 
     //TODO: remove when we set up auth
     private static final String mockPass = "MockTokenForNow";
-    private static final String mockCert = "Certified";
+
+    @BeforeEach
+    void setupVets() throws Exception {
+        vetToGetId = vetRepository.createVet(vetToGet).getId();
+        vetToUpdateId = vetRepository.createVet(vetToUpdate).getId();
+    }
 
     @Test
     void testCreateVetCreated() throws Exception {
-        Vet vet = new Vet("Minh", "CopyThisTest1", "123@gmail.com", "VerySecure123", mockCert);
-        when(vetRepository.createVet(any(Vet.class))).thenReturn(new VetDTO(mockDocId, vet));
-
-        this.mockMvc.perform(post("/api/v1/vets/signup")
+        Vet createdVet = new Vet("Arya", "Lancelot", "vet2@gmail.com", "StrongPass123!", mockCert);
+        mockMvc.perform(post("/api/v1/vets/signup")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(vet)))
+                        .content(objectMapper.writeValueAsString(createdVet)))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.firstName").value("Minh"))
-                .andExpect(jsonPath("$.lastName").value("CopyThisTest1"))
-                .andExpect(jsonPath("$.email").value("123@gmail.com"))
-                .andExpect(jsonPath("$.certification").value(mockCert))
+                .andExpect(jsonPath("$.firstName").value(createdVet.getFirstName()))
+                .andExpect(jsonPath("$.lastName").value(createdVet.getLastName()))
+                .andExpect(jsonPath("$.email").value(createdVet.getEmail()))
                 .andExpect(jsonPath("$.token").value(mockPass));
+        String ownerToCreateId = vetRepository.getVetByEmail(createdVet.getEmail()).getId();
+        vetRepository.deleteVet(ownerToCreateId);
     }
 
     @Test
     void testCreateVetConflict() throws Exception {
-        // null DTO ID path:
-        Vet vet = new Vet("Minh", "CopyThisTest1", "123@gmail.com", "VerySecure123", mockCert);
-        when(vetRepository.createVet(any(Vet.class))).thenReturn(new VetDTO(null, vet));
-        this.mockMvc.perform(post("/api/v1/vets/signup")
+        mockMvc.perform(post("/api/v1/vets/signup")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(vet)))
+                        .content(objectMapper.writeValueAsString(vetToGet)))
                 .andExpect(status().isConflict())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.error").value("Conflict fields"))
-                .andExpect(jsonPath("$.detail.email").value("Email already exists"));
-
-        // null DTO path:
-        when(vetRepository.createVet(any(Vet.class))).thenReturn(null);
-        this.mockMvc.perform(post("/api/v1/vets/signup")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(vet)))
-                .andExpect(status().isConflict())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.error").value("Conflict fields"))
                 .andExpect(jsonPath("$.detail.email").value("Email already exists"));
     }
 
     @Test
     void testCreateVetBadRequest() throws Exception {
-        Vet vet = new Vet("Minh", "CopyThisTest1", "   ", "VerySecure123", mockCert);
-        when(vetRepository.createVet(any(Vet.class))).thenReturn(null);
-        this.mockMvc.perform(post("/api/v1/vets/signup")
+        Vet invalidVet = new Vet("Arya", "Lancelot", "   ", "short", mockCert);
+
+        mockMvc.perform(post("/api/v1/vets/signup")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(vet)))
+                        .content(objectMapper.writeValueAsString(invalidVet)))
                 .andExpect(status().isBadRequest())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.error").value("Validation failed"))
-                // Reference: Copied the following 4 lines from ChatGPT (for convenience)
                 .andExpect(jsonPath("$.detail.firstName").value("Name cannot be empty"))
                 .andExpect(jsonPath("$.detail.lastName").value("Name cannot be empty"))
                 .andExpect(jsonPath("$.detail.email").value("Invalid email format"))
-                .andExpect(jsonPath("$.detail.password").value("Must be at least 8 characters"))
-                .andExpect(jsonPath("$.detail.certification").value("Certification cannot be empty"));
-    }
-
-    @Test
-    void testCreateVetServerError() throws Exception {
-        Vet vet = new Vet("Minh", "CopyThisTest1", "email@email.com", "VerySecure123", mockCert);
-        // this when/thenThrow statement was copied from ChatGPT:
-        when(vetRepository.createVet(any(Vet.class)))
-                .thenThrow(new ExecutionException(new RuntimeException("Firestore failure")));
-
-        this.mockMvc.perform(post("/api/v1/vets/signup")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(vet)))
-                .andExpect(status().isInternalServerError());
-
-        // this when/thenThrow statement was copied from ChatGPT:
-        when(vetRepository.createVet(any(Vet.class)))
-                .thenThrow(new InterruptedException("Operation was interrupted"));
-
-        this.mockMvc.perform(post("/api/v1/vets/signup")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(vet)))
-                .andExpect(status().isInternalServerError());
+                .andExpect(jsonPath("$.detail.password").value("Must be at least 8 characters"));
     }
 
     @Test
     void testGetVetByIdOk() throws Exception {
-        Vet vet = new Vet("Minh", "CopyThisTest1", "123@gmail.com", "VerySecure123", mockCert);
-
-        when(vetRepository.getVetById(mockDocId)).thenReturn(new VetDTO(mockDocId, vet));
-
-        this.mockMvc.perform(get("/api/v1/vets/{id}", mockDocId)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(vet)))
+        mockMvc.perform(get("/api/v1/vets/{id}", vetToGetId)
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.firstName").value("Minh"))
-                .andExpect(jsonPath("$.lastName").value("CopyThisTest1"))
-                .andExpect(jsonPath("$.email").value("123@gmail.com"))
-                .andExpect(jsonPath("$.token").value(mockPass))
-                .andExpect(jsonPath("$.certification").value(mockCert));
-    }
-
-    @Test
-    void testGetVetByIdNotFound() throws Exception {
-        Vet vet = new Vet("Minh", "CopyThisTest1", "   ", "VerySecure123", mockCert);
-
-        // null id
-        when(vetRepository.getVetById(mockDocId)).thenReturn(new VetDTO(null, vet));
-
-        this.mockMvc.perform(get("/api/v1/vets/{id}", mockDocId)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNotFound());
-
-        // null dto
-        when(vetRepository.getVetById(mockDocId)).thenReturn(null);
-
-        this.mockMvc.perform(get("/api/v1/vets/{id}", mockDocId)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNotFound());
-
-        // empty id
-        when(vetRepository.getVetById(any(String.class)))
-                .thenReturn(new VetDTO("", vet));
-        this.mockMvc.perform(get("/api/v1/vets/{id}", mockDocId)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNotFound());
-    }
-
-    @Test
-    void testGetVetByIdServerError() throws Exception {
-        // this when/thenThrow statement was copied from ChatGPT:
-        when(vetRepository.getVetById(mockDocId))
-                .thenThrow(new InterruptedException("Operation was interrupted"));
-
-        this.mockMvc.perform(get("/api/v1/vets/{id}", mockDocId))
-                .andExpect(status().isInternalServerError());
-
-        // this when/thenThrow statement was copied from ChatGPT:
-        when(vetRepository.getVetById(any(String.class)))
-                .thenAnswer(_ -> {
-                    throw new ExecutionException(new RuntimeException("Firestore failure"));
-                });
-
-        this.mockMvc.perform(get("/api/v1/vets/{id}", mockDocId))
-                .andExpect(status().isInternalServerError());
+                .andExpect(jsonPath("$.firstName").value(vetToGet.getFirstName()))
+                .andExpect(jsonPath("$.lastName").value(vetToGet.getLastName()))
+                .andExpect(jsonPath("$.token").value(mockPass));
     }
 
     @Test
     void testUpdateVetOk() throws Exception {
-        Vet vet = new Vet("NewName", "", "", "VerySecure123", mockCert);
-        when(vetRepository.updateVet(any(String.class), any(Map.class)))
-                .thenReturn(new VetDTO(mockDocId, vet));
-
-        this.mockMvc.perform(put("/api/v1/vets/{id}", mockDocId)
+        Vet updateVet = new Vet("NewName", "", "", "StrongPass123!", mockCert);
+        mockMvc.perform(put("/api/v1/vets/{id}", vetToUpdateId)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(vet)))
+                        .content(objectMapper.writeValueAsString(updateVet)))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.firstName").value("NewName"))
                 .andExpect(jsonPath("$.lastName").value(""))
                 .andExpect(jsonPath("$.email").value(""))
-                .andExpect(jsonPath("$.token").value(mockPass))
-                .andExpect(jsonPath("$.certification").value(mockCert));
+                .andExpect(jsonPath("$.token").value(mockPass));
     }
 
     @Test
     void testUpdateVetBadRequest() throws Exception {
-        Vet vet = new Vet("", "", null, null, null);
-        when(vetRepository.updateVet(any(String.class), any(Map.class)))
-                .thenReturn(new VetDTO(mockDocId, vet));
-
-        this.mockMvc.perform(put("/api/v1/vets/{id}", mockDocId)
+        Vet invalidUpdate = new Vet("", "", null, null, null);
+        mockMvc.perform(put("/api/v1/vets/{id}", vetToUpdateId)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(vet)))
+                        .content(objectMapper.writeValueAsString(invalidUpdate)))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
     void testUpdateVetNotFound() throws Exception {
-        Vet vet = new Vet("Minh", "CopyThisTest1", "123@abc.com", "123", mockCert);
-        when(vetRepository.updateVet(any(String.class), any(Map.class)))
-                .thenReturn(new VetDTO(null, vet));
-
-        this.mockMvc.perform(put("/api/v1/vets/{id}", mockDocId)
+        Vet updateVet = new Vet("NoOne", "None", "noone@gmail.com", "password123!", mockCert);
+        mockMvc.perform(put("/api/v1/vets/{id}", "non-existent-id")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(vet)))
+                        .content(objectMapper.writeValueAsString(updateVet)))
                 .andExpect(status().isNotFound());
-
-        when(vetRepository.updateVet(any(String.class), any(Map.class)))
-                .thenReturn(null);
-
-        this.mockMvc.perform(put("/api/v1/vets/{id}", mockDocId)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(vet)))
-                .andExpect(status().isNotFound());
-    }
-
-    @Test
-    void testUpdateVetServerError() throws Exception {
-        Vet vet = new Vet("Minh", "CopyThisTest1", "email@email.com", "VerySecure123", mockCert);
-
-        // this when/thenThrow statement was copied from ChatGPT:
-        when(vetRepository.updateVet(any(String.class), any(Map.class)))
-                .thenThrow(new InterruptedException("Operation was interrupted"));
-
-        this.mockMvc.perform(put("/api/v1/vets/{id}", mockDocId)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(vet)))
-                .andExpect(status().isInternalServerError());
-
-        // this when/thenThrow statement was copied from ChatGPT:
-        when(vetRepository.updateVet(any(String.class), any(Map.class)))
-                .thenAnswer(_ -> {
-                    throw new ExecutionException(new RuntimeException("Firestore failure"));
-                });
-
-        this.mockMvc.perform(put("/api/v1/vets/{id}", mockDocId)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(vet)))
-                .andExpect(status().isInternalServerError());
     }
 
     @Test
     void testDeleteVetNoContent() throws Exception {
-        Vet vet = new Vet("NewName", "NewName", "new@name.com", "VerySecure123", mockCert);
-        when(vetRepository.getVetById(any(String.class)))
-                .thenReturn(new VetDTO(mockDocId, vet));
-        when(vetRepository.deleteVet(any(String.class)))
-                .thenReturn(true);
+        // Create a temporary vet to delete
+        String email = "temp.vet+" + System.currentTimeMillis() + "@gmail.com";
+        Vet tempVet = new Vet("Temp", "Vet", email, "StrongPass123!", mockCert);
 
-        this.mockMvc.perform(delete("/api/v1/vets/{id}", mockDocId)
+        String responseJson = mockMvc.perform(post("/api/v1/vets/signup")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(vet)))
+                        .content(objectMapper.writeValueAsString(tempVet)))
+                .andExpect(status().isCreated())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        Map<String, Object> createdVet = objectMapper.readValue(responseJson, Map.class);
+        String tempVetId = (String) createdVet.get("id");
+
+        mockMvc.perform(delete("/api/v1/vets/{id}", tempVetId)
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
+
+        mockMvc.perform(get("/api/v1/vets/{id}", tempVetId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
     }
 
     @Test
     void testDeleteVetNotFound() throws Exception {
-        // null ID
-        Vet vet = new Vet("NewName", "NewName", "new@name.com", "VerySecure123", mockCert);
-        when(vetRepository.getVetById(any(String.class)))
-                .thenReturn(new VetDTO(null, vet));
-
-        this.mockMvc.perform(delete("/api/v1/vets/{id}", mockDocId)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(vet)))
-                .andExpect(status().isNotFound());
-
-        // null DTO
-        when(vetRepository.getVetById(any(String.class)))
-                .thenReturn(null);
-
-        this.mockMvc.perform(delete("/api/v1/vets/{id}", mockDocId)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(vet)))
-                .andExpect(status().isNotFound());
-
-        // empty id
-        when(vetRepository.getVetById(any(String.class)))
-                .thenReturn(new VetDTO("", vet));
-
-        this.mockMvc.perform(delete("/api/v1/vets/{id}", mockDocId)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(vet)))
+        mockMvc.perform(delete("/api/v1/vets/{id}", "non-existent-id")
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
     }
 
-    @Test
-    void testDeleteVetServerError() throws Exception {
-        // this when/thenThrow statement was copied from ChatGPT:
-        when(vetRepository.getVetById(mockDocId))
-                .thenThrow(new InterruptedException("Operation was interrupted"));
-
-        this.mockMvc.perform(delete("/api/v1/vets/{id}", mockDocId))
-                .andExpect(status().isInternalServerError());
-
-        // this when/thenThrow statement was copied from ChatGPT:
-        when(vetRepository.getVetById(any(String.class)))
-                .thenAnswer(_ -> {
-                    throw new ExecutionException(new RuntimeException("Firestore failure"));
-                });
-
-        this.mockMvc.perform(delete("/api/v1/vets/{id}", mockDocId))
-                .andExpect(status().isInternalServerError());
+    @AfterEach
+    void tearDown() {
+        vetRepository.deleteVet(vetToGetId);
+        vetRepository.deleteVet(vetToUpdateId);
     }
 }

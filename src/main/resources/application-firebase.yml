@@ -5,7 +5,8 @@ spring:
     name: backend
   cloud:
     gcp:
-      project-id: qdog-6aca2
+      credentials:
+        location: classpath:firebase-admin.json
 
 logging:
   level:

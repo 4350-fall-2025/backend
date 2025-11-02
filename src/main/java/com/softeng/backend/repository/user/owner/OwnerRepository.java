@@ -82,13 +82,19 @@ public class OwnerRepository implements IOwnerRepository {
      * UPDATE
      ******************************************************************************/
     // https://firebase.google.com/docs/firestore/manage-data/add-data#update-data
+    // This function has code copied from ChatGPT, which are commented in line
     public OwnerDTO updateOwner(String id, Map<String, Object> updateFields) throws ExecutionException, InterruptedException {
         DocumentReference docRef = firestore.collection(collectionName).document(id);
-        docRef.update(updateFields).get();
-
-        // The following code was copied from OpenAI's ChatGPT (https://chat.openai.com))
-        // I asked ChatGPT how we can get the updated result after writing,
         DocumentSnapshot snapshot = docRef.get().get();
+
+        // Asked ChatGPT how to handle specific exception that occurs when you call update on invalid doc id
+        if (!snapshot.exists()) {
+            return new OwnerDTO();
+        }
+
+        docRef.update(updateFields).get();
+        snapshot = docRef.get().get();
+        // Asked ChatGPT how we can get the updated result after writing
         Owner owner = snapshot.toObject(Owner.class);
         return new OwnerDTO(snapshot.getId(), owner);
     }
