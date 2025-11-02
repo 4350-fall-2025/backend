@@ -1,5 +1,7 @@
 package com.softeng.backend.controllers.user;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthException;
 import com.softeng.backend.dto.OwnerDTO;
 import com.softeng.backend.dto.VetDTO;
 import com.softeng.backend.services.user.owner.OwnerService;
@@ -13,7 +15,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -32,10 +36,31 @@ public class AuthController implements IAuthController {
         this.vetService = vetService;
     }
 
+    /**
+     * example code was used from firebase docs for authentication:
+     * https://firebase.google.com/docs/auth/admin/create-custom-tokens#create_custom_tokens_using_the_firebase_admin_sdk
+     * @param uid
+     * @param role
+     * @return auth token
+     * @throws FirebaseAuthException
+     */
+    private String createCustomToken(String uid, String role)  {
+        try{
+            Map<String, Object> additionalClaims = new HashMap<String, Object>();
+            additionalClaims.put("role", role);
+            return FirebaseAuth.getInstance().createCustomToken(uid, additionalClaims);
+        } catch (FirebaseAuthException e) {
+            logger.error(e.getMessage());
+            return "It failed to create custom token";
+        }
+
+    }
+
     @PostMapping("/login")
     public ResponseEntity<Map<String, Object>> Login(@RequestBody Map<String, String> loginRequest) {
         String email = loginRequest.get("email");
         String password = loginRequest.get("password");
+        String role;
         try {
             OwnerDTO ownerDTO;
             ownerDTO = ownerService.getOwnerByEmail(email);
@@ -44,17 +69,21 @@ public class AuthController implements IAuthController {
 
             // TODO: improve security when auth set up
             if (vetDTO != null && !vetDTO.isEmpty()) {
+                role = "vet";
                 if (!vetDTO.getVet().getPassword().equals(password)) {
                     return ResponseEntity.badRequest().body(Map.of("error", "Incorrect Credential", "detail", "Password is incorrect"));
                 } else {
-                    return ResponseEntity.ok().body(vetDTO.toMap());
+                    String token = createCustomToken(vetDTO.getId(), role);
+                    return ResponseEntity.ok().body(Map.of("user",vetDTO.toMap(), "token", token));
                 }
             }
             if (ownerDTO != null && !ownerDTO.isEmpty()) {
+                role = "owner";
                 if (!ownerDTO.getOwner().getPassword().equals(password)) {
                     return ResponseEntity.badRequest().body(Map.of("error", "Incorrect Credential", "detail", "Password is incorrect"));
                 } else {
-                    return ResponseEntity.ok().body(ownerDTO.toMap());
+                    String token = createCustomToken(ownerDTO.getId(), role);
+                    return ResponseEntity.ok().body(Map.of("user",ownerDTO.toMap(), "token", token));
                 }
             }
             logger.debug("DEBUG LOG: auth/login endpoint not found for email: {}", email);
