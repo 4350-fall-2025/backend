@@ -23,12 +23,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * are referenced in line.
  * For all test cases I copied some code from chatGPT relating to any() syntax and
  * when mocking the service, and the response validation jsonPath() calls
- *
  * Sprint 2: Asked ChatGPT for assistance when issues occurred when switching from mock repo
  * to hitting the emulator, code written with assistance from ChatGPT.
  */
 @SpringBootTest
 @AutoConfigureMockMvc
+@ActiveProfiles("emulator")
 public class AuthIntegrationTest {
 
     @Autowired
@@ -111,7 +111,7 @@ public class AuthIntegrationTest {
     }
 
     @AfterEach
-    void tearDown() throws Exception {
+    void tearDown() {
         ownerRepository.deleteOwner(ownerId);
         vetRepository.deleteVet(vetId);
     }

@@ -5,8 +5,11 @@ spring:
     name: backend
   cloud:
     gcp:
-      project-id: qdog-6aca2
-
+      firestore:
+        emulator:
+          enabled: true
+          host: localhost
+          port: 8080
 logging:
   level:
     root: INFO

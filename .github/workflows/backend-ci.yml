@@ -17,13 +17,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    env:
-      GCP_CREDENTIALS_JSON: ${{ secrets.GCP_CREDENTIALS_JSON }}
-      SPRING_PROFILES_ACTIVE: ci
-      FIRESTORE_EMULATOR_HOST: localhost:8080
-      SPRING_CLOUD_GCP_PROJECT_ID: qdog-6aca2
-      CI: true
-
     steps:
       - uses: actions/checkout@v4
 
@@ -58,16 +51,10 @@ jobs:
             --export-on-exit $HOME/.cache/firebase/emulators &
           sleep 15
 
-      #Write mock admin json for auto configuration
-      - name: Write GCP credentials to temp file
-        run: echo $GCP_CREDENTIALS_JSON | base64 -di > firebase-admin.json
-
       # Build project without tests
       - name: Build project
         run: mvn -B clean package -DskipTests
 
-      # TODO: Run tests with CI profile
+      # Run tests with emulator profile
       - name: Run tests
         run: mvn test -Dspring.profiles.active=ci
-        env:
-          SPRING_CLOUD_GCP_CREDENTIALS_LOCATION: file:firebase-admin.json
