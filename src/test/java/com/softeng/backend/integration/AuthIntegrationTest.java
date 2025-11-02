@@ -7,8 +7,10 @@ import com.softeng.backend.models.user.owner.Owner;
 import com.softeng.backend.models.user.vet.Vet;
 import com.softeng.backend.repository.user.owner.OwnerRepository;
 import com.softeng.backend.repository.user.vet.VetRepository;
+import com.softeng.backend.services.user.AuthService;
 import com.softeng.backend.services.user.owner.OwnerService;
 import com.softeng.backend.services.user.vet.VetService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -18,6 +20,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -43,9 +46,16 @@ public class AuthIntegrationTest {
     private OwnerRepository ownerRepository;
     @MockitoBean
     private VetRepository vetRepository;
+    @MockitoBean
+    private AuthService authService;
 
     private static final String mockDocId = "mockDocId";
     private static final String mockToken = "MockTokenForNow";
+
+    @BeforeEach
+    void setUp() {
+        when(authService.createCustomToken(eq(mockDocId), (any(String.class)))).thenReturn(mockToken);
+    }
 
     @Test
     void testLoginOwnerSuccess() throws Exception {
