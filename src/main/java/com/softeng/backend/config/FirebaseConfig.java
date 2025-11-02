@@ -8,6 +8,7 @@ import com.google.firebase.cloud.FirestoreClient;
 import com.softeng.backend.exception.config.FirebaseInitializeException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.*;
+import org.springframework.core.env.Environment;
 import org.springframework.core.io.Resource;
 
 import java.io.IOException;
@@ -25,7 +26,6 @@ import java.io.InputStream;
 
 
 @Configuration
-@Profile("default")
 public class FirebaseConfig {
 
     @Value("${spring.cloud.gcp.project-id}")
@@ -37,12 +37,21 @@ public class FirebaseConfig {
     @Bean
     public Firestore firestore() throws FirebaseInitializeException {
         try {
+            String emulatorHost = System.getenv("FIRESTORE_EMULATOR_HOST");
             FirebaseOptions options;
-            try (InputStream serviceAccount = firebaseCredentials.getInputStream()) {
+
+            if (emulatorHost != null && !emulatorHost.isBlank()) {
                 options = FirebaseOptions.builder()
-                        .setCredentials(GoogleCredentials.fromStream(serviceAccount))
                         .setProjectId(projectId)
+                        .setCredentials(GoogleCredentials.create(null))
                         .build();
+            } else {
+                try (InputStream serviceAccount = firebaseCredentials.getInputStream()) {
+                    options = FirebaseOptions.builder()
+                            .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+                            .setProjectId(projectId)
+                            .build();
+                }
             }
 
             if (FirebaseApp.getApps().isEmpty()) {
