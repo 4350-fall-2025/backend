@@ -4,13 +4,18 @@ import com.softeng.backend.models.user.owner.Owner;
 import com.softeng.backend.models.user.vet.Vet;
 import com.softeng.backend.repository.user.owner.OwnerRepository;
 import com.softeng.backend.repository.user.vet.VetRepository;
+import com.softeng.backend.services.user.AuthService;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -37,6 +42,8 @@ public class AuthIntegrationTest {
     private OwnerRepository ownerRepository;
     @Autowired
     private VetRepository vetRepository;
+    @MockitoBean
+    private AuthService authService;
 
     private static final String mockToken = "MockTokenForNow";
 
@@ -50,8 +57,8 @@ public class AuthIntegrationTest {
     void setup() throws Exception {
         ownerId = ownerRepository.createOwner(owner).getId();
         vetId = vetRepository.createVet(vet).getId();
+        when(authService.createCustomToken((any(String.class)), (any(String.class)))).thenReturn(mockToken);
     }
-
 
     @Test
     void testLoginOwnerSuccess() throws Exception {
