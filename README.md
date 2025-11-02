@@ -44,7 +44,10 @@ Annotation Processors -> Enable annotation processing*
 `firebase` - For using hosted database (Not recommended for running tests or profiling)
 `emulator` - You must run the emulator locally, this is used for local tests and profiling
 
-https://github.com/user-attachments/assets/66dc5e33-bb83-4bb8-abfa-5cf50776ab2b
+
+
+https://github.com/user-attachments/assets/fc647e81-b94e-4f0f-aff7-96be912b8445
+
 
 Note*: If you do not see a section in edit configurations as outlined above, you just need to click "Modify Options->Active profiles" as seen below:
 
