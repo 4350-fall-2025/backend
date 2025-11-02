@@ -6,7 +6,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 
 @SpringBootTest
-@ActiveProfiles("firebase")
+@ActiveProfiles("emulator")
 class BackendApplicationTests {
 
     @Test
