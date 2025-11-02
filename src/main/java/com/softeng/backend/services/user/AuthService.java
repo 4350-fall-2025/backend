@@ -25,7 +25,7 @@ public class AuthService {
             return FirebaseAuth.getInstance().createCustomToken(uid, additionalClaims);
         } catch (FirebaseAuthException e) {
             logger.error(e.getMessage());
-            return "It failed to create custom token";
+            return null;
         }
     }
 }
