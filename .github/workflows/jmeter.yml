@@ -90,9 +90,6 @@ jobs:
       # Run JMeter profiler against emulator
       - name: Run JMeter profiler
         run: |
-          rm -rf profiling/report
-          rm profiling/results.jtl
-          
           # Minimal logging to avoid posting TMI in logs
           export JVM_ARGS="-Dlog_level.jmeter=ERROR"
 
