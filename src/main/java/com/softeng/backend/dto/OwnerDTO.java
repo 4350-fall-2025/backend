@@ -1,7 +1,6 @@
 package com.softeng.backend.dto;
 
 import com.softeng.backend.models.user.owner.Owner;
-import com.softeng.backend.services.user.vet.VetService;
 import lombok.Getter;
 import java.util.Map;
 import java.util.Objects;
