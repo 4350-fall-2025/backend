@@ -58,6 +58,11 @@ jobs:
             --export-on-exit $HOME/.cache/firebase/emulators &
           sleep 15
 
+      #Write mock admin json for auto configuration
+      - name: Write GCP credentials to temp file
+        run: |
+          echo "${{ secrets.GCP_CREDENTIALS_JSON }}" > $HOME/firebase-admin.json
+
       # Build project without tests
       - name: Build project
         run: mvn -B clean package -DskipTests
@@ -65,3 +70,5 @@ jobs:
       # TODO: Run tests with CI profile
       - name: Run tests
         run: mvn test -Dspring.profiles.active=ci
+        env:
+          SPRING_CLOUD_GCP_CREDENTIALS_LOCATION: $HOME/firebase-admin.json
