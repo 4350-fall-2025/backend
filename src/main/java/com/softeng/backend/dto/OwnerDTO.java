@@ -1,6 +1,7 @@
 package com.softeng.backend.dto;
 
 import com.softeng.backend.models.user.owner.Owner;
+import com.softeng.backend.services.user.vet.VetService;
 import lombok.Getter;
 import java.util.Map;
 import java.util.Objects;
@@ -20,15 +21,24 @@ public class OwnerDTO {
 
     private final String id;
     private final Owner owner;
+    private final String token;
+
+    public OwnerDTO(OwnerDTO dto, String token) {
+        this.id = dto.getId();
+        this.owner = dto.getOwner();
+        this.token = token;
+    }
 
     public OwnerDTO(String id, Owner owner) {
         this.id = Objects.requireNonNullElse(id, "");
         this.owner = Objects.requireNonNullElse(owner, new Owner());
+        this.token = "MockTokenForNow";
     }
 
     public OwnerDTO() {
         this.id = "";
         this.owner = new Owner();
+        this.token = "MockTokenForNow";
     }
 
     public Map<String, Object> toMap() {
@@ -37,7 +47,7 @@ public class OwnerDTO {
                 "firstName", owner.getFirstName(),
                 "lastName", owner.getLastName(),
                 "email", owner.getEmail(),
-                "token", "MockTokenForNow"
+                "token", token
         );
     }
 

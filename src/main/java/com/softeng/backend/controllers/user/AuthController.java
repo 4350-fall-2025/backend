@@ -1,9 +1,8 @@
 package com.softeng.backend.controllers.user;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseAuthException;
 import com.softeng.backend.dto.OwnerDTO;
 import com.softeng.backend.dto.VetDTO;
+import com.softeng.backend.services.user.AuthService;
 import com.softeng.backend.services.user.owner.OwnerService;
 import com.softeng.backend.services.user.vet.VetService;
 import org.slf4j.Logger;
@@ -17,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -29,31 +27,13 @@ public class AuthController implements IAuthController {
     private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
     private final OwnerService ownerService;
     private final VetService vetService;
+    private final AuthService authService;
 
     @Autowired
-    public AuthController(OwnerService ownerService, VetService vetService) {
+    public AuthController(OwnerService ownerService, VetService vetService, AuthService authService) {
         this.ownerService = ownerService;
         this.vetService = vetService;
-    }
-
-    /**
-     * example code was used from firebase docs for authentication:
-     * https://firebase.google.com/docs/auth/admin/create-custom-tokens#create_custom_tokens_using_the_firebase_admin_sdk
-     * @param uid
-     * @param role
-     * @return auth token
-     * @throws FirebaseAuthException
-     */
-    private String createCustomToken(String uid, String role)  {
-        try{
-            Map<String, Object> additionalClaims = new HashMap<String, Object>();
-            additionalClaims.put("role", role);
-            return FirebaseAuth.getInstance().createCustomToken(uid, additionalClaims);
-        } catch (FirebaseAuthException e) {
-            logger.error(e.getMessage());
-            return "It failed to create custom token";
-        }
-
+        this.authService = authService;
     }
 
     @PostMapping("/login")
@@ -73,8 +53,9 @@ public class AuthController implements IAuthController {
                 if (!vetDTO.getVet().getPassword().equals(password)) {
                     return ResponseEntity.badRequest().body(Map.of("error", "Incorrect Credential", "detail", "Password is incorrect"));
                 } else {
-                    String token = createCustomToken(vetDTO.getId(), role);
-                    return ResponseEntity.ok().body(Map.of("user",vetDTO.toMap(), "token", token));
+                    String token = authService.createCustomToken(vetDTO.getId(), role);
+                    vetDTO = new VetDTO(vetDTO, token);
+                    return ResponseEntity.ok().body(vetDTO.toMap());
                 }
             }
             if (ownerDTO != null && !ownerDTO.isEmpty()) {
@@ -82,8 +63,9 @@ public class AuthController implements IAuthController {
                 if (!ownerDTO.getOwner().getPassword().equals(password)) {
                     return ResponseEntity.badRequest().body(Map.of("error", "Incorrect Credential", "detail", "Password is incorrect"));
                 } else {
-                    String token = createCustomToken(ownerDTO.getId(), role);
-                    return ResponseEntity.ok().body(Map.of("user",ownerDTO.toMap(), "token", token));
+                    String token = authService.createCustomToken(ownerDTO.getId(), role);
+                    ownerDTO = new OwnerDTO(ownerDTO, token);
+                    return ResponseEntity.ok().body(ownerDTO.toMap());
                 }
             }
             logger.debug("DEBUG LOG: auth/login endpoint not found for email: {}", email);
