@@ -70,4 +70,4 @@ jobs:
       - name: Run tests
         run: mvn test -Dspring.profiles.active=ci
         env:
-          SPRING_CLOUD_GCP_CREDENTIALS_LOCATION: firebase-admin.json
+          SPRING_CLOUD_GCP_CREDENTIALS_LOCATION: file:firebase-admin.json
