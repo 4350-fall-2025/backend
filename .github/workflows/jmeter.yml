@@ -45,19 +45,11 @@ jobs:
       - name: Install Firebase CLI
         run: npm install -g firebase-tools
 
-      # Install JMeter - this ensures we can generate the report with -e command
-      - name: Install JMeter 5.6.3
+      # Install JMeter
+      - name: Install JMeter
         run: |
-          JMETER_VERSION=5.6.3
-          wget https://dlcdn.apache.org//jmeter/binaries/apache-jmeter-$JMETER_VERSION.tgz
-          wget https://dlcdn.apache.org//jmeter/binaries/apache-jmeter-$JMETER_VERSION.tgz.sha512
-          sha512sum -c apache-jmeter-$JMETER_VERSION.tgz.sha512
-          tar -xzf apache-jmeter-$JMETER_VERSION.tgz
-          mv apache-jmeter-$JMETER_VERSION /opt/jmeter
-          /opt/jmeter/bin/jmeter --version
-
-      - name: Add JMeter to PATH
-        run: echo "/opt/jmeter/bin" >> $GITHUB_PATH
+          sudo apt-get update
+          sudo apt-get install -y jmeter
 
       # Start Firestore emulator
       - name: Start Firestore emulator
@@ -90,7 +82,7 @@ jobs:
       # Run JMeter profiler against emulator
       - name: Run JMeter profiler
         run: |
-          # Minimal logging to avoid posting TMI in logs
+          # Minimal logging to avoid secrets in logs
           export JVM_ARGS="-Dlog_level.jmeter=ERROR"
 
           # Run JMeter headless
