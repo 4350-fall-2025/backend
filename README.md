@@ -43,11 +43,11 @@ Annotation Processors -> Enable annotation processing*
 
 `firebase`
 
-https://github.com/user-attachments/assets/b3f54cc6-95ac-450b-8c32-04437eeebb50
+<insert image here>
 
 Note*: If you do not see a section in edit configurations as outlined above, you just need to click "Modify Options->Active profiles" as seen below:
 
-https://github.com/user-attachments/assets/893d32ed-f8fe-478d-a5e7-d923d1dcd9b7
+<insert image here>
 
 11) Run the application by executing BackendApplication.java by clicking the "Run Appplication" button in IntelliJ:
     <img width="482" height="77" alt="build-run" src="https://github.com/user-attachments/assets/dbaad99a-ee1b-4703-aac5-a25df9590b5d" />
