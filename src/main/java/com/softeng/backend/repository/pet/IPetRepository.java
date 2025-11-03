@@ -6,7 +6,6 @@ import com.softeng.backend.models.diary.Diary;
 import com.softeng.backend.models.pet.Pet;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;

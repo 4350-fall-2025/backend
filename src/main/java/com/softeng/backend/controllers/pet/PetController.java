@@ -5,7 +5,6 @@ import com.softeng.backend.dto.OwnerDTO;
 import com.softeng.backend.dto.PetDTO;
 import com.softeng.backend.models.diary.Diary;
 import com.softeng.backend. models.pet.Pet;
-import com.softeng.backend.repository.pet.PetRepository;
 import com.softeng.backend.services.pet.IPetService;
 import com.softeng.backend.services.user.owner.IOwnerService;
 import jakarta.validation.constraints.NotBlank;
@@ -30,14 +29,12 @@ public class PetController implements IPetController {
     private static final Logger logger = LoggerFactory.getLogger(PetController.class);
     private final IOwnerService ownerService;
     private final IPetService petService;
-    private final PetRepository petRepository;
 
 
     @Autowired
-    public PetController(IOwnerService ownerService, IPetService petService, PetRepository petRepository) {
+    public PetController(IOwnerService ownerService, IPetService petService) {
         this.ownerService = ownerService;
         this.petService = petService;
-        this.petRepository = petRepository;
     }
 
     /*****************************************************************************
@@ -147,7 +144,7 @@ public class PetController implements IPetController {
     public ResponseEntity<Map<String, Object>> addDiaryEntry(@NotNull @NotBlank @PathVariable String petId, @NotNull @RequestBody Diary diary) {
         DiaryDTO createdDiary;
         try {
-            createdDiary = petRepository.addDiaryEntry(petId, diary);
+            createdDiary = petService.addDiaryEntry(petId, diary);
         } catch (ExecutionException | InterruptedException e) {
             logger.error("ERROR LOG: Add diary entry fail: {}", Arrays.toString(e.getStackTrace()));
             return ResponseEntity.internalServerError().build();
