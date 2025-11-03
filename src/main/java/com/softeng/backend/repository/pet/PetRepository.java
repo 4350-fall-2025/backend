@@ -2,17 +2,24 @@ package com.softeng.backend.repository.pet;
 
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.*;
+import com.softeng.backend.dto.DiaryDTO;
 import com.softeng.backend.dto.OwnerDTO;
 import com.softeng.backend.dto.PetDTO;
+import com.softeng.backend.models.diary.Diary;
 import com.softeng.backend.models.pet.Pet;
 import com.softeng.backend.models.pet.PetLite;
 import com.softeng.backend.repository.user.owner.OwnerRepository;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 /*
@@ -26,6 +33,7 @@ public class PetRepository implements IPetRepository {
 
     private final Firestore firestore;
     private final OwnerRepository ownerRepository;
+    private static final Logger logger = LoggerFactory.getLogger(PetRepository.class);
 
     private final String PET_COLLECTION = "pets";
 
@@ -194,5 +202,31 @@ public class PetRepository implements IPetRepository {
             }
         }
         return result;
+    }
+
+    // =========================
+    // ADD DIARY ENTRY OPERATION
+    // =========================
+    public DiaryDTO addDiaryEntry(@NotNull @NotBlank String petId, @NotNull Diary diary) throws ExecutionException, InterruptedException
+    {
+        DocumentReference docRef = firestore.collection(PET_COLLECTION).document(petId);
+        DocumentSnapshot snapshot = docRef.get().get();
+        if (!snapshot.exists()) {
+            logger.info("DEBUG LOG: Pet not found for id {}", petId);
+            return new DiaryDTO();
+        }
+
+        DiaryDTO newDiaryEntry = new DiaryDTO("mock_id" ,diary);
+        // Get current diaries array or create new
+        List<Map<String, Object>> diaries = (List<Map<String, Object>>) snapshot.get("diaries");
+        if (diaries == null) {
+            diaries = new java.util.ArrayList<>();
+        }
+        diaries.add(newDiaryEntry.toMap());
+
+        // Update diaries array in Firestore
+        docRef.update("diaries", diaries).get();
+
+        return newDiaryEntry;
     }
 }
