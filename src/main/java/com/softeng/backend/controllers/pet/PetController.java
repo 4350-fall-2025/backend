@@ -155,7 +155,7 @@ public class PetController implements IPetController {
             return ResponseEntity.ok().body(createdDiary.toMap());
         }
         else {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.internalServerError().build();
         }
     }
 }
