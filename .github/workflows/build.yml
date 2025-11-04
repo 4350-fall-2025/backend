@@ -1,11 +1,13 @@
-# this CI script was copied from ChatGPT, GPT-5 
-name: Spring Boot CI manual run
+# this script was copied from ChatGPT, GPT-5 
+name: Build & Test
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, develop ]
   pull_request:
-
+    branches: [ main, develop ]
+  deployment:
+    types: [created]
   workflow_dispatch:
     inputs:
       branch:
