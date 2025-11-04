@@ -1,7 +1,12 @@
 package com.softeng.backend.repository.pet;
 
+import com.softeng.backend.dto.DiaryDTO;
 import com.softeng.backend.dto.PetDTO;
+import com.softeng.backend.exception.repository.DocumentNotFoundException;
+import com.softeng.backend.models.diary.Diary;
 import com.softeng.backend.models.pet.Pet;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -17,4 +22,6 @@ public interface IPetRepository {
     PetDTO updatePet(String petId, Pet pet) throws ExecutionException, InterruptedException;
 
     PetDTO deletePet(String petId) throws ExecutionException, InterruptedException;
+
+    DiaryDTO addDiaryEntry(@NotNull @NotBlank String petId, @NotNull Diary diary) throws ExecutionException, InterruptedException, DocumentNotFoundException;
 }

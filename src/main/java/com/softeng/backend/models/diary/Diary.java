@@ -1,7 +1,6 @@
 package com.softeng.backend.models.diary;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.google.cloud.Date;
 import com.google.cloud.spring.data.firestore.Document;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
@@ -10,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 @Document(collectionName = "diary")
 @Getter

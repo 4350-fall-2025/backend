@@ -1,6 +1,9 @@
 package com.softeng.backend.services.pet;
 
+import com.softeng.backend.dto.DiaryDTO;
 import com.softeng.backend.dto.PetDTO;
+import com.softeng.backend.exception.repository.DocumentNotFoundException;
+import com.softeng.backend.models.diary.Diary;
 import com.softeng.backend.models.pet.Pet;
 
 import java.util.List;
@@ -16,4 +19,6 @@ public interface IPetService {
     PetDTO updatePet(String petId, Pet pet) throws ExecutionException, InterruptedException;
 
     PetDTO deletePet(String petId) throws ExecutionException, InterruptedException;
+
+    DiaryDTO addDiaryEntry(String petId, Diary diary) throws ExecutionException, InterruptedException, DocumentNotFoundException;
 }

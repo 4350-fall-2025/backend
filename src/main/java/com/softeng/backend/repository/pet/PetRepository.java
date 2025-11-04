@@ -2,12 +2,19 @@ package com.softeng.backend.repository.pet;
 
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.*;
+import com.softeng.backend.dto.DiaryDTO;
 import com.softeng.backend.dto.OwnerDTO;
 import com.softeng.backend.dto.PetDTO;
+import com.softeng.backend.exception.repository.DocumentNotFoundException;
+import com.softeng.backend.models.diary.Diary;
 import com.softeng.backend.models.pet.Pet;
 import com.softeng.backend.models.pet.PetLite;
 import com.softeng.backend.repository.user.owner.OwnerRepository;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -26,6 +33,7 @@ public class PetRepository implements IPetRepository {
 
     private final Firestore firestore;
     private final OwnerRepository ownerRepository;
+    private static final Logger logger = LoggerFactory.getLogger(PetRepository.class);
 
     private final String PET_COLLECTION = "pets";
 
@@ -54,14 +62,11 @@ public class PetRepository implements IPetRepository {
         PetDTO result = new PetDTO();
 
         if (owner != null && pet.isValid()) {
-            // The following code was copied/developed with guidance from OpenAI's ChatGPT (https://chat.openai.com)
             ApiFuture<DocumentReference> addedDocRef = firestore.collection(PET_COLLECTION)
                                                                 .add(pet);
             DocumentReference reference = addedDocRef.get();
             String generatedId = reference.getId();
             pet.setId(generatedId);
-            ApiFuture<WriteResult> writeResult = reference.set(pet);
-            writeResult.get();
 
             DocumentSnapshot snapshot = reference.get().get();
             if (snapshot.exists()) {
@@ -194,5 +199,36 @@ public class PetRepository implements IPetRepository {
             }
         }
         return result;
+    }
+
+    // =========================
+    // ADD DIARY ENTRY OPERATION
+    // =========================
+    /**
+     * @param petId Document ID of the pet to delete
+     * @param diary diary entry to be added
+     * @return The newly created <code>DiaryDTO</code> object
+     * @throws ExecutionException   if computation threw an exception
+     * @throws InterruptedException if the current thread was interrupted
+     * @throws DocumentNotFoundException if no pet with <code>petId</code> exists,
+     */
+    @Override
+    public DiaryDTO addDiaryEntry(@NotNull @NotBlank String petId, @NotNull Diary diary) throws ExecutionException, InterruptedException, DocumentNotFoundException
+    {
+        DocumentReference docRef = firestore.collection(PET_COLLECTION).document(petId);
+        DocumentSnapshot snapshot = docRef.get().get();
+        if (!snapshot.exists()) {
+            logger.info("DEBUG LOG: Pet not found for id {}", petId);
+            throw new DocumentNotFoundException("Pet not found for id " + petId);
+        }
+
+        // Reference to subcollection "diaries" under the pet document
+        ApiFuture<DocumentReference> futureDocRef = firestore.collection("pets")
+                .document(petId)
+                .collection("diaries")
+                .add(diary);
+        DocumentReference reference = futureDocRef.get();
+
+        return new DiaryDTO(reference.getId(), reference.get().get().toObject(Diary.class));
     }
 }

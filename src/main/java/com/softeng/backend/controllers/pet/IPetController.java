@@ -1,6 +1,8 @@
 package com.softeng.backend.controllers.pet;
 
+import com.softeng.backend.models.diary.Diary;
 import com.softeng.backend.models.pet.Pet;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.http.ResponseEntity;
@@ -22,4 +24,6 @@ public interface IPetController {
     // DELETE
     ResponseEntity<Map<String, Object>> removePet(@NotNull @NotBlank @PathVariable String petId);
 
+    //CREATE PET DIARY ENTRY
+    ResponseEntity<Map<String, Object>> addDiaryEntry(@NotNull @NotBlank @PathVariable String petId, @NotNull @Valid @RequestBody Diary diary);
 }

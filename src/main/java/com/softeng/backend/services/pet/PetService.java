@@ -1,6 +1,9 @@
 package com.softeng.backend.services.pet;
 
+import com.softeng.backend.dto.DiaryDTO;
 import com.softeng.backend.dto.PetDTO;
+import com.softeng.backend.exception.repository.DocumentNotFoundException;
+import com.softeng.backend.models.diary.Diary;
 import com.softeng.backend.models.pet.Pet;
 import com.softeng.backend.repository.pet.IPetRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -69,5 +72,13 @@ public class PetService implements IPetService {
     @Override
     public PetDTO deletePet(String petId) throws ExecutionException, InterruptedException {
         return petRepository.deletePet(petId);
+    }
+
+    // =========================
+    // ADD DIARY ENTRY OPERATION
+    // =========================
+    @Override
+    public DiaryDTO addDiaryEntry(String petId, Diary diary) throws ExecutionException, InterruptedException, DocumentNotFoundException {
+        return petRepository.addDiaryEntry(petId, diary);
     }
 }

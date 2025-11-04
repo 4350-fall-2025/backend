@@ -25,8 +25,8 @@ public class DiaryDTO {
         return Map.of(
                 "id", id,
                 "contentType", diary.getContentType(),
-                "contentBody", diary.getContentType(),
-                "file", diary.getFiles(),
+                "contentBody", diary.getContentBody(),
+                "files", diary.getFiles(),
                 "createTimestamp", diary.getCreateTimestamp()
         );
     }
