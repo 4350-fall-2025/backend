@@ -1,7 +1,7 @@
 package com.softeng.backend.services.user.owner;
 
 import com.softeng.backend.dto.OwnerDTO;
-import com.softeng.backend.models.pet.Pet;
+import com.softeng.backend.models.pet.PetLite;
 import com.softeng.backend.models.user.owner.Owner;
 
 import java.util.concurrent.ExecutionException;
@@ -29,9 +29,11 @@ public interface IOwnerService {
      ******************************************************************************/
     OwnerDTO updateOwner(String id, Owner owner) throws ExecutionException, InterruptedException;
 
-    OwnerDTO updatePet(String ownerId, Pet pet) throws ExecutionException, InterruptedException;
+    void addPet(String ownerId, PetLite pet) throws ExecutionException, InterruptedException;
 
-    OwnerDTO removePet(String ownerId, String petId) throws ExecutionException, InterruptedException;
+    void updatePet(String ownerId, PetLite pet) throws ExecutionException, InterruptedException;
+
+    void removePet(String ownerId, String petId) throws ExecutionException, InterruptedException;
 
     /*****************************************************************************
      * DELETE

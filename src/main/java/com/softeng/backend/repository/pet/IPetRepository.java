@@ -15,19 +15,19 @@ import java.util.concurrent.ExecutionException;
 
 public interface IPetRepository {
 
-    PetDTO createPet(Pet pet) throws ExecutionException, InterruptedException;
+    PetDTO createPet(Pet pet) throws ExecutionException, InterruptedException, DocumentNotFoundException;
 
-    PetDTO getPetById(String petId) throws ExecutionException, InterruptedException;
+    PetDTO getPetById(String petId) throws ExecutionException, InterruptedException, DocumentNotFoundException;
 
-    List<PetDTO> getPetsByOwnerId(String ownerId) throws ExecutionException, InterruptedException;
+    List<PetDTO> getPetsByOwnerId(String ownerId) throws ExecutionException, InterruptedException, DocumentNotFoundException;
 
-    PetDTO updatePet(String petId, Pet pet) throws ExecutionException, InterruptedException;
+    PetDTO updatePet(String petId, Pet pet) throws ExecutionException, InterruptedException, DocumentNotFoundException;
 
-    PetDTO deletePet(String petId) throws ExecutionException, InterruptedException;
+    PetDTO deletePet(String petId) throws ExecutionException, InterruptedException, DocumentNotFoundException;
 
     DiaryDTO addDiaryEntry(@NotNull @NotBlank String petId, @NotNull Diary diary) throws ExecutionException, InterruptedException, DocumentNotFoundException;
 
-    ArrayList<DiaryDTO> getDiaryEntryInRange(@NotNull @NotBlank String petId,
+    List<DiaryDTO> getDiaryEntryInRange(@NotNull @NotBlank String petId,
                                              @NotNull Date from,
                                              @NotNull Date to,
                                              int limit) throws ExecutionException, InterruptedException, DocumentNotFoundException;

@@ -5,11 +5,13 @@ import com.google.cloud.spring.data.firestore.Document;
 import com.softeng.backend.models.enums.AnimalGroup;
 import com.softeng.backend.models.enums.PetSexType;
 import com.softeng.backend.models.enums.SterileStatus;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PastOrPresent;
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.springframework.data.annotation.Id;
 
 import java.util.Date;
 
@@ -19,20 +21,21 @@ import java.util.Date;
 @NoArgsConstructor
 public class Pet implements IPet {
 
-    @Id @Setter
-    private String id;
+    @NotNull @NotEmpty @Pattern(regexp = "^[A-Za-z\\s\\-]+$", message = "Name must contain only letters, spaces, or hyphens")
     private String name;
-
-    @Setter
+    @NotNull @NotEmpty
     private String ownerId;
+    @NotNull @NotEmpty @Pattern(regexp = "^[A-Za-z\\s\\-]+$", message = "species must contain only letters, spaces, or hyphens")
     private String species;
+    @NotNull @NotEmpty @Pattern(regexp = "^[A-Za-z\\s\\-]+$", message = "breed must contain only letters, spaces, or hyphens")
     private String breed;
+
     private boolean estimatedBirthdate;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private PetSexType sex;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd") @PastOrPresent(message = "Birth date must be before or today")
     private Date birthdate;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING)
@@ -40,38 +43,5 @@ public class Pet implements IPet {
 
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private AnimalGroup animalGroup;
-
-    /**
-     * Validators generated with GPT-4.1
-     */
-    @Override
-    public boolean isValid() {
-
-        return isValidName() && isValidSpecies() && isValidBreed() && isValidOwnerId() &&
-                (sex != null) && isValidBirthDate() && (sterileStatus != null);
-    }
-
-    private boolean isValidName() {
-        return name != null && !name.trim().isEmpty() && name.length() <= 32 &&
-               name.matches("^[A-Za-z\\s\\-]+$");
-    }
-
-    private boolean isValidSpecies() {
-        return species != null && !species.trim().isEmpty() &&
-               species.length() <= 20 && species.matches("^[A-Za-z\\s]+$");
-    }
-
-    private boolean isValidBreed() {
-        return breed != null && !breed.trim().isEmpty() &&
-               breed.length() <= 32 && breed.matches("^[A-Za-z\\s\\-]+$");
-    }
-
-    private boolean isValidBirthDate() {
-        return birthdate != null && birthdate.before(new Date());
-    }
-
-    private boolean isValidOwnerId() {
-        return ownerId != null && !ownerId.trim().isEmpty();
-    }
 }
 
