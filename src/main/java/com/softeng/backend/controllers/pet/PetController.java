@@ -14,10 +14,13 @@ import jakarta.validation.constraints.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
@@ -155,5 +158,27 @@ public class PetController implements IPetController {
         }
 
         return ResponseEntity.ok().body(createdDiary.toMap());
+    }
+
+    @GetMapping("/{petId}/diaries")
+    public ResponseEntity<ArrayList<Map<String, Object>>> getDiaryEntryInRange(@NotNull @NotBlank @PathVariable String petId,
+                                                             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date from,
+                                                             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date to,
+                                                             @NotNull int limit) {
+        ArrayList<DiaryDTO> diaryDTOs;
+        try {
+            diaryDTOs = petService.getDiaryEntryInRange(petId, from, to, limit);
+        } catch (ExecutionException | InterruptedException e) {
+            logger.error("ERROR LOG: Get diary entry fail: {}", Arrays.toString(e.getStackTrace()));
+            return ResponseEntity.internalServerError().build();
+        } catch (DocumentNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
+
+        ArrayList<Map<String, Object>> response = new ArrayList<>();
+        for (DiaryDTO diaryDTO : diaryDTOs) {
+            response.add(diaryDTO.toMap());
+        }
+        return ResponseEntity.ok().body(response);
     }
 }
