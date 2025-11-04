@@ -165,6 +165,10 @@ public class PetController implements IPetController {
                                                                                @RequestParam(defaultValue = "1970-01-01T00:00:00Z") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date from,
                                                                                @RequestParam(defaultValue = "9999-12-31T00:00:00Z") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date to,
                                                                                @RequestParam(defaultValue = "1000") int limit) {
+        if (!from.before(to)) {
+            return ResponseEntity.badRequest().build();
+        }
+
         ArrayList<DiaryDTO> diaryDTOs;
         try {
             diaryDTOs = petService.getDiaryEntryInRange(petId, from, to, limit);
