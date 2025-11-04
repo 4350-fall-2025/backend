@@ -32,7 +32,7 @@ public interface IPetController {
 
     //GET DIARY ENTRY IN RANGE
     ResponseEntity<ArrayList<Map<String, Object>>> getDiaryEntryInRange(@NotNull @NotBlank @PathVariable String petId,
-                                                                                            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date from,
-                                                                                            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date to,
-                                                                                            @NotNull int limit);
+                                                                        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date from,
+                                                                        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date to,
+                                                                        @NotNull int limit);
 }
