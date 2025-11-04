@@ -10,6 +10,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -80,5 +82,16 @@ public class PetService implements IPetService {
     @Override
     public DiaryDTO addDiaryEntry(String petId, Diary diary) throws ExecutionException, InterruptedException, DocumentNotFoundException {
         return petRepository.addDiaryEntry(petId, diary);
+    }
+
+    // =========================
+    // GET DIARY ENTRY IN RANGE OPERATION
+    // =========================
+    @Override
+    public ArrayList<DiaryDTO> getDiaryEntryInRange(String petId,
+                                             Date from,
+                                             Date to,
+                                             int limit) throws ExecutionException, InterruptedException, DocumentNotFoundException {
+        return petRepository.getDiaryEntryInRange(petId, from, to, limit);
     }
 }

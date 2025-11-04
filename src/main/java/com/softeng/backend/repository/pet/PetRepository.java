@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -218,7 +219,7 @@ public class PetRepository implements IPetRepository {
         DocumentReference docRef = firestore.collection(PET_COLLECTION).document(petId);
         DocumentSnapshot snapshot = docRef.get().get();
         if (!snapshot.exists()) {
-            logger.info("DEBUG LOG: Pet not found for id {}", petId);
+            logger.info("DEBUG LOG: Pet not found for id {} in add diary entry operation", petId);
             throw new DocumentNotFoundException("Pet not found for id " + petId);
         }
 
@@ -230,5 +231,38 @@ public class PetRepository implements IPetRepository {
         DocumentReference reference = futureDocRef.get();
 
         return new DiaryDTO(reference.getId(), reference.get().get().toObject(Diary.class));
+    }
+
+    // =========================
+    // GET DIARY ENTRY IN RANGE OPERATION
+    // =========================
+    public ArrayList<DiaryDTO> getDiaryEntryInRange(@NotNull @NotBlank String petId,
+                                                    @NotNull Date from,
+                                                    @NotNull Date to,
+                                                    int limit) throws ExecutionException, InterruptedException, DocumentNotFoundException {
+        DocumentReference petRef = firestore.collection(PET_COLLECTION).document(petId);
+        DocumentSnapshot docSnapshot = petRef.get().get();
+
+        if (!docSnapshot.exists()) {
+            logger.info("DEBUG LOG: Pet not found for id {} in get diary entry in range operation", petId);
+            throw new DocumentNotFoundException("Pet not found for id " + petId); // or throw exception
+        }
+
+        CollectionReference diariesRef = petRef.collection("diaries");
+
+        Query query = diariesRef
+                .whereGreaterThanOrEqualTo("createTimestamp", from)
+                .whereLessThanOrEqualTo("createTimestamp", to)
+                .orderBy("createTimestamp", Query.Direction.ASCENDING)
+                .limit(limit);
+
+        QuerySnapshot querySnapshot = query.get().get();
+
+        ArrayList<DiaryDTO> diaries = new ArrayList<>();
+        querySnapshot.forEach(doc -> {
+            Diary diary = doc.toObject(Diary.class);
+            diaries.add(new DiaryDTO(doc.getId(), diary));
+        });
+        return diaries;
     }
 }
