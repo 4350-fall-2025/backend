@@ -2,6 +2,7 @@ package com.softeng.backend.services.pet;
 
 import com.softeng.backend.dto.DiaryDTO;
 import com.softeng.backend.dto.PetDTO;
+import com.softeng.backend.exception.repository.DocumentNotFoundException;
 import com.softeng.backend.models.diary.Diary;
 import com.softeng.backend.models.pet.Pet;
 import com.softeng.backend.repository.pet.IPetRepository;
@@ -77,7 +78,7 @@ public class PetService implements IPetService {
     // ADD DIARY ENTRY OPERATION
     // =========================
     @Override
-    public DiaryDTO addDiaryEntry(String petId, Diary diary) throws ExecutionException, InterruptedException {
+    public DiaryDTO addDiaryEntry(String petId, Diary diary) throws ExecutionException, InterruptedException, DocumentNotFoundException {
         return petRepository.addDiaryEntry(petId, diary);
     }
 }

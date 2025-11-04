@@ -3,6 +3,7 @@ package com.softeng.backend.controllers.pet;
 import com.softeng.backend.dto.DiaryDTO;
 import com.softeng.backend.dto.OwnerDTO;
 import com.softeng.backend.dto.PetDTO;
+import com.softeng.backend.exception.repository.DocumentNotFoundException;
 import com.softeng.backend.models.diary.Diary;
 import com.softeng.backend. models.pet.Pet;
 import com.softeng.backend.services.pet.IPetService;
@@ -149,13 +150,10 @@ public class PetController implements IPetController {
         } catch (ExecutionException | InterruptedException e) {
             logger.error("ERROR LOG: Add diary entry fail: {}", Arrays.toString(e.getStackTrace()));
             return ResponseEntity.internalServerError().build();
+        } catch (DocumentNotFoundException e) {
+            return ResponseEntity.notFound().build();
         }
 
-        if (!createdDiary.getId().isBlank()) {
-            return ResponseEntity.ok().body(createdDiary.toMap());
-        }
-        else {
-            return ResponseEntity.internalServerError().build();
-        }
+        return ResponseEntity.ok().body(createdDiary.toMap());
     }
 }
