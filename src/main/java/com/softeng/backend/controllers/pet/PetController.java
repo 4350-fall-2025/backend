@@ -1,13 +1,11 @@
 package com.softeng.backend.controllers.pet;
 
 import com.softeng.backend.dto.DiaryDTO;
-import com.softeng.backend.dto.OwnerDTO;
 import com.softeng.backend.dto.PetDTO;
 import com.softeng.backend.exception.repository.DocumentNotFoundException;
 import com.softeng.backend.models.diary.Diary;
 import com.softeng.backend. models.pet.Pet;
 import com.softeng.backend.services.pet.IPetService;
-import com.softeng.backend.services.user.owner.IOwnerService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -18,10 +16,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 
 // The following class was partially developed with boilerplate and code
@@ -32,13 +27,11 @@ import java.util.concurrent.ExecutionException;
 public class PetController implements IPetController {
 
     private static final Logger logger = LoggerFactory.getLogger(PetController.class);
-    private final IOwnerService ownerService;
     private final IPetService petService;
 
 
     @Autowired
-    public PetController(IOwnerService ownerService, IPetService petService) {
-        this.ownerService = ownerService;
+    public PetController(IPetService petService) {
         this.petService = petService;
     }
 
@@ -47,22 +40,15 @@ public class PetController implements IPetController {
      ******************************************************************************/
     @PostMapping()
     @Override
-    public ResponseEntity<Map<String, Object>> createPet(@NotNull @RequestBody Pet pet) {
-
-        if (!pet.isValid()) {
-            return ResponseEntity.badRequest().build();
-        }
+    public ResponseEntity<Map<String, Object>> createPet(@NotNull @Valid @RequestBody Pet pet) {
 
         try {
             PetDTO result = petService.createPet(pet);
-
-            if (result.getPet().getId() != null) {
-                return ResponseEntity.ok().body(result.toMap());
-            }
-
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.ok().body(result.toMap());
         } catch (ExecutionException | InterruptedException e) {
             return ResponseEntity.internalServerError().build();
+        } catch (DocumentNotFoundException e) {
+            return ResponseEntity.notFound().build();
         }
     }
 
@@ -75,14 +61,11 @@ public class PetController implements IPetController {
 
         try {
             PetDTO result = petService.getPetById(petId);
-
-            if (result.getPet().getId() != null) {
-                return ResponseEntity.ok().body(result.toMap());
-            }
-
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.ok().body(result.toMap());
         } catch (ExecutionException | InterruptedException e) {
             return ResponseEntity.internalServerError().build();
+        } catch (DocumentNotFoundException e) {
+            return ResponseEntity.notFound().build();
         }
     }
 
@@ -91,25 +74,16 @@ public class PetController implements IPetController {
      ******************************************************************************/
     @PutMapping("/{petId}")
     @Override
-    public ResponseEntity<Map<String, Object>> updatePet(@NotNull @NotBlank @PathVariable String petId, @NotNull @RequestBody Pet pet) {
+    public ResponseEntity<Map<String, Object>> updatePet(@NotNull @NotBlank @PathVariable String petId, @NotNull @Valid @RequestBody Pet pet) {
         PetDTO updated;
-        //TODO implement partial update
-        if (!pet.isValid()) {
-            return ResponseEntity.badRequest().build();
-        }
 
         try {
-            pet.setId(petId);
-            ownerService.updatePet(pet.getOwnerId(), pet);
             updated = petService.updatePet(petId, pet);
+            return ResponseEntity.ok().body(updated.toMap());
         } catch (ExecutionException | InterruptedException e) {
             logger.error("ERROR LOG: Update pet endpoint failed: {}", Arrays.toString(e.getStackTrace()));
             return ResponseEntity.internalServerError().build();
-        }
-
-        if (updated.getId() != null) {
-            return ResponseEntity.ok().body(updated.toMap());
-        } else {
+        } catch (DocumentNotFoundException e) {
             return ResponseEntity.notFound().build();
         }
     }
@@ -120,23 +94,13 @@ public class PetController implements IPetController {
     @DeleteMapping("/{petId}")
     @Override
     public ResponseEntity<Map<String, Object>> removePet(@NotNull @NotBlank @PathVariable String petId) {
-        OwnerDTO updated;
         try {
-            PetDTO removed = petService.deletePet(petId);
-            if (!removed.getPet().isValid()) {
-                return ResponseEntity.notFound().build();
-            }
-
-            String ownerId = removed.getPet().getOwnerId();
-            updated = ownerService.removePet(ownerId, petId);
+            petService.deletePet(petId);
+            return ResponseEntity.noContent().build();
         } catch (ExecutionException | InterruptedException e) {
             logger.error("ERROR LOG: Update delete endpoint failed: {}", Arrays.toString(e.getStackTrace()));
             return ResponseEntity.internalServerError().build();
-        }
-
-        if (updated.getId() != null) {
-            return ResponseEntity.ok().body(updated.toMap());
-        } else {
+        } catch (DocumentNotFoundException e) {
             return ResponseEntity.notFound().build();
         }
     }
@@ -161,15 +125,15 @@ public class PetController implements IPetController {
     }
 
     @GetMapping("/{petId}/diaries")
-    public ResponseEntity<ArrayList<Map<String, Object>>> getDiaryEntryInRange(@NotNull @NotBlank @PathVariable String petId,
-                                                                               @RequestParam(defaultValue = "1970-01-01T00:00:00Z") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date from,
-                                                                               @RequestParam(defaultValue = "9999-12-31T00:00:00Z") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date to,
-                                                                               @RequestParam(defaultValue = "1000") int limit) {
+    public ResponseEntity<List<Map<String, Object>>> getDiaryEntryInRange(@NotNull @NotBlank @PathVariable String petId,
+                                                                          @RequestParam(defaultValue = "1970-01-01T00:00:00Z") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date from,
+                                                                          @RequestParam(defaultValue = "9999-12-31T00:00:00Z") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Date to,
+                                                                          @RequestParam(defaultValue = "1000") @NotNull int limit) {
         if (!from.before(to)) {
             return ResponseEntity.badRequest().build();
         }
 
-        ArrayList<DiaryDTO> diaryDTOs;
+        List<DiaryDTO> diaryDTOs;
         try {
             diaryDTOs = petService.getDiaryEntryInRange(petId, from, to, limit);
         } catch (ExecutionException | InterruptedException e) {
@@ -179,10 +143,8 @@ public class PetController implements IPetController {
             return ResponseEntity.notFound().build();
         }
 
-        ArrayList<Map<String, Object>> response = new ArrayList<>();
-        for (DiaryDTO diaryDTO : diaryDTOs) {
-            response.add(diaryDTO.toMap());
-        }
+        List<Map<String, Object>> response = diaryDTOs.stream().map(DiaryDTO::toMap).toList();
+
         return ResponseEntity.ok().body(response);
     }
 }

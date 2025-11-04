@@ -1,7 +1,6 @@
 package com.softeng.backend.services.user.owner;
 
 import com.softeng.backend.dto.OwnerDTO;
-import com.softeng.backend.models.pet.Pet;
 import com.softeng.backend.models.pet.PetLite;
 import com.softeng.backend.models.user.owner.Owner;
 import com.softeng.backend.repository.user.owner.OwnerRepository;
@@ -80,12 +79,19 @@ public class OwnerService implements IOwnerService {
         return ownerRepository.updateOwner(id, updateFields);
     }
 
-    public OwnerDTO updatePet(String ownerId, Pet pet) throws ExecutionException, InterruptedException {
-        return ownerRepository.updatePet(ownerId, new PetLite(pet.getId(), pet.getName(), pet.getBreed()));
+    @Override
+    public void addPet(String ownerId, PetLite pet) throws ExecutionException, InterruptedException {
+        ownerRepository.addPet(ownerId, pet);
     }
 
-    public OwnerDTO removePet(String ownerId, String petId) throws ExecutionException, InterruptedException {
-        return ownerRepository.removePet(ownerId, petId);
+    @Override
+    public void updatePet(String ownerId, PetLite pet) throws ExecutionException, InterruptedException {
+        ownerRepository.updatePet(ownerId, pet);
+    }
+
+    @Override
+    public void removePet(String ownerId, String petId) throws ExecutionException, InterruptedException {
+        ownerRepository.removePet(ownerId, petId);
     }
 
     /*****************************************************************************

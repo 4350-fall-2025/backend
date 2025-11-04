@@ -1,6 +1,7 @@
 package com.softeng.backend.repository.user.owner;
 
 import com.softeng.backend.dto.OwnerDTO;
+import com.softeng.backend.exception.repository.DocumentNotFoundException;
 import com.softeng.backend.models.pet.PetLite;
 import com.softeng.backend.models.user.owner.Owner;
 
@@ -25,10 +26,12 @@ public interface IOwnerRepository {
      ******************************************************************************/
     OwnerDTO updateOwner(String id, Map<String, Object> updateFields) throws ExecutionException, InterruptedException;
 
-    OwnerDTO addPet(String ownerId, PetLite pet) throws ExecutionException, InterruptedException;
+    void addPet(String ownerId, PetLite pet) throws ExecutionException, InterruptedException, DocumentNotFoundException;
+    void updatePet(String ownerId, PetLite subdocument) throws ExecutionException, InterruptedException, DocumentNotFoundException;
+    void removePet(String ownerId, String petId) throws ExecutionException, InterruptedException, DocumentNotFoundException;
 
     /*****************************************************************************
      * DELETE
      ******************************************************************************/
-    public boolean deleteOwner(String id);
+     boolean deleteOwner(String id);
 }
