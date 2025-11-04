@@ -35,7 +35,7 @@ public class Pet implements IPet {
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     private PetSexType sex;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd") @PastOrPresent(message = "Birth date must be before or today")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd") @PastOrPresent(message = "Birth date must be on or before today")
     private Date birthdate;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING)
