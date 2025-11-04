@@ -73,12 +73,19 @@ Other download options available on the [firebase website](https://firebase.goog
 .firebaserc
 firebase.json
 
-3. Navigate to the correct directory in your terminal:
+3. Set up Environment variables if you want to use emulators for auth & storage: 
+
+Click on the "Run" menu in IntelliJ: Run->Edit Configurations
+> For environment variables:
+> - FIREBASE_AUTH_EMULATOR_HOST=localhost:9099 
+> - FIREBASE_STORAGE_EMULATOR_HOST=localhost:9199
+
+4. Navigate to the correct directory in your terminal:
 ```bash
   cd src/main/java/com/softeng/backend
 ```
    
-4. run the emulators:
+5. run the emulators:
 ```bash
 firebase emulators:start --import ../../../../../test/data
 ```

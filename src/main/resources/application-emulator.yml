@@ -10,6 +10,14 @@ spring:
           enabled: true
           host: localhost
           port: 8080
+      storage:
+        emulator:
+          host: localhost
+          port: 9199
+      auth:
+        emulator:
+          host: localhost
+          port: 9099
 logging:
   level:
     root: INFO
