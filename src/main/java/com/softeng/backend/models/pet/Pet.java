@@ -5,10 +5,7 @@ import com.google.cloud.spring.data.firestore.Document;
 import com.softeng.backend.models.enums.AnimalGroup;
 import com.softeng.backend.models.enums.PetSexType;
 import com.softeng.backend.models.enums.SterileStatus;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.PastOrPresent;
-import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,27 +18,28 @@ import java.util.Date;
 @NoArgsConstructor
 public class Pet implements IPet {
 
-    @NotNull @NotEmpty @Pattern(regexp = "^[A-Za-z\\s\\-]+$", message = "Name must contain only letters, spaces, or hyphens")
+    @NotNull @NotBlank @Pattern(regexp = "^[A-Za-z\\s\\-]+$", message = "Name must contain only letters, spaces, or hyphens")
     private String name;
-    @NotNull @NotEmpty
+    @NotNull @NotBlank
     private String ownerId;
-    @NotNull @NotEmpty @Pattern(regexp = "^[A-Za-z\\s\\-]+$", message = "species must contain only letters, spaces, or hyphens")
+    @NotNull @NotBlank @Pattern(regexp = "^[A-Za-z\\s\\-]+$", message = "species must contain only letters, spaces, or hyphens")
     private String species;
-    @NotNull @NotEmpty @Pattern(regexp = "^[A-Za-z\\s\\-]+$", message = "breed must contain only letters, spaces, or hyphens")
+    @NotNull @NotBlank @Pattern(regexp = "^[A-Za-z\\s\\-]+$", message = "breed must contain only letters, spaces, or hyphens")
     private String breed;
 
+    @NotNull
     private boolean estimatedBirthdate;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    @NotNull @JsonFormat(shape = JsonFormat.Shape.STRING)
     private PetSexType sex;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd") @PastOrPresent(message = "Birth date must be on or before today")
+    @NotNull @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd") @PastOrPresent(message = "Birth date must be on or before today")
     private Date birthdate;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    @NotNull @JsonFormat(shape = JsonFormat.Shape.STRING)
     private SterileStatus sterileStatus;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    @NotNull @JsonFormat(shape = JsonFormat.Shape.STRING)
     private AnimalGroup animalGroup;
 }
 
