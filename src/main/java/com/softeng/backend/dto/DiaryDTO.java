@@ -6,6 +6,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
 @AllArgsConstructor
@@ -27,7 +29,7 @@ public class DiaryDTO {
                 "contentType", diary.getContentType(),
                 "contentBody", diary.getContentBody(),
                 "files", diary.getFiles(),
-                "createTimestamp", diary.getCreateTimestamp()
+                "createTimestamp", diary.getCreateTimestamp().toInstant().atOffset(ZoneOffset.UTC).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
         );
     }
 }
