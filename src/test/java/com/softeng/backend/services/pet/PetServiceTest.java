@@ -45,6 +45,8 @@ public class PetServiceTest {
     private static final String MOCK_ID = "mockId";
     private static final Diary MOCK_DIARY = new Diary("GENERAL", "content body",
             new ArrayList<>(), new Date());
+    private static final String MOCK_DIARY_ID = "mockDiaryId";
+
 
     //private static final Pet pet = new Pet("Basma","1","human", "husky", FALSE, PetSexType.FEMALE,new Date());
 
@@ -182,7 +184,7 @@ public class PetServiceTest {
         Date to = new Date();
 
         List<DiaryDTO> expectedDiaries = new ArrayList<>();
-        expectedDiaries.add(new DiaryDTO("diary1Id", MOCK_DIARY));
+        expectedDiaries.add(new DiaryDTO(MOCK_DIARY_ID, MOCK_DIARY));
 
         when(petRepository.getDiaryEntryInRange(MOCK_ID, from, to, 0))
                 .thenReturn(expectedDiaries);
@@ -227,4 +229,36 @@ public class PetServiceTest {
         assertThrows(InterruptedException.class,
                 () -> petService.getDiaryEntryInRange(MOCK_ID, from, to, 0));
     }
+  
+  @Test
+    public void addDiaryEntryTestSuccess() throws Exception {
+        Date date = new Date();
+        Diary diary = new Diary("DIET","He started eating meat today",  new ArrayList<String>(),date);
+
+        DiaryDTO diaryDTO = new DiaryDTO(MOCK_DIARY_ID, diary);
+        when(petRepository.addDiaryEntry(MOCK_ID, diary)).thenReturn(diaryDTO);
+
+        DiaryDTO result = petService.addDiaryEntry(MOCK_ID, diary);
+        assertNotNull(result);
+        assertEquals(MOCK_DIARY_ID, result.getId());
+        assertEquals("DIET", result.getDiary().getContentType());
+        assertEquals("He started eating meat today", result.getDiary().getContentBody());
+    }
+
+    @Test
+    public void addDiaryEntryTestPetNotFound() throws Exception {
+        Date date = new Date();
+        Diary diary = new Diary("DIET","He started eating meat today",  new ArrayList<String>(),date);
+
+        when(petRepository.addDiaryEntry(MOCK_ID, diary)).thenThrow(new DocumentNotFoundException("Pet not found"));
+
+        DocumentNotFoundException thrown = assertThrows(
+                DocumentNotFoundException.class,
+                () -> petService.addDiaryEntry(MOCK_ID, diary)
+        );
+        assertEquals("Pet not found", thrown.getMessage());
+    }
+
+
+
 }
