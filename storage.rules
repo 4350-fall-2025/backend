@@ -1,14 +1,24 @@
+rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
 
-    // Only allow authenticated users to read/write inside "uploads" folder
-    match /uploads/{fileName} {
-      allow read, write: if request.auth != null;
+    // Global rule: anyone not logged in cannot write or read
+    match /{allPaths=**} {
+      allow write: if request.auth != null;
     }
 
-    // Optionally, block everything else
-    match /{allPaths=**} {
-      allow read, write: if false;
+    // 1. Diaries under pets
+    match /owners/{ownerId}/pets/{petId}/diaries/{diaryId} {
+      allow read: if request.auth != null &&
+                  (request.auth.uid == ownerId || request.auth.token.role == 'vet');
+      allow write: if request.auth != null && request.auth.uid == ownerId;
     }
+
+    // 2. Pet Images
+        match /owners/{ownerId}/pets/{petId} {
+          allow read: if request.auth != null &&
+                      (request.auth.uid == ownerId || request.auth.token.role == 'vet');
+          allow write: if request.auth != null && request.auth.uid == ownerId;
+        }
   }
 }
