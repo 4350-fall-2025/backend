@@ -302,12 +302,12 @@ public class PetControllerTest {
 
     @Test
     public void testGetPetByIdInternalServerError() throws Exception {
-        when(petService.getPetById(anyString())).thenThrow(ExecutionException.class);
+        when(petService.getPetById(any(String.class))).thenThrow(ExecutionException.class);
 
         this.mockMvc.perform(get("/api/v1/pets/{petId}", MOCK_ID))
                 .andExpect(status().isInternalServerError());
 
-        when(petService.getPetById(anyString())).thenThrow(InterruptedException.class);
+        when(petService.getPetById(any(String.class))).thenThrow(InterruptedException.class);
 
         this.mockMvc.perform(get("/api/v1/pets/{petId}", MOCK_ID))
                 .andExpect(status().isInternalServerError());
@@ -571,12 +571,12 @@ public class PetControllerTest {
 
     @Test
     public void testDeletePetByIdInternalServerError() throws Exception {
-        when(petService.deletePet(anyString())).thenThrow(ExecutionException.class);
+        when(petService.deletePet(any(String.class))).thenThrow(ExecutionException.class);
 
         this.mockMvc.perform(delete("/api/v1/pets/{petId}", MOCK_ID))
                 .andExpect(status().isInternalServerError());
 
-        when(petService.deletePet(anyString())).thenThrow(InterruptedException.class);
+        when(petService.deletePet(any(String.class))).thenThrow(InterruptedException.class);
 
         this.mockMvc.perform(delete("/api/v1/pets/{petId}", MOCK_ID))
                 .andExpect(status().isInternalServerError());
