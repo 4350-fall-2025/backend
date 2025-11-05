@@ -23,8 +23,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
@@ -195,7 +194,7 @@ public class PetServiceTest {
     }
 
     @Test
-    public void updateGetDiaryEntryInRangePetNotFound() throws Exception {
+    public void getDiaryEntryInRangePetNotFound() throws Exception {
         Date from = new Date();
         Date to = new Date();
 
@@ -207,7 +206,7 @@ public class PetServiceTest {
     }
 
     @Test
-    public void updateGetDiaryEntryInRangeExecutionException() throws Exception {
+    public void getDiaryEntryInRangeExecutionException() throws Exception {
         Date from = new Date();
         Date to = new Date();
 
@@ -219,7 +218,7 @@ public class PetServiceTest {
     }
 
     @Test
-    public void updateGetDiaryEntryInRangeInterruptedException() throws Exception {
+    public void getDiaryEntryInRangeInterruptedException() throws Exception {
         Date from = new Date();
         Date to = new Date();
 
@@ -233,7 +232,7 @@ public class PetServiceTest {
   @Test
     public void addDiaryEntryTestSuccess() throws Exception {
         Date date = new Date();
-        Diary diary = new Diary("DIET","He started eating meat today",  new ArrayList<String>(),date);
+        Diary diary = new Diary("DIET","He started eating meat today",  new ArrayList<>(), date);
 
         DiaryDTO diaryDTO = new DiaryDTO(MOCK_DIARY_ID, diary);
         when(petRepository.addDiaryEntry(MOCK_ID, diary)).thenReturn(diaryDTO);
@@ -248,7 +247,7 @@ public class PetServiceTest {
     @Test
     public void addDiaryEntryTestPetNotFound() throws Exception {
         Date date = new Date();
-        Diary diary = new Diary("DIET","He started eating meat today",  new ArrayList<String>(),date);
+        Diary diary = new Diary("DIET","He started eating meat today",  new ArrayList<>(), date);
 
         when(petRepository.addDiaryEntry(MOCK_ID, diary)).thenThrow(new DocumentNotFoundException("Pet not found"));
 
@@ -258,7 +257,4 @@ public class PetServiceTest {
         );
         assertEquals("Pet not found", thrown.getMessage());
     }
-
-
-
 }
