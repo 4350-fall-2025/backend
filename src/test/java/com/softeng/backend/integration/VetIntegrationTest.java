@@ -32,6 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("emulator")
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class VetIntegrationTest {
     @Autowired
     private MockMvc mockMvc;
@@ -55,7 +56,7 @@ public class VetIntegrationTest {
     //TODO: remove when we set up auth
     private static final String mockPass = "MockTokenForNow";
 
-    @BeforeEach
+    @BeforeAll
     void setupVets() throws Exception {
         vetToGetId = vetRepository.createVet(vetToGet).getId();
         vetToUpdateId = vetRepository.createVet(vetToUpdate).getId();
@@ -176,7 +177,7 @@ public class VetIntegrationTest {
                 .andExpect(status().isNotFound());
     }
 
-    @AfterEach
+    @AfterAll
     void tearDown() {
         vetRepository.deleteVet(vetToGetId);
         vetRepository.deleteVet(vetToUpdateId);
