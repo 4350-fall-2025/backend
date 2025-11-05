@@ -21,7 +21,7 @@ Annotation Processors -> Enable annotation processing*
 
 9) Set up Firestore authentication (to accesss hosted database):
 
-   a) For graders/Lauren, you will be provided the auth file as communicated. Please note that due to security concerns, we require firebase emulators in order to use storage features, such as uploading images. Refer to step 10 to continue setup. 
+   a) For graders/Lauren, you will be provided a new auth file as communicated via email each sprint. Please note that due to security concerns, we require firebase emulators in order to use storage features, such as uploading images. Refer to step 10 to continue setup. 
 
    b) For devs: 
 
@@ -45,13 +45,14 @@ Annotation Processors -> Enable annotation processing*
     backend/src/main/resources
 ```
 
-11) Set the active profile for BackendApplication. In IntelliJ, Click the "Run->Edit Configurations" and in the Run/Debug Configurations, under "Active profiles", enter 1 of 2 profiles depending on your needs (`firebase`, `emulator`):
+11) Set the active profile for BackendApplication. For graders, please enter `emulator`, and after setting the profile, refer to step 12. 
+
+## How to set active profile in IntelliJ:
+In IntelliJ, Click the "Run->Edit Configurations" and in the Run/Debug Configurations, under "Active profiles", enter 1 of 2 profiles depending on your needs (`firebase`, `emulator`):
 
 https://github.com/user-attachments/assets/fc647e81-b94e-4f0f-aff7-96be912b8445
 
-
 Note*: If you do not see a section for profiles in edit configurations as outlined above, you just need to click "Modify Options->Active profiles" as seen below:
-
 
 https://github.com/user-attachments/assets/54f69f0e-ac77-4339-8987-cf339f88b191
 
@@ -65,16 +66,19 @@ https://github.com/user-attachments/assets/54f69f0e-ac77-4339-8987-cf339f88b191
 - Also has auth/storage emulator, so you CAN upload images and other files.
 - Follow the instructions below for setting up and running the emulators.
 
+12) For the emulator environment, you will need to install and run the emulators, and set 2 environment variables.
+
+####  Environment Variables:
 > Set up Environment variables if you want to use emulators for auth & storage:
 > 
 > Click on the "Run" menu in IntelliJ: Run->Edit Configurations
-> For environment variables:
+> Enter the following in the "Environment variables section" (can be found under Modify menu if not visible):
 > 
 > - FIREBASE_AUTH_EMULATOR_HOST=localhost:9099
 > - FIREBASE_STORAGE_EMULATOR_HOST=localhost:9199
 >
 
-To run the emulators:
+#### Run & install the emulators
 
 ```bash
 firebase emulators:start --only firestore,auth,storage --project qdog-6aca2
@@ -87,7 +91,7 @@ firebase emulators:export ../../../../../test/data
 ```
 You can run the emulators with `--import ../../../../../test/data` to import the data into the emulators.
 
-11) Run the application by executing BackendApplication.java by clicking the "Run Appplication" button in IntelliJ:
+13) Run the application by running the emulators (step 12), and then executing BackendApplication.java by clicking the "Run Appplication" button in IntelliJ:
     <img width="482" height="77" alt="build-run" src="https://github.com/user-attachments/assets/dbaad99a-ee1b-4703-aac5-a25df9590b5d" />
 
 # Sources
