@@ -1,10 +1,14 @@
 package com.softeng.backend.services.user;
 
 import com.softeng.backend.dto.OwnerDTO;
+import com.softeng.backend.exception.repository.DocumentNotFoundException;
+import com.softeng.backend.models.pet.Pet;
+import com.softeng.backend.models.pet.PetLite;
 import com.softeng.backend.models.user.owner.Owner;
 import com.softeng.backend.repository.user.owner.OwnerRepository;
 import com.softeng.backend.services.user.owner.OwnerService;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -13,8 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 /*
@@ -23,6 +26,7 @@ import static org.mockito.Mockito.*;
  */
 
 @ExtendWith(MockitoExtension.class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class OwnerServiceTest {
     @Mock
     private OwnerRepository ownerRepository;
@@ -165,6 +169,33 @@ public class OwnerServiceTest {
         assertEquals(expectedDTO, result);
         assertEquals("UpdatedLast", result.getOwner().getLastName());
         verify(ownerRepository).updateOwner(mockDocId, updateFields);
+    }
+
+
+    @Test
+    void updateOwnerPetShouldHandleEmptyUpdateFields() throws Exception {
+        PetLite pet = new PetLite();
+
+        // doThrow section copied from ChatGPT, Model GPT-5
+        doThrow(new DocumentNotFoundException("Pet with id " + null + " not found"))
+                .when(ownerRepository).updatePet(mockDocId, pet);
+
+        assertThrows(DocumentNotFoundException.class, () ->
+                ownerRepository.updatePet(mockDocId, pet)
+        );
+    }
+
+    @Test
+    void updateOwnerPetShouldHandleInvalidId() throws Exception {
+        PetLite pet = new PetLite("1", "pet", "dog");
+
+        // doThrow section copied from ChatGPT, Model GPT-5
+        doThrow(new DocumentNotFoundException("Owner not found"))
+                .when(ownerRepository).updatePet("invalidId", pet);
+
+        assertThrows(DocumentNotFoundException.class, () ->
+                ownerRepository.updatePet("invalidId", pet)
+        );
     }
 
     @Test
