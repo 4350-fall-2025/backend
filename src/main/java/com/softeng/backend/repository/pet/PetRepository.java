@@ -2,16 +2,24 @@ package com.softeng.backend.repository.pet;
 
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.*;
+import com.softeng.backend.dto.DiaryDTO;
 import com.softeng.backend.dto.OwnerDTO;
 import com.softeng.backend.dto.PetDTO;
+import com.softeng.backend.exception.repository.DocumentNotFoundException;
+import com.softeng.backend.models.diary.Diary;
 import com.softeng.backend.models.pet.Pet;
-import com.softeng.backend.models.pet.PetLite;
 import com.softeng.backend.repository.user.owner.OwnerRepository;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -26,6 +34,7 @@ public class PetRepository implements IPetRepository {
 
     private final Firestore firestore;
     private final OwnerRepository ownerRepository;
+    private static final Logger logger = LoggerFactory.getLogger(PetRepository.class);
 
     private final String PET_COLLECTION = "pets";
 
@@ -42,39 +51,26 @@ public class PetRepository implements IPetRepository {
 
     /**
      *
-     * @param ownerId Document ID of the pet owner
      * @param pet <code>Pet</code> object to insert into database
      * @return A DTO of the created pet. The content may be empty if <code>pet</code>
      * is invalid
      * @throws ExecutionException if computation threw an exception
      * @throws InterruptedException if the current thread was interrupted
+     * @throws DocumentNotFoundException if owner does not exist
      */
     @Override
-    public PetDTO createPet(String ownerId, Pet pet) throws ExecutionException, InterruptedException {
-        OwnerDTO owner = ownerRepository.getOwnerById(ownerId);
-        PetDTO result = new PetDTO();
-
-        if (owner != null && pet.isValid()) {
-            pet.setOwnerId(ownerId);
-            // The following code was copied/developed with guidance from OpenAI's ChatGPT (https://chat.openai.com)
-            ApiFuture<DocumentReference> addedDocRef = firestore.collection(PET_COLLECTION)
-                                                                .add(pet);
-            DocumentReference reference = addedDocRef.get();
-            String generatedId = reference.getId();
-            pet.setId(generatedId);
-            ApiFuture<WriteResult> writeResult = reference.set(pet);
-            writeResult.get();
-
-            DocumentSnapshot snapshot = reference.get().get();
-            if (snapshot.exists()) {
-                pet = snapshot.toObject(Pet.class);
-                if (pet != null && pet.isValid()) {
-                    ownerRepository.addPet(ownerId, new PetLite(generatedId, pet.getName(), pet.getBreed()));
-                    result = new PetDTO(pet.getId(), pet);
-                }
-            }
+    public PetDTO createPet(@Valid Pet pet) throws ExecutionException, InterruptedException, DocumentNotFoundException {
+        OwnerDTO owner = ownerRepository.getOwnerById(pet.getOwnerId());
+        if (owner.isEmpty())
+        {
+            throw new DocumentNotFoundException("Owner not found");
         }
-        return result;
+
+        ApiFuture<DocumentReference> addedDocRef = firestore.collection(PET_COLLECTION)
+                                                            .add(pet);
+        DocumentReference reference = addedDocRef.get();
+
+        return new PetDTO(reference.getId(), reference.get().get().toObject(Pet.class));
     }
 
     // =========================
@@ -82,30 +78,25 @@ public class PetRepository implements IPetRepository {
     // =========================
 
     /**
-     * @param ownerId Document ID of the pet owner
      * @param petId Document ID of the pet to retrieve
      * @return A DTO of the pet. The content may be empty if no pet with
      * <code>petId</code> exists
      * @throws ExecutionException if computation threw an exception
      * @throws InterruptedException if the current thread was interrupted
+     * @throws DocumentNotFoundException if the pet is not found for provided id
      */
     @Override
-    public List<PetDTO> getPetById(String ownerId, String petId) throws ExecutionException, InterruptedException {
-        List<PetDTO> result = new ArrayList<>();
+    public PetDTO getPetById(String petId) throws ExecutionException, InterruptedException, DocumentNotFoundException {
 
-        ApiFuture<QuerySnapshot> future = firestore.collection(PET_COLLECTION)
-                .whereEqualTo("ownerId", ownerId).whereEqualTo("id", petId).get();
+        ApiFuture<DocumentSnapshot> future = firestore.collection(PET_COLLECTION).document(petId).get();
+        DocumentSnapshot document = future.get();
 
-        QueryDocumentSnapshot doc = future.get().getDocuments().getFirst();
-
-        if (doc.exists()) {
-            Pet pet = doc.toObject(Pet.class);
-            if (pet.isValid()) {
-                result.add(new PetDTO(pet.getId(), pet));
-            }
+        if (document.exists()) {
+            Pet pet = document.toObject(Pet.class);
+            return new PetDTO(petId, pet);
+        } else {
+            throw new DocumentNotFoundException("Pet not found");
         }
-
-        return result;
     }
 
     /**
@@ -117,8 +108,14 @@ public class PetRepository implements IPetRepository {
      * @throws InterruptedException if the current thread was interrupted
      */
     @Override
-    public List<PetDTO> getPetsByOwnerId(String ownerId) throws ExecutionException, InterruptedException {
+    public List<PetDTO> getPetsByOwnerId(String ownerId) throws ExecutionException, InterruptedException, DocumentNotFoundException {
         List<PetDTO> result = new ArrayList<>();
+
+        OwnerDTO owner = ownerRepository.getOwnerById(ownerId);
+        if (owner.isEmpty())
+        {
+            throw new DocumentNotFoundException("Owner not found");
+        }
 
         ApiFuture<QuerySnapshot> future = firestore.collection(PET_COLLECTION)
                 .whereEqualTo("ownerId", ownerId).get();
@@ -127,7 +124,7 @@ public class PetRepository implements IPetRepository {
 
         for (QueryDocumentSnapshot doc: docs) {
             Pet pet = doc.toObject(Pet.class);
-            result.add(new PetDTO(pet.getId(), pet));
+            result.add(new PetDTO(doc.getId(), pet));
         }
 
         return result;
@@ -139,37 +136,33 @@ public class PetRepository implements IPetRepository {
     // =========================
 
     /**
-     * @param ownerId Document ID of the pet owner
      * @param petId Document ID of the pet to update
      * @param pet   <code>Pet</code> object containing updated information
      * @return The updated <code>Pet</code> object
      * @throws ExecutionException   if computation threw an exception
      * @throws InterruptedException if the current thread was interrupted
+     * @throws DocumentNotFoundException if the pet is not found for provided id
      */
     @Override
-    public PetDTO updatePet(String ownerId, String petId, Pet pet) throws ExecutionException, InterruptedException {
-        PetDTO result = new PetDTO();
-
-        if (pet != null && pet.isValid()) {
-            ApiFuture<QuerySnapshot> future = firestore.collection(PET_COLLECTION)
-                    .whereEqualTo("ownerId", ownerId)
-                    .whereEqualTo("id", petId)
-                    .get();
-
-            List<QueryDocumentSnapshot> documents = future.get().getDocuments();
-            if (!documents.isEmpty()) {
-                DocumentReference docRef = documents.getFirst().getReference();
-                // Set the new pet data
-                pet.setId(petId);
-                pet.setOwnerId(ownerId);
-                ApiFuture<WriteResult> writeResult = docRef.set(pet);
-                writeResult.get();
-
-                result = new PetDTO(pet.getId(), pet);
-            }
+    public PetDTO updatePet(String petId, @Valid Pet pet) throws ExecutionException, InterruptedException, DocumentNotFoundException {
+        OwnerDTO owner = ownerRepository.getOwnerById(pet.getOwnerId());
+        if (owner.isEmpty())
+        {
+            throw new DocumentNotFoundException("Owner not found");
         }
 
-        return result;
+        ApiFuture<DocumentSnapshot> future = firestore.collection(PET_COLLECTION).document(petId).get();
+        DocumentSnapshot document = future.get();
+        if (!document.exists()) {
+            throw new DocumentNotFoundException("Pet not found");
+        }
+
+        DocumentReference docRef = document.getReference();
+        ApiFuture<WriteResult> writeResult = docRef.set(pet);
+        writeResult.get();
+
+        Pet updatedPet = docRef.get().get().toObject(Pet.class);
+        return new PetDTO(petId, updatedPet);
     }
 
     // =========================
@@ -182,28 +175,88 @@ public class PetRepository implements IPetRepository {
      * <code>petId</code> exists, an empty <code>Pet</code> object is returned
      * @throws ExecutionException   if computation threw an exception
      * @throws InterruptedException if the current thread was interrupted
+     * @throws DocumentNotFoundException if the pet is not found for provided id
      */
     @Override
-    public PetDTO deletePet(String ownerId, String petId) throws ExecutionException, InterruptedException {
-        PetDTO result = new PetDTO();
+    public PetDTO deletePet(String petId) throws ExecutionException, InterruptedException, DocumentNotFoundException {
 
-        ApiFuture<QuerySnapshot> future = firestore.collection(PET_COLLECTION)
-                .whereEqualTo("ownerId", ownerId)
-                .whereEqualTo("id", petId)
-                .get();
+        ApiFuture<DocumentSnapshot> future = firestore.collection(PET_COLLECTION).document(petId).get();
+        DocumentSnapshot document = future.get();
 
-        List<QueryDocumentSnapshot> documents = future.get().getDocuments();
-        if (!documents.isEmpty()) {
-            DocumentReference docRef = documents.getFirst().getReference();
-            DocumentSnapshot doc = docRef.get().get();
-            if (doc.exists()) {
-                Pet deletedPet = doc.toObject(Pet.class);
-                if (deletedPet != null && deletedPet.isValid()) {
-                    result = new PetDTO(deletedPet.getId(), deletedPet);
-                    docRef.delete().get();
-                }
-            }
+        if (!document.exists()) {
+            throw new DocumentNotFoundException("Pet not found");
         }
+
+        Pet deletedPet = document.toObject(Pet.class);
+        PetDTO result = new PetDTO(document.getId(), deletedPet);
+
+        DocumentReference docRef = document.getReference();
+        docRef.delete().get();
+
         return result;
+    }
+
+    // =========================
+    // ADD DIARY ENTRY OPERATION
+    // =========================
+    /**
+     * @param petId Document ID of the pet to delete
+     * @param diary diary entry to be added
+     * @return The newly created <code>DiaryDTO</code> object
+     * @throws ExecutionException   if computation threw an exception
+     * @throws InterruptedException if the current thread was interrupted
+     * @throws DocumentNotFoundException if no pet with <code>petId</code> exists,
+     */
+    @Override
+    public DiaryDTO addDiaryEntry(@NotNull @NotBlank String petId, @NotNull Diary diary) throws ExecutionException, InterruptedException, DocumentNotFoundException
+    {
+        DocumentReference docRef = firestore.collection(PET_COLLECTION).document(petId);
+        DocumentSnapshot snapshot = docRef.get().get();
+        if (!snapshot.exists()) {
+            logger.info("DEBUG LOG: Pet not found for id {} in add diary entry operation", petId);
+            throw new DocumentNotFoundException("Pet not found for id " + petId);
+        }
+
+        // Reference to subcollection "diaries" under the pet document
+        ApiFuture<DocumentReference> futureDocRef = firestore.collection("pets")
+                .document(petId)
+                .collection("diaries")
+                .add(diary);
+        DocumentReference reference = futureDocRef.get();
+
+        return new DiaryDTO(reference.getId(), reference.get().get().toObject(Diary.class));
+    }
+
+    // =========================
+    // GET DIARY ENTRY IN RANGE OPERATION
+    // =========================
+    public List<DiaryDTO> getDiaryEntryInRange(@NotNull @NotBlank String petId,
+                                                    @NotNull Date from,
+                                                    @NotNull Date to,
+                                                    int limit) throws ExecutionException, InterruptedException, DocumentNotFoundException {
+        DocumentReference petRef = firestore.collection(PET_COLLECTION).document(petId);
+        DocumentSnapshot docSnapshot = petRef.get().get();
+
+        if (!docSnapshot.exists()) {
+            logger.info("DEBUG LOG: Pet not found for id {} in get diary entry in range operation", petId);
+            throw new DocumentNotFoundException("Pet not found for id " + petId); // or throw exception
+        }
+
+        CollectionReference diariesRef = petRef.collection("diaries");
+
+        Query query = diariesRef
+                .whereGreaterThanOrEqualTo("createTimestamp", from)
+                .whereLessThanOrEqualTo("createTimestamp", to)
+                .orderBy("createTimestamp", Query.Direction.ASCENDING)
+                .limit(limit);
+
+        QuerySnapshot querySnapshot = query.get().get();
+
+        ArrayList<DiaryDTO> diaries = new ArrayList<>();
+        querySnapshot.forEach(doc -> {
+            Diary diary = doc.toObject(Diary.class);
+            diaries.add(new DiaryDTO(doc.getId(), diary));
+        });
+        return diaries;
     }
 }

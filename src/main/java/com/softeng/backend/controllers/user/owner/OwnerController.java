@@ -1,7 +1,9 @@
 package com.softeng.backend.controllers.user.owner;
 
 import com.softeng.backend.dto.OwnerDTO;
+import com.softeng.backend.dto.PetDTO;
 import com.softeng.backend.models.user.owner.Owner;
+import com.softeng.backend.services.pet.PetService;
 import com.softeng.backend.services.user.owner.OwnerService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.net.URI;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
@@ -29,10 +32,12 @@ public class OwnerController implements IOwnerController {
 
     private static final Logger logger = LoggerFactory.getLogger(OwnerController.class);
     private final OwnerService ownerService;
+    private final PetService petService;
 
     @Autowired
-    public OwnerController(OwnerService ownerService) {
+    public OwnerController(OwnerService ownerService,  PetService petService) {
         this.ownerService = ownerService;
+        this.petService = petService;
     }
 
     /*****************************************************************************
@@ -84,6 +89,25 @@ public class OwnerController implements IOwnerController {
         return ResponseEntity.ok().body(dto.toMap());
     }
 
+    @GetMapping("/{ownerId}/pets")
+    public ResponseEntity<List<Map<String, Object>>> getOwnersPets(@PathVariable String ownerId) {
+        List<Map<String, Object>> result;
+
+        List<PetDTO> pets;
+        try {
+            pets = petService.getPetsByOwnerId(ownerId);
+
+            // Steam map generated with IntelliJ autocomplete
+            result = pets.stream().map(PetDTO::toMap).toList();
+
+        } catch (ExecutionException | InterruptedException e) {
+            logger.error("ERROR LOG: Endpoint failed: {}", Arrays.toString(e.getStackTrace()));
+            return ResponseEntity.internalServerError().build();
+        }
+
+        return ResponseEntity.ok().body(result);
+    }
+
     /*****************************************************************************
      * UPDATE
      ******************************************************************************/
@@ -95,8 +119,6 @@ public class OwnerController implements IOwnerController {
             logger.debug("DEBUG LOG: Owner update /id endpoint detected empty request: {}", id);
             return ResponseEntity.badRequest().build();
         }
-
-        //TODO: check invalid user
 
         try {
             dto = ownerService.updateOwner(id, owner);

@@ -7,11 +7,11 @@ import com.google.firebase.FirebaseOptions;
 import com.google.firebase.cloud.FirestoreClient;
 import com.softeng.backend.exception.config.FirebaseInitializeException;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.*;
+import org.springframework.core.io.Resource;
 
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * References:
@@ -23,27 +23,35 @@ import java.io.IOException;
  * - Troubleshooted connection issues with ChatGPT when database connection didn't work
  */
 
+
 @Configuration
+@Profile("firebase")
 public class FirebaseConfig {
 
-    @Value("${GOOGLE_APPLICATION_CREDENTIALS:}")
-    private String appCredentialsPath;
+    @Value("${spring.cloud.gcp.project-id}")
+    private String projectId;
+
+    @Value("${spring.cloud.gcp.credentials.location:}")
+    private Resource firebaseCredentials;
 
     @Bean
-    public Firestore initializeApp() throws FirebaseInitializeException {
+    public Firestore firestore() throws FirebaseInitializeException {
 
-        Firestore app;
-        try {
+        FirebaseOptions options;
 
-            FileInputStream serviceAccount = new FileInputStream(appCredentialsPath);
-            FirebaseOptions options = new FirebaseOptions.Builder()
+        try (InputStream serviceAccount = firebaseCredentials.getInputStream()) {
+            options = FirebaseOptions.builder()
                     .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+                    .setProjectId(projectId)
                     .build();
-            FirebaseApp.initializeApp(options);
-            return FirestoreClient.getFirestore();
-
-        } catch(IOException e) {
+        } catch (IOException e) {
             throw new FirebaseInitializeException();
         }
+
+        if (FirebaseApp.getApps().isEmpty()) {
+            FirebaseApp.initializeApp(options);
+        }
+
+        return FirestoreClient.getFirestore();
     }
 }

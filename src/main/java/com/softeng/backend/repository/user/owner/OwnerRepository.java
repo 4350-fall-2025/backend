@@ -3,6 +3,7 @@ package com.softeng.backend.repository.user.owner;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.*;
 import com.softeng.backend.dto.OwnerDTO;
+import com.softeng.backend.exception.repository.DocumentNotFoundException;
 import com.softeng.backend.models.pet.PetLite;
 import com.softeng.backend.models.user.owner.Owner;
 import org.slf4j.Logger;
@@ -82,24 +83,30 @@ public class OwnerRepository implements IOwnerRepository {
      * UPDATE
      ******************************************************************************/
     // https://firebase.google.com/docs/firestore/manage-data/add-data#update-data
+    // This function has code copied from ChatGPT, which are commented in line
     public OwnerDTO updateOwner(String id, Map<String, Object> updateFields) throws ExecutionException, InterruptedException {
         DocumentReference docRef = firestore.collection(collectionName).document(id);
-        docRef.update(updateFields).get();
-
-        // The following code was copied from OpenAI's ChatGPT (https://chat.openai.com))
-        // I asked ChatGPT how we can get the updated result after writing,
         DocumentSnapshot snapshot = docRef.get().get();
+
+        // Asked ChatGPT how to handle specific exception that occurs when you call update on invalid doc id
+        if (!snapshot.exists()) {
+            return new OwnerDTO();
+        }
+
+        docRef.update(updateFields).get();
+        snapshot = docRef.get().get();
+        // Asked ChatGPT how we can get the updated result after writing
         Owner owner = snapshot.toObject(Owner.class);
         return new OwnerDTO(snapshot.getId(), owner);
     }
 
     @Override
-    public OwnerDTO addPet(String ownerId, PetLite pet) throws ExecutionException, InterruptedException {
+    public void addPet(String ownerId, PetLite pet) throws ExecutionException, InterruptedException, DocumentNotFoundException {
         DocumentReference docRef = firestore.collection(collectionName).document(ownerId);
         DocumentSnapshot snapshot = docRef.get().get();
         if (!snapshot.exists()) {
-            logger.info("DEBUG LOG: Owner not found for id {}", ownerId);
-            return new OwnerDTO();
+            logger.info("DEBUG LOG: Owner not found for id {} during add pet", ownerId);
+            throw new DocumentNotFoundException("Owner not found for id " + ownerId);
         }
 
         // Get current pets array or create new
@@ -117,26 +124,22 @@ public class OwnerRepository implements IOwnerRepository {
 
         // Update pets array in Firestore
         docRef.update("pets", pets).get();
-
-        // Return updated OwnerDTO
-        DocumentSnapshot updatedSnapshot = docRef.get().get();
-        Owner updatedOwner = updatedSnapshot.toObject(Owner.class);
-        return new OwnerDTO(updatedSnapshot.getId(), updatedOwner);
     }
 
-    public OwnerDTO updatePet(String ownerId, PetLite subdocument) throws ExecutionException, InterruptedException {
+    @Override
+    public void updatePet(String ownerId, PetLite subdocument) throws ExecutionException, InterruptedException, DocumentNotFoundException {
         DocumentReference docRef = firestore.collection(collectionName).document(ownerId);
         DocumentSnapshot snapshot = docRef.get().get();
         if (!snapshot.exists()) {
-            logger.info("DEBUG LOG: Owner not found for id {}", ownerId);
-            return new OwnerDTO();
+            logger.info("DEBUG LOG: Owner not found for id {} during update pet", ownerId);
+            throw new DocumentNotFoundException("Owner not found");
         }
 
         // Get current pets array
         List<Map<String, Object>> pets = (List<Map<String, Object>>) snapshot.get("pets");
         if (pets == null) {
-            logger.info("DEBUG LOG: No pets found for owner id {}", ownerId);
-            return new OwnerDTO(snapshot.getId(), snapshot.toObject(Owner.class));
+            logger.info("DEBUG LOG: No pets found for owner id {} during update pet", ownerId);
+            throw new DocumentNotFoundException("No pets found");
         }
 
         // Find and update the pet map
@@ -154,49 +157,40 @@ public class OwnerRepository implements IOwnerRepository {
         }
 
         if (!updated) {
-            logger.info("DEBUG LOG: Pet with id {} not found for owner id {}", subdocument.getId(), ownerId);
-            return new OwnerDTO(snapshot.getId(), snapshot.toObject(Owner.class));
+            logger.info("DEBUG LOG: Pet with id {} not found for owner id {} during update pet", subdocument.getId(), ownerId);
+            throw new DocumentNotFoundException("Pet with id " + subdocument.getId() + " not found");
         }
 
         // Update pets array in Firestore
         docRef.update("pets", pets).get();
-
-        // Return updated OwnerDTO
-        DocumentSnapshot updatedSnapshot = docRef.get().get();
-        Owner updatedOwner = updatedSnapshot.toObject(Owner.class);
-        return new OwnerDTO(updatedSnapshot.getId(), updatedOwner);
     }
 
-    public OwnerDTO removePet(String ownerId, String petId) throws ExecutionException, InterruptedException {
+    @Override
+    public void removePet(String ownerId, String petId) throws ExecutionException, InterruptedException, DocumentNotFoundException {
         DocumentReference docRef = firestore.collection(collectionName).document(ownerId);
         DocumentSnapshot snapshot = docRef.get().get();
         if (!snapshot.exists()) {
-            logger.info("DEBUG LOG: Owner not found for id {}", ownerId);
-            return new OwnerDTO();
+            logger.info("DEBUG LOG: Owner not found for id {} during remove pet", ownerId);
+            throw new DocumentNotFoundException("Owner not found");
         }
 
         // Get current pets array
         List<Map<String, Object>> pets = (List<Map<String, Object>>) snapshot.get("pets");
         if (pets == null) {
-            logger.info("DEBUG LOG: No pets found for owner id {}", ownerId);
-            return new OwnerDTO(snapshot.getId(), snapshot.toObject(Owner.class));
+            logger.info("DEBUG LOG: No pets found for owner id {} during remove pet", ownerId);
+            throw new DocumentNotFoundException("No pets found");
         }
 
         // Find and remove the pet map
         boolean removed = pets.removeIf(petMap -> petMap != null && petId.equals(petMap.get("id")));
 
         if (!removed) {
-            logger.info("DEBUG LOG: Pet with id {} not found for owner id {}", petId, ownerId);
-            return new OwnerDTO(snapshot.getId(), snapshot.toObject(Owner.class));
+            logger.info("DEBUG LOG: Pet with id {} not found for owner id {} during remove pet", petId, ownerId);
+            throw new DocumentNotFoundException("Pet with id " + petId + " not found");
         }
 
         // Update pets array in Firestore
         docRef.update("pets", pets).get();
-
-        // Return updated OwnerDTO
-        DocumentSnapshot updatedSnapshot = docRef.get().get();
-        Owner updatedOwner = updatedSnapshot.toObject(Owner.class);
-        return new OwnerDTO(updatedSnapshot.getId(), updatedOwner);
     }
 
     /*****************************************************************************

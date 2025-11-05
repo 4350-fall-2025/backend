@@ -13,9 +13,15 @@
 7) Enable Annotation Processing through the menu in IntelliJ: 
 *IntelliJ Menu -> Build, Execution, Deploymnet -> Compiler -> 
 Annotation Processors -> Enable annotation processing*
-8) Set up Firestore authentication:
+8) Install firebase CLI
+    ```bash
+    curl -sL firebase.tools | bash
+    ```
+   Other download options available on the [firebase website](https://firebase.google.com/docs/cli?authuser=2#install_the_firebase_cli) 
 
-   a) For graders/Lauren, you will be provided the auth file as communicated. Refer to step 9
+9) Set up Firestore authentication (to accesss hosted database):
+
+   a) For graders/Lauren, you will be provided a new auth file as communicated via email each sprint. Please note that due to security concerns, we require firebase emulators in order to use storage features, such as uploading images. Refer to step 10 to continue setup. 
 
    b) For devs: 
 
@@ -33,38 +39,64 @@ Annotation Processors -> Enable annotation processing*
 
    >>   v) Rename the file to "firebase-admin.json"
 
-9) Move/Copy the "firebase-admin.json" file to the following directory in the project:
+10) Move/Copy the "firebase-admin.json" file to the following directory in the project:
          
 ```
     backend/src/main/resources
 ```
 
-10) (See *Note below if you do not see an enviornment variables option). In IntelliJ, Click the "Run->Edit Configurations" and in the Run/Debug Configurations, under "Environment Variables" enter the following environment variables:
+11) Set the active profile for BackendApplication. For graders, please enter `emulator`, and after setting the profile, refer to step 12. 
 
-GOOGLE_APPLICATION_CREDENTIALS=*enter your ABSOLUTE path to the firebase-admin.json file here*
+## How to set active profile in IntelliJ:
+In IntelliJ, Click the "Run->Edit Configurations" and in the Run/Debug Configurations, under "Active profiles", enter 1 of 2 profiles depending on your needs (`firebase`, `emulator`):
 
-Eg: Windows: 
-GOOGLE_APPLICATION_CREDENTIALS=C:\Users\you\Docs\Project\backend\src\etc\firebase-admin.json
+https://github.com/user-attachments/assets/fc647e81-b94e-4f0f-aff7-96be912b8445
 
-Eg. Mac/Linux: 
-GOOGLE_APPLICATION_CREDENTIALS=/Users/you/docs/project/backend/src/etc/firebase-admin.json
+Note*: If you do not see a section for profiles in edit configurations as outlined above, you just need to click "Modify Options->Active profiles" as seen below:
 
-*Tip: you can right-click the firebase-admin.json file in IntelliJ then copy the absolute path*
-Then click "Apply", then "Ok".
+https://github.com/user-attachments/assets/54f69f0e-ac77-4339-8987-cf339f88b191
 
-https://github.com/user-attachments/assets/b3f54cc6-95ac-450b-8c32-04437eeebb50
+`firebase` profile:
 
-Note*: If you do not see a section in edit configurations as outlined above, you just need to click "Modify Options->Enviornment Variables" as seen below:
+- For using hosted database (Not recommended for running tests or profiling)
+- Does not have auth or storage set up (you can't upload images)
 
-https://github.com/user-attachments/assets/893d32ed-f8fe-478d-a5e7-d923d1dcd9b7
+`emulator` profile:
+- With this profile you must run the emulator locally, this is used for local tests and profiling
+- Also has auth/storage emulator, so you CAN upload images and other files.
+- Follow the instructions below for setting up and running the emulators.
 
+12) For the emulator environment, you will need to install and run the emulators, and set 2 environment variables.
 
-11) Run the application by executing BackendApplication.java by clicking the "Run Appplication" button in IntelliJ:
+####  Environment Variables:
+> Set up Environment variables if you want to use emulators for auth & storage:
+> 
+> Click on the "Run" menu in IntelliJ: Run->Edit Configurations
+> Enter the following in the "Environment variables section" (can be found under Modify menu if not visible):
+> 
+> - FIREBASE_AUTH_EMULATOR_HOST=localhost:9099
+> - FIREBASE_STORAGE_EMULATOR_HOST=localhost:9199
+>
+
+#### Run & install the emulators
+
+```bash
+firebase emulators:start --only firestore,auth,storage --project qdog-6aca2
+```
+
+*Note:* before you STOP the emulators, save test data by running in a different terminal:
+```bash
+cd src/main/java/com/softeng/backend
+firebase emulators:export ../../../../../test/data
+```
+You can run the emulators with `--import ../../../../../test/data` to import the data into the emulators.
+
+13) Run the application by running the emulators (step 12), and then executing BackendApplication.java by clicking the "Run Appplication" button in IntelliJ:
     <img width="482" height="77" alt="build-run" src="https://github.com/user-attachments/assets/dbaad99a-ee1b-4703-aac5-a25df9590b5d" />
 
 # Sources
 
-Some portions of this project, specifically guidance on implementing Firestore CRUD operations for Owner objects in Spring Boot, were informed by OpenAI’s ChatGPT (GPT-5) on multiple occasions between October 10 and October 12 2025.
+Some portions of this project, specifically guidance on implementing Firestore CRUD operations for Owner objects in Spring Boot, were informed by OpenAI’s ChatGPT (GPT-5) on multiple occasions for each sprint.
 
 Inline comments indicate where AI guidance was referenced or code was used. 
 For reference, OpenAI ChatGPT is available at: https://chat.openai.com 
