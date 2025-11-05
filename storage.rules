@@ -1,3 +1,4 @@
+// rules created with the help of ChatGPT, Model GPT-5
 service firebase.storage {
   match /b/{bucket}/o {
 

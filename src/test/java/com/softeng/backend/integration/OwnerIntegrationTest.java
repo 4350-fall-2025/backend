@@ -4,9 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.softeng.backend.models.user.owner.Owner;
 import com.softeng.backend.repository.pet.PetRepository;
 import com.softeng.backend.repository.user.owner.OwnerRepository;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -32,6 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("emulator")
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class OwnerIntegrationTest {
 
     @Autowired
@@ -56,7 +55,7 @@ public class OwnerIntegrationTest {
     @Autowired
     private PetRepository petRepository;
 
-    @BeforeEach
+    @BeforeAll
     void setupOwner() throws Exception {
         ownerToGetId = ownerRepository.createOwner(ownerToGet).getId();
         ownerToUpdateId = ownerRepository.createOwner(ownerToUpdate).getId();
@@ -178,7 +177,7 @@ public class OwnerIntegrationTest {
                 .andExpect(status().isNotFound());
     }
 
-    @AfterEach
+    @AfterAll
     void tearDown() {
         ownerRepository.deleteOwner(ownerToGetId);
         ownerRepository.deleteOwner(ownerToUpdateId);
