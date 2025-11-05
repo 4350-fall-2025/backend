@@ -354,7 +354,7 @@ public class OwnerControllerTest {
 
         when(petService.getPetsByOwnerId(anyString())).thenReturn(pets);
 
-        mockMvc.perform(get("/api/v1/owners/{ownerId}/pets?petId", mockDocId))
+        mockMvc.perform(get("/api/v1/owners/{ownerId}/pets", mockDocId))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 // First pet
@@ -386,7 +386,7 @@ public class OwnerControllerTest {
     void testGetOwnersPetsEmptyList() throws Exception {
         when(petService.getPetsByOwnerId(anyString())).thenReturn(Collections.emptyList());
 
-        mockMvc.perform(get("/api/v1/pets/{ownerId}/pets", mockDocId))
+        mockMvc.perform(get("/api/v1/owners/{ownerId}/pets", mockDocId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$.length()").value(0)); // ensure empty array
@@ -396,7 +396,7 @@ public class OwnerControllerTest {
     void testGetOwnersPetsInternalServerError() throws Exception {
         when(petService.getPetsByOwnerId(anyString())).thenThrow(ExecutionException.class);
 
-        mockMvc.perform(get("/api/v1/pets/{ownerId}/pets", mockDocId))
+        mockMvc.perform(get("/api/v1/owners/{ownerId}/pets", mockDocId))
                 .andExpect(status().isInternalServerError());
     }
 
@@ -404,7 +404,7 @@ public class OwnerControllerTest {
     void testGetOwnersPetsNotFound() throws Exception {
         when(petService.getPetsByOwnerId(anyString())).thenThrow(DocumentNotFoundException.class);
 
-        mockMvc.perform(get("/api/v1/pets/{ownerId}/pets", mockDocId))
+        mockMvc.perform(get("/api/v1/owners/{ownerId}/pets", mockDocId))
                 .andExpect(status().isNotFound());
     }
 }
