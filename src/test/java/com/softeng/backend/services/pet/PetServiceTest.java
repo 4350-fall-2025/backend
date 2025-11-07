@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -41,6 +42,8 @@ public class PetServiceTest {
 
     private static final String MOCK_OWNER_ID = "mockDocId";
     private static final String MOCK_ID = "mockId";
+    private static final Diary MOCK_DIARY = new Diary("GENERAL", "content body",
+            new ArrayList<>(), new Date());
     private static final String MOCK_DIARY_ID = "mockDiaryId";
 
 
@@ -89,8 +92,6 @@ public class PetServiceTest {
 
     @Test
     public void getPetByIdTestFailure() throws Exception {
-        Date date = new Date();
-        Pet pet = new Pet("Basma",MOCK_OWNER_ID,"dog", "husky", false, PetSexType.FEMALE,date, SterileStatus.NON_STERILE, AnimalGroup.AMPHIBIAN);
         when(petRepository.getPetById(MOCK_ID)).thenThrow(new DocumentNotFoundException(("Pet not found")));
 
         DocumentNotFoundException thrown = assertThrows(
@@ -177,9 +178,61 @@ public class PetServiceTest {
     }
 
     @Test
+    public void updateGetDiaryEntryInRangeSuccess() throws Exception {
+        Date from = new Date();
+        Date to = new Date();
+
+        List<DiaryDTO> expectedDiaries = new ArrayList<>();
+        expectedDiaries.add(new DiaryDTO(MOCK_DIARY_ID, MOCK_DIARY));
+
+        when(petRepository.getDiaryEntryInRange(MOCK_ID, from, to, 0))
+                .thenReturn(expectedDiaries);
+
+        List<DiaryDTO> result = petService.getDiaryEntryInRange(MOCK_ID, from, to, 0);
+
+        assertEquals(expectedDiaries.get(0).getId(), result.get(0).getId());
+    }
+
+    @Test
+    public void getDiaryEntryInRangePetNotFound() throws Exception {
+        Date from = new Date();
+        Date to = new Date();
+
+        when(petRepository.getDiaryEntryInRange(MOCK_ID, from, to, 0))
+                .thenThrow(new DocumentNotFoundException("Pet not found"));
+
+        assertThrows(DocumentNotFoundException.class,
+                () -> petService.getDiaryEntryInRange(MOCK_ID, from, to, 0));
+    }
+
+    @Test
+    public void getDiaryEntryInRangeExecutionException() throws Exception {
+        Date from = new Date();
+        Date to = new Date();
+
+        when(petRepository.getDiaryEntryInRange(MOCK_ID, from, to, 0))
+                .thenThrow(new ExecutionException(new Throwable("Database error")));
+
+        assertThrows(ExecutionException.class,
+                () -> petService.getDiaryEntryInRange(MOCK_ID, from, to, 0));
+    }
+
+    @Test
+    public void getDiaryEntryInRangeInterruptedException() throws Exception {
+        Date from = new Date();
+        Date to = new Date();
+
+        when(petRepository.getDiaryEntryInRange(MOCK_ID, from, to, 0))
+                .thenThrow(new InterruptedException("Database error"));
+
+        assertThrows(InterruptedException.class,
+                () -> petService.getDiaryEntryInRange(MOCK_ID, from, to, 0));
+    }
+  
+  @Test
     public void addDiaryEntryTestSuccess() throws Exception {
         Date date = new Date();
-        Diary diary = new Diary("DIET","He started eating meat today",  new ArrayList<String>(),date);
+        Diary diary = new Diary("DIET","He started eating meat today",  new ArrayList<>(), date);
 
         DiaryDTO diaryDTO = new DiaryDTO(MOCK_DIARY_ID, diary);
         when(petRepository.addDiaryEntry(MOCK_ID, diary)).thenReturn(diaryDTO);
@@ -194,7 +247,7 @@ public class PetServiceTest {
     @Test
     public void addDiaryEntryTestPetNotFound() throws Exception {
         Date date = new Date();
-        Diary diary = new Diary("DIET","He started eating meat today",  new ArrayList<String>(),date);
+        Diary diary = new Diary("DIET","He started eating meat today",  new ArrayList<>(), date);
 
         when(petRepository.addDiaryEntry(MOCK_ID, diary)).thenThrow(new DocumentNotFoundException("Pet not found"));
 
@@ -204,7 +257,4 @@ public class PetServiceTest {
         );
         assertEquals("Pet not found", thrown.getMessage());
     }
-
-
-
 }
