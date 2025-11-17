@@ -1,0 +1,66 @@
+# Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/
+mvnw
+mvnw.cmd
+*.jar
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.settings/
+.classpath
+.project
+
+# Git
+.git/
+.github/
+.gitignore
+.gitattributes
+
+#Github
+github-actions-key.json
+gha-creds-*.json
+
+# Docker
+Dockerfile
+.dockerignore
+docker-compose.yml
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Secrets
+*.key
+*.pem
+*.p12
+*.jks
+
+# Firebase
+**/firebase*.json
+.firebaserc
+storage.rules
+src/main/resources/service-account-key.json
+
+# Test files
+**/profiling/
+**/test/
+**/*Test.java
+
+# Documentation
+README.md
+LICENSE
+*.md

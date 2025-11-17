@@ -53,6 +53,7 @@ firebase-admin.json
 # Firebase cache
 .firebase/
 *.firebase/
+**/service-account-key.json
 
 # Firebase config
 
@@ -124,3 +125,7 @@ env
 # dataconnect generated files
 .dataconnect
 *.dataconnect
+
+# GitHub Actions
+**/github-actions-key.json
+gha-creds-*.json

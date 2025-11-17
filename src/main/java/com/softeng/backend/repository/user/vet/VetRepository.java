@@ -2,7 +2,6 @@ package com.softeng.backend.repository.user.vet;
 
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.*;
-import com.softeng.backend.dto.OwnerDTO;
 import com.softeng.backend.dto.VetDTO;
 import com.softeng.backend.models.user.vet.Vet;
 import org.slf4j.Logger;
@@ -29,11 +28,11 @@ import java.util.concurrent.ExecutionException;
 @Repository
 public class VetRepository implements IVetRepository {
 
-    @Autowired
-    private Firestore firestore;
+    private final Firestore firestore;
     private final String collectionName = "vets";
     private static final Logger logger = LoggerFactory.getLogger(VetRepository.class);
 
+    @Autowired
     public VetRepository(Firestore firestore) {
         this.firestore = firestore;
     }

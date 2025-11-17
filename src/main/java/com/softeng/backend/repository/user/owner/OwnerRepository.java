@@ -32,11 +32,11 @@ import java.util.concurrent.ExecutionException;
 @Repository
 public class OwnerRepository implements IOwnerRepository {
 
-    @Autowired
-    private Firestore firestore;
+    private final Firestore firestore;
     private final String collectionName = "owners";
     private static final Logger logger = LoggerFactory.getLogger(OwnerRepository.class);
 
+    @Autowired
     public OwnerRepository(Firestore firestore) {
         this.firestore = firestore;
     }

@@ -25,14 +25,17 @@ import java.io.InputStream;
 
 
 @Configuration
-@Profile("firebase")
+@Profile({"firebase", "prod"})
 public class FirebaseConfig {
 
     @Value("${spring.cloud.gcp.project-id}")
     private String projectId;
 
-    @Value("${spring.cloud.gcp.credentials.location:}")
+    @Value("${spring.cloud.gcp.credentials.location}")
     private Resource firebaseCredentials;
+
+    @Value("${spring.cloud.gcp.database-id}")
+    private String databaseId;
 
     @Bean
     public Firestore firestore() throws FirebaseInitializeException {
@@ -52,6 +55,6 @@ public class FirebaseConfig {
             FirebaseApp.initializeApp(options);
         }
 
-        return FirestoreClient.getFirestore();
+        return FirestoreClient.getFirestore(databaseId);
     }
 }

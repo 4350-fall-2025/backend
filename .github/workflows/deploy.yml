@@ -1,0 +1,107 @@
+# Build and deploy docker container
+# Boilerplate built with Claude 4.5
+
+name: Build and Deploy
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 25
+        uses: actions/setup-java@v4
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Run tests
+        run: mvn test
+
+  build-and-push:
+    needs: test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=sha,prefix={{branch}}-
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Set up Docker buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v3
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Deploy to Cloud Run (GCP)
+        id: deploy-cloudrun
+        uses: google-github-actions/deploy-cloudrun@v2
+        with:
+          service: spring-boot-service
+          region: us-west1
+          image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          credentials: ${{ secrets.GCP_SA_KEY }}
+          env_vars: |
+            SPRING_PROFILES_ACTIVE=prod,firebase
+            GOOGLE_CLOUD_PROJECT=${{ secrets.GCP_PROJECT_ID }}
+            GOOGLE_CLOUD_DATABASE=${{ secrets.GCP_FIRESTORE_DATABASE_ID }}
+            GOOGLE_APPLICATION_CREDENTIALS=${{ secrets.GCP_SA_KEY }}
+          secrets: |
+            /secrets/firebase-admin.json=firebase-credentials:latest
+          flags: |
+            --port=3000
+            --memory=512Mi
+            --cpu=1
+            --min-instances=0
+            --max-instances=10
+            --allow-unauthenticated

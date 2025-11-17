@@ -5,6 +5,7 @@ spring:
     name: backend
   cloud:
     gcp:
+      database-id: ${GOOGLE_CLOUD_DATABASE}
       credentials:
         location: classpath:firebase-admin.json
 
