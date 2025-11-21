@@ -41,15 +41,26 @@ public class FirebaseConfig {
     public Firestore firestore() throws FirebaseInitializeException {
 
         FirebaseOptions options;
+        GoogleCredentials googleCredentials;
 
-        try (InputStream serviceAccount = firebaseCredentials.getInputStream()) {
-            options = FirebaseOptions.builder()
-                    .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-                    .setProjectId(projectId)
-                    .build();
-        } catch (IOException e) {
-            throw new FirebaseInitializeException();
+        if (!firebaseCredentials.exists()) {
+            try {
+                googleCredentials = GoogleCredentials.getApplicationDefault();
+            } catch (IOException e) {
+                throw new FirebaseInitializeException(e.getMessage());
+            }
+        } else {
+            try (InputStream serviceAccount = firebaseCredentials.getInputStream()) {
+                googleCredentials = GoogleCredentials.fromStream(serviceAccount);
+            } catch (IOException e) {
+                throw new FirebaseInitializeException();
+            }
         }
+
+        options = FirebaseOptions.builder()
+                .setCredentials(googleCredentials)
+                .setProjectId(projectId)
+                .build();
 
         if (FirebaseApp.getApps().isEmpty()) {
             FirebaseApp.initializeApp(options);

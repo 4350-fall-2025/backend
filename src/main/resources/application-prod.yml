@@ -5,14 +5,11 @@ spring:
     gcp:
       project-id: ${GOOGLE_CLOUD_PROJECT}
       database-id: ${GOOGLE_CLOUD_DATABASE}
-      credentials:
-        location: ${GOOGLE_APPLICATION_CREDENTIALS}
 
 logging:
   level:
     root: INFO
     com.softeng.backend: DEBUG
-    org.springframework.web: DEBUG #TODO: REMOVE ME
 
 management:
   endpoints:

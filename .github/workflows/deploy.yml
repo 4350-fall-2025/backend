@@ -75,30 +75,33 @@ jobs:
   deploy:
     needs: build-and-push
     runs-on: ubuntu-latest
+    permissions:
+        contents: read
+        id-token: write
     if: github.ref == 'refs/heads/main'
 
     steps:
       - name: Authenticate to Google Cloud
+        id: auth
         uses: google-github-actions/auth@v3
         with:
-          credentials_json: ${{ secrets.GCP_SA_KEY }}
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          create_credentials_file: true
+          workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
 
       - name: Deploy to Cloud Run (GCP)
         id: deploy-cloudrun
         uses: google-github-actions/deploy-cloudrun@v2
         with:
-          service: spring-boot-service
-          region: us-west1
+          service: ${{ secrets.SERVICE_NAME }}
+          region: ${{ secrets.GCP_REGION }}
           image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
-          credentials: ${{ secrets.GCP_SA_KEY }}
           env_vars: |
-            SPRING_PROFILES_ACTIVE=prod,firebase
+            SPRING_PROFILES_ACTIVE=prod
             GOOGLE_CLOUD_PROJECT=${{ secrets.GCP_PROJECT_ID }}
-            GOOGLE_CLOUD_DATABASE=${{ secrets.GCP_FIRESTORE_DATABASE_ID }}
-            GOOGLE_APPLICATION_CREDENTIALS=${{ secrets.GCP_SA_KEY }}
-          secrets: |
-            /secrets/firebase-admin.json=firebase-credentials:latest
+            GOOGLE_CLOUD_DATABASE=${{ secrets.GCP_DATABASE_ID }}
           flags: |
+            --service-account=${{ secrets.GCP_RUN_SERVICE_ACCOUNT }}
             --port=3000
             --memory=512Mi
             --cpu=1
