@@ -21,6 +21,15 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/ws-chat").setAllowedOrigins("*").withSockJS();
+        // Raw websocket endpoint (clients should connect with ?username=Alice)
+        registry.addEndpoint("/ws-chat")
+                .setHandshakeHandler(new UserHandshakeHandler())
+                .setAllowedOrigins("*");
+
+        // SockJS endpoint (browsers)
+        registry.addEndpoint("/ws-chat")
+                .setHandshakeHandler(new UserHandshakeHandler())
+                .setAllowedOrigins("*")
+                .withSockJS();
     }
 }

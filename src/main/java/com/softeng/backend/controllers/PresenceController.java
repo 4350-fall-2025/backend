@@ -1,7 +1,10 @@
 package com.softeng.backend.controllers;
 
+import com.softeng.backend.controllers.user.AuthController;
 import com.softeng.backend.models.RegisterMessage;
 import com.softeng.backend.services.user.OnlineUserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
@@ -11,6 +14,7 @@ import org.springframework.stereotype.Controller;
 @Controller
 public class PresenceController {
 
+    private static final Logger logger = LoggerFactory.getLogger(PresenceController.class);
     private final OnlineUserService onlineUserService;
     private final SimpMessagingTemplate template;
 
@@ -27,5 +31,7 @@ public class PresenceController {
         if (username == null || username.isBlank()) return;
         onlineUserService.addUser(sessionId, username);
         template.convertAndSend("/topic/online", onlineUserService.getOnlineUsers());
+
+        logger.info("User {} has been registered successfully", username);
     }
 }
