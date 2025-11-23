@@ -1,6 +1,6 @@
-package com.softeng.backend.controllers;
+package com.softeng.backend.controllers.user.socket;
 
-import com.softeng.backend.models.ChatMessage;
+import com.softeng.backend.models.message.ChatMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,4 +1,4 @@
-package com.softeng.backend.models;
+package com.softeng.backend.models.message;
 
 public class ChatMessage {
     private String sender;

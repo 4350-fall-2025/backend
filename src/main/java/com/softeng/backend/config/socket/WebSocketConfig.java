@@ -1,4 +1,4 @@
-package com.softeng.backend.config;
+package com.softeng.backend.config.socket;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
@@ -24,11 +24,13 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         // Raw websocket endpoint (clients should connect with ?username=Alice)
         registry.addEndpoint("/ws-chat")
                 .setHandshakeHandler(new UserHandshakeHandler())
+                .addInterceptors(new UserHandshakeInterceptor())
                 .setAllowedOrigins("*");
 
         // SockJS endpoint (browsers)
         registry.addEndpoint("/ws-chat")
                 .setHandshakeHandler(new UserHandshakeHandler())
+                .addInterceptors(new UserHandshakeInterceptor())
                 .setAllowedOrigins("*")
                 .withSockJS();
     }

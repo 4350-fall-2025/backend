@@ -1,4 +1,4 @@
-package com.softeng.backend.config;
+package com.softeng.backend.config.database;
 
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.firestore.Firestore;

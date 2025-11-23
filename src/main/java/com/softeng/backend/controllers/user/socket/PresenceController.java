@@ -1,7 +1,6 @@
-package com.softeng.backend.controllers;
+package com.softeng.backend.controllers.user.socket;
 
-import com.softeng.backend.controllers.user.AuthController;
-import com.softeng.backend.models.RegisterMessage;
+import com.softeng.backend.models.message.RegisterMessage;
 import com.softeng.backend.services.user.OnlineUserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

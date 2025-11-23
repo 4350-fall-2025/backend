@@ -1,4 +1,4 @@
-package com.softeng.backend.models;
+package com.softeng.backend.models.message;
 
 public class RegisterMessage {
     private String username;

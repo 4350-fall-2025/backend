@@ -1,0 +1,72 @@
+package com.softeng.backend.config.socket;
+
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.server.ServerHttpRequest;
+import org.springframework.http.server.ServletServerHttpResponse;
+import org.springframework.web.socket.WebSocketHandler;
+import org.springframework.web.socket.server.HandshakeInterceptor;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.util.Map;
+import java.util.stream.Stream;
+
+public class UserHandshakeInterceptor implements HandshakeInterceptor {
+
+    private static String extractParamFromUri(URI uri, String name) {
+        if (uri == null || uri.getQuery() == null) return null;
+        return Stream.of(uri.getQuery().split("&"))
+                .map(p -> p.split("=", 2))
+                .filter(parts -> parts.length == 2 && parts[0].equals(name))
+                .map(parts -> parts[1])
+                .findFirst().orElse(null);
+    }
+
+    @Override
+    public boolean beforeHandshake(ServerHttpRequest request, org.springframework.http.server.ServerHttpResponse response,
+                                   WebSocketHandler wsHandler, Map<String, Object> attributes) throws Exception {
+        String userId;
+
+        userId = extractParamFromUri(request.getURI(), "userId");
+
+        if (userId == null || userId.trim().isEmpty()) {
+            String json = "{\"error\":\"userId query parameter is required\"}";
+
+            // If running in a servlet environment, write a proper HTTP 400 body
+            if (response instanceof ServletServerHttpResponse) {
+                HttpServletResponse servletResp = ((ServletServerHttpResponse) response).getServletResponse();
+                servletResp.setStatus(HttpStatus.BAD_REQUEST.value());
+                servletResp.setContentType("application/json;charset=UTF-8");
+                try {
+                    servletResp.getWriter().write(json);
+                    servletResp.getWriter().flush();
+                } catch (IOException ignored) {
+                }
+            } else {
+                // Fallback for other ServerHttpResponse implementations
+                response.setStatusCode(HttpStatus.BAD_REQUEST);
+                try (OutputStream os = response.getBody()) {
+                    os.write(json.getBytes(StandardCharsets.UTF_8));
+                    os.flush();
+                } catch (IOException ignored) {
+                }
+            }
+
+            // reject the handshake
+            return false;
+        }
+
+        // store for the HandshakeHandler to create Principal
+        attributes.put("userId", userId.trim());
+        return true;
+    }
+
+    @Override
+    public void afterHandshake(ServerHttpRequest request, org.springframework.http.server.ServerHttpResponse response,
+                               WebSocketHandler wsHandler, Exception exception) {
+        // nothing
+    }
+}
