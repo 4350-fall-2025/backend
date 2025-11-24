@@ -6,7 +6,7 @@ spring:
       project-id: ${GOOGLE_CLOUD_PROJECT}
       database-id: ${GOOGLE_CLOUD_DATABASE}
       credentials:
-          location: classpath:firebase-prod.json
+          location: ${GOOGLE_APPLICATION_CREDENTIALS}
 
 logging:
   level:
