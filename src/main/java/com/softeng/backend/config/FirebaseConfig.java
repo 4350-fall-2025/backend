@@ -43,18 +43,10 @@ public class FirebaseConfig {
         FirebaseOptions options;
         GoogleCredentials googleCredentials;
 
-        if (!firebaseCredentials.exists()) {
-            try {
-                googleCredentials = GoogleCredentials.getApplicationDefault();
-            } catch (IOException e) {
-                throw new FirebaseInitializeException(e.getMessage());
-            }
-        } else {
-            try (InputStream serviceAccount = firebaseCredentials.getInputStream()) {
-                googleCredentials = GoogleCredentials.fromStream(serviceAccount);
-            } catch (IOException e) {
-                throw new FirebaseInitializeException();
-            }
+        try (InputStream serviceAccount = firebaseCredentials.getInputStream()) {
+            googleCredentials = GoogleCredentials.fromStream(serviceAccount);
+        } catch (IOException e) {
+            throw new FirebaseInitializeException();
         }
 
         options = FirebaseOptions.builder()

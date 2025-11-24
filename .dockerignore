@@ -53,7 +53,7 @@ Thumbs.db
 **/firebase*.json
 .firebaserc
 storage.rules
-src/main/resources/service-account-key.json
+service-account-key.json
 
 # Test files
 **/profiling/
