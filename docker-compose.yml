@@ -1,0 +1,15 @@
+version: "3.8"
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: backend:latest
+    volumes:
+      - ./src/main/resources/firebase-prod.json:/app/credentials/firebase-prod.json:ro
+    environment:
+      - GOOGLE_APPLICATION_CREDENTIALS=/app/credentials/firebase-prod.json
+      - GOOGLE_CLOUD_PROJECT=<replace_with_project_id>
+      - GOOGLE_CLOUD_DATABASE=<replace_with_database_id>
+    restart: unless-stopped
+

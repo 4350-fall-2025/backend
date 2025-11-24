@@ -5,6 +5,8 @@ spring:
     gcp:
       project-id: ${GOOGLE_CLOUD_PROJECT}
       database-id: ${GOOGLE_CLOUD_DATABASE}
+      credentials:
+        location: classpath:firebase-prod.json
 
 logging:
   level:
