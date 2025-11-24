@@ -23,6 +23,6 @@ public class WebSocketEventListener {
     public void handleSessionDisconnect(SessionDisconnectEvent event) {
         String sessionId = event.getSessionId();
         onlineVetService.removeSession(sessionId);
-        template.convertAndSend("/topic/online", onlineVetService.getOnlineUserIds());
+        template.convertAndSend("/topic/online", onlineVetService.getOnlineVetIds());
     }
 }

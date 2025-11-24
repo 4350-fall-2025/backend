@@ -1,8 +1,12 @@
 package com.softeng.backend.models.message;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 
 @Getter
 public class OnlineVetMessage {
-    private String userId;
+    @NotNull
+    @NotBlank
+    private String vetId;
 }

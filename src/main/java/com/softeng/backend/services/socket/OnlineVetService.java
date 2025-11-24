@@ -10,28 +10,30 @@ import java.util.stream.Collectors;
 
 @Service
 public class OnlineVetService implements IOnlineVetService {
-    private final ConcurrentHashMap<String, String> sessionIdToUserIds = new ConcurrentHashMap<>();
-    private final ConcurrentHashMap<String, String> userIdToSessionId = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, String> sessionIdToVetIds = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, String> vetIdToSessionId = new ConcurrentHashMap<>();
 
-    public void addUserIds(@NotNull @NotBlank String sessionId, @NotNull @NotBlank String userId) {
-        if (sessionId == null || userId == null) return;
-        sessionIdToUserIds.put(sessionId, userId);
-        userIdToSessionId.put(userId, sessionId);
+    @Override
+    public void addVetIds(@NotNull @NotBlank String sessionId, @NotNull @NotBlank String vetId) {
+        sessionIdToVetIds.put(sessionId, vetId);
+        vetIdToSessionId.put(vetId, sessionId);
     }
 
+    @Override
     public void removeSession(@NotNull @NotBlank String sessionId) {
-        if (sessionId == null) return;
-        String userId = sessionIdToUserIds.remove(sessionId);
-        if (userId != null) {
-            userIdToSessionId.remove(userId);
+        String vetId = sessionIdToVetIds.remove(sessionId);
+        if (vetId != null) {
+            vetIdToSessionId.remove(vetId);
         }
     }
 
-    public boolean isOnline(@NotNull @NotBlank String userId) {
-        return userId != null && userIdToSessionId.containsKey(userId);
+    @Override
+    public boolean isOnline(@NotNull @NotBlank String vetId) {
+        return vetIdToSessionId.containsKey(vetId);
     }
 
-    public List<String> getOnlineUserIds() {
-        return userIdToSessionId.keySet().stream().sorted().collect(Collectors.toList());
+    @Override
+    public List<String> getOnlineVetIds() {
+        return vetIdToSessionId.keySet().stream().sorted().collect(Collectors.toList());
     }
 }

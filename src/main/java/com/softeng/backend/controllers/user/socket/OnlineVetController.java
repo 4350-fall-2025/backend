@@ -11,7 +11,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
 @Controller
-public class OnlineVetController {
+public class OnlineVetController implements IOnlineVetController{
 
     private static final Logger logger = LoggerFactory.getLogger(OnlineVetController.class);
     private final OnlineVetService onlineVetService;
@@ -23,14 +23,15 @@ public class OnlineVetController {
         this.template = template;
     }
 
+    @Override
     @MessageMapping("/vet/online")
     public void Online(OnlineVetMessage msg, SimpMessageHeaderAccessor headerAccessor) {
         String sessionId = headerAccessor.getSessionId();
-        String userId = msg != null ? msg.getUserId() : null;
-        if (userId == null || userId.isBlank()) return;
-        onlineVetService.addUserIds(sessionId, userId);
-        template.convertAndSend("/topic/online", onlineVetService.getOnlineUserIds());
+        String vetId = msg.getVetId();
 
-        logger.info("User {} has been registered successfully", userId);
+        onlineVetService.addVetIds(sessionId, vetId);
+        template.convertAndSend("/topic/online", onlineVetService.getOnlineVetIds());
+
+        logger.info("User {} has been registered successfully", vetId);
     }
 }
