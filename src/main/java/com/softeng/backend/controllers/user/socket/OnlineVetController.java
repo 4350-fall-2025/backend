@@ -32,6 +32,6 @@ public class OnlineVetController implements IOnlineVetController{
         onlineVetService.addVetIds(sessionId, vetId);
         template.convertAndSend("/topic/online", onlineVetService.getOnlineVetIds());
 
-        logger.info("User {} has been registered successfully", vetId);
+        logger.info("User {} is online", vetId);
     }
 }
