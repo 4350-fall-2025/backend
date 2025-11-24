@@ -1,8 +1,13 @@
 package com.softeng.backend.listener;
 
+import com.softeng.backend.services.socket.OnlineVetService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.event.EventListener;
+import org.springframework.messaging.MessageHeaders;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
+import org.springframework.messaging.simp.SimpMessageType;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionSubscribeEvent;
@@ -10,10 +15,18 @@ import org.springframework.web.socket.messaging.SessionSubscribeEvent;
 import java.security.Principal;
 
 @Component
-public class StompSubscribeListener {
+public class StompSubscribeListener implements IStompSubscribeListener{
 
     private static final Logger logger = LoggerFactory.getLogger(StompSubscribeListener.class);
+    private final OnlineVetService onlineVetService;
+    private final SimpMessagingTemplate template;
 
+    public StompSubscribeListener(OnlineVetService onlineVetService, SimpMessagingTemplate template) {
+        this.onlineVetService = onlineVetService;
+        this.template = template;
+    }
+
+    @Override
     @EventListener
     public void handleSessionSubscribe(SessionSubscribeEvent event) {
         StompHeaderAccessor sha = StompHeaderAccessor.wrap(event.getMessage());
@@ -25,5 +38,21 @@ public class StompSubscribeListener {
 
         logger.info("STOMP SUBSCRIBE session={} user={} subscriptionId={} destination={}",
                 sessionId, username, subscriptionId, destination);
+
+        // when a client subscribes to /topic/online, send current list to that session only
+        if ("/topic/online".equals(destination)) {
+            if (sessionId == null) return;
+
+            MessageHeaders headers = createHeaders(sessionId);
+            // send to the subscribing session's user destination; client should subscribe to /user/queue/online-init
+            template.convertAndSendToUser(sessionId, "/queue/online-init", onlineVetService.getOnlineVetIds(), headers);
+        }
+    }
+
+    private MessageHeaders createHeaders(String sessionId) {
+        SimpMessageHeaderAccessor headerAccessor = SimpMessageHeaderAccessor.create(SimpMessageType.MESSAGE);
+        headerAccessor.setSessionId(sessionId);
+        headerAccessor.setLeaveMutable(true);
+        return headerAccessor.getMessageHeaders();
     }
 }

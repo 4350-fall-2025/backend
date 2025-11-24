@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
 @Component
-public class WebSocketEventListener {
+public class WebSocketEventListener implements IWebSocketEventListener {
 
     private final OnlineVetService onlineVetService;
     private final SimpMessagingTemplate template;
@@ -19,6 +19,7 @@ public class WebSocketEventListener {
         this.template = template;
     }
 
+    @Override
     @EventListener
     public void handleSessionDisconnect(SessionDisconnectEvent event) {
         String sessionId = event.getSessionId();
