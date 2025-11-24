@@ -2,6 +2,7 @@ package com.softeng.backend.controllers.user.owner;
 
 import com.softeng.backend.dto.OwnerDTO;
 import com.softeng.backend.dto.PetDTO;
+import com.softeng.backend.exception.repository.DocumentNotFoundException;
 import com.softeng.backend.models.user.owner.Owner;
 import com.softeng.backend.services.pet.PetService;
 import com.softeng.backend.services.user.owner.OwnerService;
@@ -96,16 +97,16 @@ public class OwnerController implements IOwnerController {
         List<PetDTO> pets;
         try {
             pets = petService.getPetsByOwnerId(ownerId);
-
             // Steam map generated with IntelliJ autocomplete
             result = pets.stream().map(PetDTO::toMap).toList();
-
+            return ResponseEntity.ok().body(result);
         } catch (ExecutionException | InterruptedException e) {
             logger.error("ERROR LOG: Endpoint failed: {}", Arrays.toString(e.getStackTrace()));
             return ResponseEntity.internalServerError().build();
+        } catch (DocumentNotFoundException e) {
+            logger.info("INFO LOG: Cannot find owner with id: {}", ownerId);
+            return ResponseEntity.notFound().build();
         }
-
-        return ResponseEntity.ok().body(result);
     }
 
     /*****************************************************************************
