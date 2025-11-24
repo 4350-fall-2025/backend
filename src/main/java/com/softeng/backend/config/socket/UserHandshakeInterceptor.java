@@ -16,21 +16,21 @@ import java.util.stream.Stream;
 
 public class UserHandshakeInterceptor implements HandshakeInterceptor {
 
-    private static String extractParamFromUri(URI uri, String name) {
+    private static String extractParamFromUri(URI uri) {
         if (uri == null || uri.getQuery() == null) return null;
         return Stream.of(uri.getQuery().split("&"))
                 .map(p -> p.split("=", 2))
-                .filter(parts -> parts.length == 2 && parts[0].equals(name))
+                .filter(parts -> parts.length == 2 && parts[0].equals("userId"))
                 .map(parts -> parts[1])
                 .findFirst().orElse(null);
     }
 
     @Override
     public boolean beforeHandshake(ServerHttpRequest request, org.springframework.http.server.ServerHttpResponse response,
-                                   WebSocketHandler wsHandler, Map<String, Object> attributes) throws Exception {
+                                   WebSocketHandler wsHandler, Map<String, Object> attributes) {
         String userId;
 
-        userId = extractParamFromUri(request.getURI(), "userId");
+        userId = extractParamFromUri(request.getURI());
 
         if (userId == null || userId.trim().isEmpty()) {
             String json = "{\"error\":\"userId query parameter is required\"}";
