@@ -16,6 +16,7 @@ public class UserHandshakeHandler extends DefaultHandshakeHandler {
         if (request instanceof ServletServerHttpRequest servletRequest) {
             HttpServletRequest http = servletRequest.getServletRequest();
             userId = http.getParameter("userId");
+            //TODO: validate userId
             return new StompPrincipal(userId);
         }
         return null;

@@ -1,7 +1,7 @@
 package com.softeng.backend.controllers.user.socket;
 
 import com.softeng.backend.models.message.ConnectionRequest;
-import com.softeng.backend.services.user.OnlineUserService;
+import com.softeng.backend.services.socket.OnlineVetService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,19 +14,19 @@ public class RequestController {
 
     private static final Logger logger = LoggerFactory.getLogger(RequestController.class);
     private final SimpMessagingTemplate template;
-    private final OnlineUserService onlineUserService;
+    private final OnlineVetService onlineVetService;
 
     @Autowired
-    public RequestController(SimpMessagingTemplate template, OnlineUserService onlineUserService) {
+    public RequestController(SimpMessagingTemplate template, OnlineVetService onlineVetService) {
         this.template = template;
-        this.onlineUserService = onlineUserService;
+        this.onlineVetService = onlineVetService;
     }
 
     @MessageMapping("/request")
     public void sendRequest(ConnectionRequest req) {
         if (req == null || req.getFrom() == null || req.getTo() == null) return;
 
-        if (onlineUserService.isOnline(req.getTo())) {
+        if (onlineVetService.isOnline(req.getTo())) {
             // send incoming request to the target user's personal queue
             template.convertAndSendToUser(req.getTo(), "/queue/requests", req);
             logger.info("Connection request sent from {} to {}", req.getFrom(), req.getTo());
