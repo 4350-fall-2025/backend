@@ -1,7 +1,7 @@
 package com.softeng.backend.controllers.user.socket;
 
-import com.softeng.backend.models.message.OnlineVetMessage;
 import com.softeng.backend.services.socket.OnlineVetService;
+import jakarta.validation.constraints.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +9,8 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
+
+import java.security.Principal;
 
 @Controller
 public class OnlineVetController implements IOnlineVetController{
@@ -25,9 +27,20 @@ public class OnlineVetController implements IOnlineVetController{
 
     @Override
     @MessageMapping("/vet/online")
-    public void Online(OnlineVetMessage msg, SimpMessageHeaderAccessor headerAccessor) {
+    public void Online(@NotNull SimpMessageHeaderAccessor headerAccessor) {
         String sessionId = headerAccessor.getSessionId();
-        String vetId = msg.getVetId();
+        Principal user = headerAccessor.getUser();
+
+        if (sessionId == null || user == null) {
+            logger.warn("Session ID or user is null");
+            return;
+        }
+
+        String vetId = headerAccessor.getUser().getName();
+        if (vetId == null) {
+            logger.warn("No vetId found for session {}", sessionId);
+            return;
+        }
 
         onlineVetService.addVetIds(sessionId, vetId);
         template.convertAndSend("/topic/online", onlineVetService.getOnlineVetIds());
