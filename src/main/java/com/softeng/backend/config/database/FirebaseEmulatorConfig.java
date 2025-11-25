@@ -3,7 +3,7 @@
  * How to set up admin sdk firebase firestore, storage & auth config for emulators
  */
 
-package com.softeng.backend.config;
+package com.softeng.backend.config.database;
 
 import com.google.api.gax.core.FixedCredentialsProvider;
 import com.google.auth.oauth2.GoogleCredentials;
