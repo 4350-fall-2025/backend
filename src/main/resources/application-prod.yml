@@ -1,0 +1,28 @@
+environment: production
+
+spring:
+  cloud:
+    gcp:
+      project-id: ${GOOGLE_CLOUD_PROJECT}
+      database-id: ${GOOGLE_CLOUD_DATABASE}
+      credentials:
+          location: ${GOOGLE_APPLICATION_CREDENTIALS}
+
+logging:
+  level:
+    root: INFO
+    com.softeng.backend: INFO
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: when-authorized
+  health:
+    livenessState:
+      enabled: true
+    readinessState:
+      enabled: true

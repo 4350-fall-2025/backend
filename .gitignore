@@ -49,10 +49,12 @@ npm-debug.log*
 # Yes I'm being redundant but just subscribe to the "you can never be too careful" philosophy.
 **/firebase-admin.json
 firebase-admin.json
+firebase-prod.json
 
 # Firebase cache
 .firebase/
 *.firebase/
+**/service-account-key.json
 
 # Firebase config
 
@@ -124,3 +126,7 @@ env
 # dataconnect generated files
 .dataconnect
 *.dataconnect
+
+# GitHub Actions
+**/github-actions-key.json
+gha-creds-*.json
