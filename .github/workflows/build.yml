@@ -69,4 +69,4 @@ jobs:
         with:
           args: >
               -Dsonar.projectKey=4350-fall-2025
-              -Dsonar.organization=4350-fall-2025
+              -Dsonar.organization=backend
