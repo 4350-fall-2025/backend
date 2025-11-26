@@ -50,10 +50,11 @@ Thumbs.db
 *.jks
 
 # Firebase
-**/firebase*.json
 .firebaserc
 storage.rules
 service-account-key.json
+firebase-admin.json
+firebase-prod.json
 
 # Test files
 **/profiling/
