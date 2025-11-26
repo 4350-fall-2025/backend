@@ -60,3 +60,13 @@ jobs:
       # Run tests with emulator profile
       - name: Run tests
         run: mvn test
+
+      # Run Security Analysis
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@v2
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          args: >
+              -Dsonar.projectKey=4350-fall-2025
+              -Dsonar.organization=4350-fall-2025
