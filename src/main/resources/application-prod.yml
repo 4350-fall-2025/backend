@@ -11,7 +11,7 @@ spring:
 logging:
   level:
     root: INFO
-    com.softeng.backend: DEBUG
+    com.softeng.backend: INFO
 
 management:
   endpoints:
