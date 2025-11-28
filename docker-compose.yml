@@ -13,6 +13,5 @@ services:
       - GOOGLE_APPLICATION_CREDENTIALS=file:/app/credentials/firebase-prod.json
       - GOOGLE_CLOUD_PROJECT=qdog-prod-43670
       - GOOGLE_CLOUD_DATABASE=prod
-      - SPRING_PROFILES_ACTIVE=prod
     restart: no
 
