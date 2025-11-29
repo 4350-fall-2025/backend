@@ -1,9 +1,9 @@
 # .github/workflows/jmeter.yml
 # provided in class by Lauren, modified by Victoria with help of ChatGPT
-name: Spring Boot CI manual run with DB emulator + profiling
+name: Spring Boot CI manual run with DB emulator + load testing
 
 on:
-  # Manual trigger for profiling runs
+  # Manual trigger for analysing runs
   workflow_dispatch:
     inputs:
       branch:
@@ -14,7 +14,7 @@ on:
   # Automatically run only for PRs that affect relevant files and target main
   pull_request:
     paths:
-      - 'profiling/**'                # JMeter test plans
+      - 'load-tests/**'                # JMeter test plans
       - '.github/workflows/jmeter.yml' # Workflow file itself
       - 'pom.xml'                      # Maven build changes
 
@@ -87,8 +87,8 @@ jobs:
             sleep 2
           done
 
-      # Run JMeter profiler against emulator
-      - name: Run JMeter profiler
+      # Run JMeter against emulator
+      - name: Run JMeter Tests
         run: |
           # Minimal logging to avoid secrets in logs
           export JVM_ARGS="-Dlog_level.jmeter=ERROR"
