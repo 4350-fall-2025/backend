@@ -3,6 +3,12 @@ package com.softeng.backend.controllers.user;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.softeng.backend.controllers.user.owner.OwnerController;
 import com.softeng.backend.dto.OwnerDTO;
+import com.softeng.backend.dto.PetDTO;
+import com.softeng.backend.exception.repository.DocumentNotFoundException;
+import com.softeng.backend.models.enums.AnimalGroup;
+import com.softeng.backend.models.enums.PetSexType;
+import com.softeng.backend.models.enums.SterileStatus;
+import com.softeng.backend.models.pet.Pet;
 import com.softeng.backend.models.user.owner.Owner;
 import com.softeng.backend.services.pet.PetService;
 import com.softeng.backend.services.user.owner.OwnerService;
@@ -13,9 +19,13 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -332,5 +342,69 @@ public class OwnerControllerTest {
 
         this.mockMvc.perform(delete("/api/v1/owners/{id}", mockDocId))
                 .andExpect(status().isInternalServerError());
+    }
+
+    @Test
+    void testGetOwnersPetsSuccess() throws Exception {
+        // Mock data
+        Date date = new Date();
+        Pet pet1 = new Pet("Bin", "owner123", "dog", "husky", true, PetSexType.FEMALE, date, SterileStatus.STERILE, AnimalGroup.SMALL_MAMMAL);
+        Pet pet2 = new Pet("Neko", "owner123", "cat", "persian", false, PetSexType.MALE, date, SterileStatus.UNKNOWN, AnimalGroup.SMALL_MAMMAL);
+        List<PetDTO> pets = List.of(new PetDTO("1", pet1), new PetDTO("2", pet2));
+
+        when(petService.getPetsByOwnerId(anyString())).thenReturn(pets);
+
+        mockMvc.perform(get("/api/v1/owners/{ownerId}/pets", mockDocId))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                // First pet
+                .andExpect(jsonPath("$[0].id").value("1"))
+                .andExpect(jsonPath("$[0].name").value("Bin"))
+                .andExpect(jsonPath("$[0].ownerId").value("owner123"))
+                .andExpect(jsonPath("$[0].species").value("dog"))
+                .andExpect(jsonPath("$[0].breed").value("husky"))
+                .andExpect(jsonPath("$[0].sex").value("FEMALE"))
+                .andExpect(jsonPath("$[0].birthdate").value(date.toString()))
+                .andExpect(jsonPath("$[0].sterileStatus").value("STERILE"))
+                .andExpect(jsonPath("$[0].animalGroup").value("SMALL_MAMMAL"))
+                .andExpect(jsonPath("$[0].estimatedBirthdate").value(true))
+
+                // Second pet
+                .andExpect(jsonPath("$[1].id").value("2"))
+                .andExpect(jsonPath("$[1].name").value("Neko"))
+                .andExpect(jsonPath("$[1].ownerId").value("owner123"))
+                .andExpect(jsonPath("$[1].species").value("cat"))
+                .andExpect(jsonPath("$[1].breed").value("persian"))
+                .andExpect(jsonPath("$[1].sex").value("MALE"))
+                .andExpect(jsonPath("$[1].birthdate").value(date.toString()))
+                .andExpect(jsonPath("$[1].sterileStatus").value("UNKNOWN"))
+                .andExpect(jsonPath("$[1].animalGroup").value("SMALL_MAMMAL"))
+                .andExpect(jsonPath("$[1].estimatedBirthdate").value(false));
+    }
+
+    @Test
+    void testGetOwnersPetsEmptyList() throws Exception {
+        when(petService.getPetsByOwnerId(anyString())).thenReturn(Collections.emptyList());
+
+        mockMvc.perform(get("/api/v1/owners/{ownerId}/pets", mockDocId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$.length()").value(0)); // ensure empty array
+    }
+
+    @Test
+    void testGetOwnersPetsInternalServerError() throws Exception {
+        when(petService.getPetsByOwnerId(anyString())).thenThrow(ExecutionException.class);
+
+        mockMvc.perform(get("/api/v1/owners/{ownerId}/pets", mockDocId))
+                .andExpect(status().isInternalServerError());
+    }
+
+    @Test
+    void testGetOwnersPetsNotFound() throws Exception {
+        when(petService.getPetsByOwnerId(anyString())).thenThrow(DocumentNotFoundException.class);
+
+        mockMvc.perform(get("/api/v1/owners/{ownerId}/pets", mockDocId))
+                .andExpect(status().isNotFound());
     }
 }

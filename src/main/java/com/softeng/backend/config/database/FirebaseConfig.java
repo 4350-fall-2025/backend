@@ -1,4 +1,4 @@
-package com.softeng.backend.config;
+package com.softeng.backend.config.database;
 
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.cloud.firestore.Firestore;
@@ -25,33 +25,39 @@ import java.io.InputStream;
 
 
 @Configuration
-@Profile("firebase")
+@Profile({"firebase", "prod"})
 public class FirebaseConfig {
 
     @Value("${spring.cloud.gcp.project-id}")
     private String projectId;
 
-    @Value("${spring.cloud.gcp.credentials.location:}")
+    @Value("${spring.cloud.gcp.credentials.location}")
     private Resource firebaseCredentials;
+
+    @Value("${spring.cloud.gcp.database-id}")
+    private String databaseId;
 
     @Bean
     public Firestore firestore() throws FirebaseInitializeException {
 
         FirebaseOptions options;
+        GoogleCredentials googleCredentials;
 
         try (InputStream serviceAccount = firebaseCredentials.getInputStream()) {
-            options = FirebaseOptions.builder()
-                    .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-                    .setProjectId(projectId)
-                    .build();
+            googleCredentials = GoogleCredentials.fromStream(serviceAccount);
         } catch (IOException e) {
             throw new FirebaseInitializeException();
         }
+
+        options = FirebaseOptions.builder()
+                .setCredentials(googleCredentials)
+                .setProjectId(projectId)
+                .build();
 
         if (FirebaseApp.getApps().isEmpty()) {
             FirebaseApp.initializeApp(options);
         }
 
-        return FirestoreClient.getFirestore();
+        return FirestoreClient.getFirestore(databaseId);
     }
 }

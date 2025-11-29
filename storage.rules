@@ -3,23 +3,18 @@ rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
 
-    // Global rule: anyone not logged in cannot write or read
-    match /{allPaths=**} {
-      allow write: if request.auth != null;
-    }
-
     // 1. Diaries under pets
-    match /owners/{ownerId}/pets/{petId}/diaries/{diaryId} {
+    match /owners/{ownerId}/pets/{petId}/diaries/{diaryId}/{filename} {
       allow read: if request.auth != null &&
                   (request.auth.uid == ownerId || request.auth.token.role == 'vet');
       allow write: if request.auth != null && request.auth.uid == ownerId;
     }
 
     // 2. Pet Images
-        match /owners/{ownerId}/pets/{petId} {
-          allow read: if request.auth != null &&
-                      (request.auth.uid == ownerId || request.auth.token.role == 'vet');
-          allow write: if request.auth != null && request.auth.uid == ownerId;
-        }
-  }
+    match /owners/{ownerId}/pets/{petId} {
+      allow read: if request.auth != null &&
+                  (request.auth.uid == ownerId || request.auth.token.role == 'vet');
+      allow write: if request.auth != null && request.auth.uid == ownerId;
+    }
+}
 }

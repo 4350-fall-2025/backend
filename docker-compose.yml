@@ -1,0 +1,17 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    image: backend:latest
+    volumes:
+      - ./src/main/resources/firebase-prod.json:/app/credentials/firebase-prod.json:ro
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - GOOGLE_APPLICATION_CREDENTIALS=file:/app/credentials/firebase-prod.json
+      - GOOGLE_CLOUD_PROJECT=qdog-prod-43670
+      - GOOGLE_CLOUD_DATABASE=prod
+    restart: no
+
