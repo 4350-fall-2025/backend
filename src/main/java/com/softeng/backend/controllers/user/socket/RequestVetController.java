@@ -33,15 +33,17 @@ public class RequestVetController implements IRequestVetController {
     public void requestVet(@NotNull @NotBlank RequestMessage requestMessage, @NotNull SimpMessageHeaderAccessor headerAccessor) {
         String targetVetId = requestMessage.getTo();
         String sourceOwnerId = requestMessage.getFrom();
+        String petId = requestMessage.getPetId();
 
         if (onlineVetService.isOnline(requestMessage.getTo())) {
             requestVetService.requestVet(sourceOwnerId, targetVetId);
+            RequestMessage response = new RequestMessage(sourceOwnerId, targetVetId, petId, RequestStatus.PENDING);
             // send incoming request to the target vet personal queue
-            template.convertAndSendToUser(targetVetId, "/queue/requests", requestMessage);
+            template.convertAndSendToUser(targetVetId, "/queue/requests", response);
             logger.info("Connection request sent from {} to {}", sourceOwnerId, targetVetId);
         } else {
             // inform requester that target is offline
-            RequestMessage error = new RequestMessage(sourceOwnerId, targetVetId, RequestStatus.REJECTED);
+            RequestMessage error = new RequestMessage(sourceOwnerId, targetVetId, petId, RequestStatus.REJECTED);
             template.convertAndSendToUser(sourceOwnerId, "/queue/requests", error);
             logger.info("Connection request sent from {} failed because {} is offline", sourceOwnerId, targetVetId);
         }
@@ -52,9 +54,10 @@ public class RequestVetController implements IRequestVetController {
     public void acceptRequest(@NotNull @NotBlank RequestMessage requestMessage, @NotNull SimpMessageHeaderAccessor headerAccessor) {
         String targetOwnerId = requestMessage.getTo();
         String sourceVetId = requestMessage.getFrom();
+        String petId = requestMessage.getPetId();
         requestVetService.acceptRequest(targetOwnerId, sourceVetId);
         // notify both parties that the request was accepted
-        RequestMessage acceptMessage = new RequestMessage(sourceVetId, targetOwnerId, RequestStatus.ACCEPTED);
+        RequestMessage acceptMessage = new RequestMessage(sourceVetId, targetOwnerId, petId, RequestStatus.ACCEPTED);
         template.convertAndSendToUser(targetOwnerId, "/queue/requests", acceptMessage);
         template.convertAndSendToUser(sourceVetId, "/queue/requests", acceptMessage);
         logger.info("Connection request from {} to {} accepted", targetOwnerId, sourceVetId);
@@ -65,9 +68,10 @@ public class RequestVetController implements IRequestVetController {
     public void cancelRequestFromVet(@NotNull @NotBlank RequestMessage requestMessage, @NotNull SimpMessageHeaderAccessor headerAccessor) {
         String targetOwnerId = requestMessage.getTo();
         String sourceVetId = requestMessage.getFrom();
+        String petId = requestMessage.getPetId();
         requestVetService.cancelRequest(targetOwnerId, sourceVetId);
         // notify the owner that the vet has canceled the request
-        RequestMessage rejectMessage = new RequestMessage(sourceVetId, targetOwnerId, RequestStatus.REJECTED);
+        RequestMessage rejectMessage = new RequestMessage(sourceVetId, targetOwnerId, petId, RequestStatus.REJECTED);
         template.convertAndSendToUser(targetOwnerId, "/queue/requests", rejectMessage);
         logger.info("Connection request from {} to {} rejected", targetOwnerId, sourceVetId);
     }
@@ -77,9 +81,10 @@ public class RequestVetController implements IRequestVetController {
     public void cancelRequestFromOwner(@NotNull @NotBlank RequestMessage requestMessage, @NotNull SimpMessageHeaderAccessor headerAccessor) {
         String targetVetId = requestMessage.getTo();
         String sourceOwnerId = requestMessage.getFrom();
+        String petId = requestMessage.getPetId();
         requestVetService.cancelRequest(sourceOwnerId, targetVetId);
         // notify the vet that the owner has canceled the request
-        RequestMessage cancelMessage = new RequestMessage(sourceOwnerId, targetVetId, RequestStatus.CANCELED);
+        RequestMessage cancelMessage = new RequestMessage(sourceOwnerId, targetVetId, petId, RequestStatus.CANCELED);
         template.convertAndSendToUser(targetVetId, "/queue/requests", cancelMessage);
         logger.info("Connection request from {} to {} cancelled", sourceOwnerId, targetVetId);
     }

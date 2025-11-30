@@ -40,7 +40,7 @@ public class WebSocketEventListener implements IWebSocketEventListener {
             List<String> userIds = requestVetService.removeAllRequestsByUserId(userId);
             for (String counterpartId : userIds) {
                 // notify counterparts that the user has disconnected
-                RequestMessage disconnectMessage = new RequestMessage(userId, counterpartId, RequestStatus.CANCELED);
+                RequestMessage disconnectMessage = new RequestMessage(userId, counterpartId, "empty", RequestStatus.CANCELED);
                 template.convertAndSendToUser(counterpartId, "/queue/requests", disconnectMessage);
             }
         }

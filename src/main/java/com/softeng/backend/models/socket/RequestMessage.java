@@ -15,5 +15,8 @@ public class RequestMessage {
     @NotNull
     @NotBlank
     private String to;
+    @NotNull
+    @NotBlank
+    private String petId;
     private RequestStatus status;
 }
