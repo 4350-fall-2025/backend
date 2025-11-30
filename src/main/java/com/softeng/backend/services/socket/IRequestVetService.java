@@ -1,6 +1,5 @@
 package com.softeng.backend.services.socket;
 
-import com.softeng.backend.models.enums.RequestStatus;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
