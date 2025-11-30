@@ -16,6 +16,8 @@ import org.springframework.stereotype.Controller;
 
 @Controller
 public class RequestVetController implements IRequestVetController {
+
+    private static final String REQUEST_DESTINATION = "/queue/requests";
     private static final Logger logger = LoggerFactory.getLogger(RequestVetController.class);
     private final RequestVetService requestVetService;
     private final OnlineVetService onlineVetService;
@@ -39,12 +41,12 @@ public class RequestVetController implements IRequestVetController {
             requestVetService.requestVet(sourceOwnerId, targetVetId);
             RequestMessage response = new RequestMessage(sourceOwnerId, targetVetId, petId, RequestStatus.PENDING);
             // send incoming request to the target vet personal queue
-            template.convertAndSendToUser(targetVetId, "/queue/requests", response);
+            template.convertAndSendToUser(targetVetId, REQUEST_DESTINATION, response);
             logger.info("Connection request sent from {} to {}", sourceOwnerId, targetVetId);
         } else {
             // inform requester that target is offline
             RequestMessage error = new RequestMessage(sourceOwnerId, targetVetId, petId, RequestStatus.REJECTED);
-            template.convertAndSendToUser(sourceOwnerId, "/queue/requests", error);
+            template.convertAndSendToUser(sourceOwnerId, REQUEST_DESTINATION, error);
             logger.info("Connection request sent from {} failed because {} is offline", sourceOwnerId, targetVetId);
         }
     }
@@ -58,8 +60,8 @@ public class RequestVetController implements IRequestVetController {
         requestVetService.acceptRequest(targetOwnerId, sourceVetId);
         // notify both parties that the request was accepted
         RequestMessage acceptMessage = new RequestMessage(sourceVetId, targetOwnerId, petId, RequestStatus.ACCEPTED);
-        template.convertAndSendToUser(targetOwnerId, "/queue/requests", acceptMessage);
-        template.convertAndSendToUser(sourceVetId, "/queue/requests", acceptMessage);
+        template.convertAndSendToUser(targetOwnerId, REQUEST_DESTINATION, acceptMessage);
+        template.convertAndSendToUser(sourceVetId, REQUEST_DESTINATION, acceptMessage);
         logger.info("Connection request from {} to {} accepted", targetOwnerId, sourceVetId);
     }
 
@@ -72,7 +74,7 @@ public class RequestVetController implements IRequestVetController {
         requestVetService.cancelRequest(targetOwnerId, sourceVetId);
         // notify the owner that the vet has canceled the request
         RequestMessage rejectMessage = new RequestMessage(sourceVetId, targetOwnerId, petId, RequestStatus.REJECTED);
-        template.convertAndSendToUser(targetOwnerId, "/queue/requests", rejectMessage);
+        template.convertAndSendToUser(targetOwnerId, REQUEST_DESTINATION, rejectMessage);
         logger.info("Connection request from {} to {} rejected", targetOwnerId, sourceVetId);
     }
 
@@ -85,7 +87,7 @@ public class RequestVetController implements IRequestVetController {
         requestVetService.cancelRequest(sourceOwnerId, targetVetId);
         // notify the vet that the owner has canceled the request
         RequestMessage cancelMessage = new RequestMessage(sourceOwnerId, targetVetId, petId, RequestStatus.CANCELED);
-        template.convertAndSendToUser(targetVetId, "/queue/requests", cancelMessage);
+        template.convertAndSendToUser(targetVetId, REQUEST_DESTINATION, cancelMessage);
         logger.info("Connection request from {} to {} cancelled", sourceOwnerId, targetVetId);
     }
 }
