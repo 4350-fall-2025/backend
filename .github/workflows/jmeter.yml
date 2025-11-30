@@ -95,13 +95,13 @@ jobs:
 
           # Run JMeter headless
           jmeter -n \
-            -t profiling/API-Test-Plan.jmx \
-            -l profiling/results.jtl \
-            -e -o profiling/report
+            -t load-tests/API-Test-Plan.jmx \
+            -l load-tests/results.jtl \
+            -e -o load-tests/report
 
       # Upload JMeter report
       - name: Upload JMeter HTML report
         uses: actions/upload-artifact@v4
         with:
           name: jmeter-report
-          path: profiling/report/
+          path: load-tests/report/
