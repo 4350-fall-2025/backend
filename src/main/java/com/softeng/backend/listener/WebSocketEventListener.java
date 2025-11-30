@@ -1,12 +1,16 @@
 package com.softeng.backend.listener;
 
+import com.softeng.backend.models.enums.RequestStatus;
 import com.softeng.backend.models.socket.RequestMessage;
 import com.softeng.backend.services.socket.OnlineVetService;
 import com.softeng.backend.services.socket.RequestVetService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.web.socket.messaging.SessionConnectEvent;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
 import java.util.List;
@@ -15,6 +19,7 @@ import java.util.List;
 @Component
 public class WebSocketEventListener implements IWebSocketEventListener {
 
+    private static final Logger logger = LoggerFactory.getLogger(WebSocketEventListener.class);
     private final OnlineVetService onlineVetService;
     private final RequestVetService requestVetService;
     private final SimpMessagingTemplate template;
@@ -35,11 +40,20 @@ public class WebSocketEventListener implements IWebSocketEventListener {
             List<String> userIds = requestVetService.removeAllRequestsByUserId(userId);
             for (String counterpartId : userIds) {
                 // notify counterparts that the user has disconnected
-                RequestMessage disconnectMessage = new RequestMessage(userId, counterpartId, false, "User disconnected");
+                RequestMessage disconnectMessage = new RequestMessage(userId, counterpartId, RequestStatus.CANCELED);
                 template.convertAndSendToUser(counterpartId, "/queue/requests", disconnectMessage);
             }
         }
         onlineVetService.removeSession(sessionId);
         template.convertAndSend("/topic/online", onlineVetService.getOnlineVetIds());
+        logger.info("Session Disconnected for user: {}", userId);
+    }
+
+    @Override
+    @EventListener
+    public void handleSessionConnect(SessionConnectEvent event) {
+        //log
+        String userId = event.getUser() != null ? event.getUser().getName() : null;
+        logger.info("Received a session connect event from {}", userId);
     }
 }

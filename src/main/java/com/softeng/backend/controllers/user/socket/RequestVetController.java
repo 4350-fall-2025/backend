@@ -1,5 +1,6 @@
 package com.softeng.backend.controllers.user.socket;
 
+import com.softeng.backend.models.enums.RequestStatus;
 import com.softeng.backend.models.socket.RequestMessage;
 import com.softeng.backend.services.socket.OnlineVetService;
 import com.softeng.backend.services.socket.RequestVetService;
@@ -40,7 +41,7 @@ public class RequestVetController implements IRequestVetController {
             logger.info("Connection request sent from {} to {}", sourceOwnerId, targetVetId);
         } else {
             // inform requester that target is offline
-            RequestMessage error = new RequestMessage(sourceOwnerId, targetVetId, false, "User is offline");
+            RequestMessage error = new RequestMessage(sourceOwnerId, targetVetId, RequestStatus.REJECTED);
             template.convertAndSendToUser(sourceOwnerId, "/queue/requests", error);
             logger.info("Connection request sent from {} failed because {} is offline", sourceOwnerId, targetVetId);
         }
@@ -53,18 +54,22 @@ public class RequestVetController implements IRequestVetController {
         String sourceVetId = requestMessage.getFrom();
         requestVetService.acceptRequest(targetOwnerId, sourceVetId);
         // notify both parties that the request was accepted
-        template.convertAndSendToUser(targetOwnerId, "/queue/requests", requestMessage);
-        template.convertAndSendToUser(sourceVetId, "/queue/requests", requestMessage);
+        RequestMessage acceptMessage = new RequestMessage(sourceVetId, targetOwnerId, RequestStatus.ACCEPTED);
+        template.convertAndSendToUser(targetOwnerId, "/queue/requests", acceptMessage);
+        template.convertAndSendToUser(sourceVetId, "/queue/requests", acceptMessage);
+        logger.info("Connection request from {} to {} accepted", targetOwnerId, sourceVetId);
     }
 
     @Override
-    @MessageMapping("/vet/cancel")
+    @MessageMapping("/vet/reject")
     public void cancelRequestFromVet(@NotNull @NotBlank RequestMessage requestMessage, @NotNull SimpMessageHeaderAccessor headerAccessor) {
         String targetOwnerId = requestMessage.getTo();
         String sourceVetId = requestMessage.getFrom();
         requestVetService.cancelRequest(targetOwnerId, sourceVetId);
         // notify the owner that the vet has canceled the request
-        template.convertAndSendToUser(targetOwnerId, "/queue/requests", requestMessage);
+        RequestMessage rejectMessage = new RequestMessage(sourceVetId, targetOwnerId, RequestStatus.REJECTED);
+        template.convertAndSendToUser(targetOwnerId, "/queue/requests", rejectMessage);
+        logger.info("Connection request from {} to {} rejected", targetOwnerId, sourceVetId);
     }
 
     @Override
@@ -74,6 +79,8 @@ public class RequestVetController implements IRequestVetController {
         String sourceOwnerId = requestMessage.getFrom();
         requestVetService.cancelRequest(sourceOwnerId, targetVetId);
         // notify the vet that the owner has canceled the request
-        template.convertAndSendToUser(targetVetId, "/queue/requests", requestMessage);
+        RequestMessage cancelMessage = new RequestMessage(sourceOwnerId, targetVetId, RequestStatus.CANCELED);
+        template.convertAndSendToUser(targetVetId, "/queue/requests", cancelMessage);
+        logger.info("Connection request from {} to {} cancelled", sourceOwnerId, targetVetId);
     }
 }
