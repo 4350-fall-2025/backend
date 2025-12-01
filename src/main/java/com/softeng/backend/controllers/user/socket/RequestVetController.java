@@ -71,7 +71,7 @@ public class RequestVetController implements IRequestVetController {
         String targetOwnerId = requestMessage.getTo();
         String sourceVetId = requestMessage.getFrom();
         String petId = requestMessage.getPetId();
-        requestVetService.cancelRequest(targetOwnerId, sourceVetId);
+        requestVetService.removeRequest(targetOwnerId, sourceVetId);
         // notify the owner that the vet has canceled the request
         RequestMessage rejectMessage = new RequestMessage(sourceVetId, targetOwnerId, petId, RequestStatus.REJECTED);
         template.convertAndSendToUser(targetOwnerId, REQUEST_DESTINATION, rejectMessage);
@@ -84,7 +84,7 @@ public class RequestVetController implements IRequestVetController {
         String targetVetId = requestMessage.getTo();
         String sourceOwnerId = requestMessage.getFrom();
         String petId = requestMessage.getPetId();
-        requestVetService.cancelRequest(sourceOwnerId, targetVetId);
+        requestVetService.removeRequest(sourceOwnerId, targetVetId);
         // notify the vet that the owner has canceled the request
         RequestMessage cancelMessage = new RequestMessage(sourceOwnerId, targetVetId, petId, RequestStatus.CANCELED);
         template.convertAndSendToUser(targetVetId, REQUEST_DESTINATION, cancelMessage);

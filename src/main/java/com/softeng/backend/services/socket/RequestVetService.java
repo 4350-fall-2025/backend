@@ -14,8 +14,8 @@ import java.util.concurrent.ConcurrentHashMap;
 public class RequestVetService implements IRequestVetService {
     private final ConcurrentHashMap<String, RequestStatus> userIdsToRequestStatus = new ConcurrentHashMap<>();
 
-    private String key(String ownerId, String vetId) {
-        return ownerId + ":" + vetId;
+    private String key(String userIdA, String userIdB) {
+        return (userIdA.compareTo(userIdB) <= 0) ? (userIdA + ":" + userIdB) : (userIdB + ":" + userIdA);
     }
 
     @Override
@@ -32,8 +32,18 @@ public class RequestVetService implements IRequestVetService {
     }
 
     @Override
-    public void cancelRequest(@NotNull @NotBlank String ownerId, @NotNull @NotBlank String vetId) {
-        userIdsToRequestStatus.remove(key(ownerId, vetId));
+    public void removeRequest(@NotNull @NotBlank String userIdA, @NotNull @NotBlank String userIdB) {
+        userIdsToRequestStatus.remove(key(userIdA, userIdB));
+    }
+
+    @Override
+    public boolean isAccepted(@NotNull @NotBlank String userIdA, @NotNull @NotBlank String userIdB) {
+        String k = key(userIdA, userIdB);
+        if (userIdsToRequestStatus.containsKey(k)) {
+            RequestStatus status = userIdsToRequestStatus.get(k);
+            return status == RequestStatus.ACCEPTED;
+        }
+        return false;
     }
 
     @Override

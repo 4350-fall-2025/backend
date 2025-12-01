@@ -44,6 +44,7 @@ public class WebSocketEventListener implements IWebSocketEventListener {
                 template.convertAndSendToUser(counterpartId, "/queue/requests", disconnectMessage);
             }
         }
+        //TODO: only send update if removal happened
         onlineVetService.removeSession(sessionId);
         template.convertAndSend("/topic/online", onlineVetService.getOnlineVetIds());
         logger.info("Session Disconnected for user: {}", userId);
