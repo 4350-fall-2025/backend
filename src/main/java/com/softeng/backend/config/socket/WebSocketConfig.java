@@ -26,13 +26,13 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         registry.addEndpoint("/ws-chat")
                 .setHandshakeHandler(new UserHandshakeHandler())
                 .addInterceptors(new UserHandshakeInterceptor())
-                .setAllowedOrigins("*");
+                .setAllowedOrigins("http://localhost:3001");
 
         // SockJS endpoint (browsers)
         registry.addEndpoint("/ws-chat")
                 .setHandshakeHandler(new UserHandshakeHandler())
                 .addInterceptors(new UserHandshakeInterceptor())
-                .setAllowedOrigins("*")
+                .setAllowedOrigins("http://localhost:3001")
                 .withSockJS();
     }
 }
