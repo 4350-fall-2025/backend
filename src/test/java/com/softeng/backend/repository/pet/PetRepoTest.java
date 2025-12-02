@@ -7,6 +7,7 @@ import com.softeng.backend.dto.PetDTO;
 import com.softeng.backend.exception.repository.DocumentNotFoundException;
 import com.softeng.backend.models.diary.Diary;
 import com.softeng.backend.models.pet.Pet;
+import com.softeng.backend.models.user.owner.Owner;
 import com.softeng.backend.models.enums.PetSexType;
 import com.softeng.backend.models.enums.SterileStatus;
 import com.softeng.backend.models.enums.AnimalGroup;
@@ -63,7 +64,7 @@ public class PetRepoTest {
     void setup() throws Exception {
         // Create owner
         OwnerDTO ownerDTO = ownerRepository.createOwner(
-                new com.softeng.backend.models.user.owner.Owner(
+                new Owner(
                         "Pet", "Owner", "petowner@gmail.com", "StrongPass123!"
                 )
         );
