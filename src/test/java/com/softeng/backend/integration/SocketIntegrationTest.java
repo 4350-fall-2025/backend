@@ -59,7 +59,12 @@ public class SocketIntegrationTest {
                 Set.of("vet2")
         );
 
-        CountDownLatch latch = new CountDownLatch(2);
+        CountDownLatch initLatch = new CountDownLatch(1);
+        List<CountDownLatch> progressionLatches = List.of(
+                new CountDownLatch(1),
+                new CountDownLatch(1),
+                new CountDownLatch(1)
+        );
         AtomicInteger stage = new AtomicInteger(0);
         AtomicReference<Throwable> failure = new AtomicReference<>();
 
@@ -80,7 +85,7 @@ public class SocketIntegrationTest {
                 } catch (Throwable t) {
                     failure.set(t);
                 } finally {
-                    latch.countDown();
+                    initLatch.countDown();
                 }
             }
         };
@@ -100,13 +105,12 @@ public class SocketIntegrationTest {
 
                     // Ignore unexpected sizes before sequence start; only advance on exact match
                     if (current.equals(expectedProgression.get(currentStage))) {
-                        if (stage.incrementAndGet() == expectedProgression.size()) {
-                            latch.countDown();
-                        }
+                        progressionLatches.get(currentStage).countDown();
+                        stage.incrementAndGet();
                     }
                 } catch (Throwable t) {
                     failure.set(t);
-                    latch.countDown();
+                    progressionLatches.forEach(CountDownLatch::countDown);
                 }
             }
         };
@@ -114,23 +118,32 @@ public class SocketIntegrationTest {
         // Subscribe init and broadcast
         ownerSession.subscribe("/user/queue/online-init", handler);
         ownerSession.subscribe("/topic/online", topicOnlineHandler);
+        if (!initLatch.await(5, TimeUnit.SECONDS)) {
+            fail("Did not get initial online vets");
+        }
 
         // First vet comes online
         vetClient1 = stompClient();
         StompSession vetSession1 = connect(vetClient1, "vet1");
         vetSession1.send("/app/vet/online", new byte[0]);
+        if (!progressionLatches.getFirst().await(5, TimeUnit.SECONDS)) {
+            fail("Did not observe first vet online");
+        }
 
         // Second vet comes online
         vetClient2 = stompClient();
         StompSession vetSession2 = connect(vetClient2, "vet2");
         vetSession2.send("/app/vet/online", new byte[0]);
+        if (!progressionLatches.get(1).await(5, TimeUnit.SECONDS)) {
+            fail("Did not observe second vet online");
+        }
 
         // First vet disconnects
         vetSession1.disconnect();
-
-        if (!latch.await(500, TimeUnit.SECONDS)) {
-            fail("Did not observe expected progression");
+        if (!progressionLatches.getLast().await(5, TimeUnit.SECONDS)) {
+            fail("Did not observe first vet offline");
         }
+
         if (failure.get() != null) {
             throw new AssertionError("Progression failed", failure.get());
         }
