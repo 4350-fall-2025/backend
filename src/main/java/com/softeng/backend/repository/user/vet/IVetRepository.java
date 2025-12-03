@@ -1,6 +1,5 @@
 package com.softeng.backend.repository.user.vet;
 
-import com.softeng.backend.dto.OwnerDTO;
 import com.softeng.backend.dto.VetDTO;
 import com.softeng.backend.models.user.vet.Vet;
 
@@ -28,5 +27,5 @@ public interface IVetRepository {
     /*****************************************************************************
      * DELETE
      ******************************************************************************/
-    public boolean deleteVet(String id);
+    void deleteVet(String id) throws ExecutionException, InterruptedException;
 }

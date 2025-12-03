@@ -165,22 +165,14 @@ public class VetServiceTest {
     }
 
     @Test
-    void deleteVetShouldHandleValidId() {
-        when(vetRepository.deleteVet(mockDocId)).thenReturn(true);
-
-        boolean result = vetService.deleteVet(mockDocId);
-
-        assert(result);
+    void deleteVetShouldHandleValidId() throws Exception {
+        vetService.deleteVet(mockDocId);
         verify(vetRepository).deleteVet(mockDocId);
     }
 
     @Test
-    void deleteVetShouldHandleInvalidId() {
-        when(vetRepository.deleteVet(mockDocId)).thenReturn(false);
-
-        boolean result = vetService.deleteVet(mockDocId);
-
-        assert(!result);
+    void deleteVetShouldHandleInvalidId() throws Exception {
+        vetService.deleteVet(mockDocId);
         verify(vetRepository).deleteVet(mockDocId);
     }
 }

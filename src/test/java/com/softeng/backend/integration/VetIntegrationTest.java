@@ -178,7 +178,7 @@ public class VetIntegrationTest {
     }
 
     @AfterAll
-    void tearDown() {
+    void tearDown() throws Exception {
         vetRepository.deleteVet(vetToGetId);
         vetRepository.deleteVet(vetToUpdateId);
     }

@@ -142,7 +142,7 @@ public class OwnerRepoTest {
     }
 
     @AfterAll
-    void tearDown() {
+    void tearDown() throws Exception {
         ownerRepository.deleteOwner(ownerToUpdateId);
     }
 }

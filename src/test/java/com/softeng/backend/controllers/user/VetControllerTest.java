@@ -262,8 +262,6 @@ public class VetControllerTest {
         Vet vet = new Vet("NewName", "NewName", "new@name.com", "VerySecure123", mockCert);
         when(vetService.getVetById(any(String.class)))
                 .thenReturn(new VetDTO(mockDocId, vet));
-        when(vetService.deleteVet(any(String.class)))
-                .thenReturn(true);
 
         this.mockMvc.perform(delete("/api/v1/vets/{id}", mockDocId)
                         .contentType(MediaType.APPLICATION_JSON)
