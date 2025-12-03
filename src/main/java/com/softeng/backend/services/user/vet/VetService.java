@@ -84,7 +84,7 @@ public class VetService implements IVetService {
     /*****************************************************************************
      * DELETE
      ******************************************************************************/
-    public boolean deleteVet(String id) {
-        return vetRepository.deleteVet(id);
+    public void deleteVet(String id) throws ExecutionException, InterruptedException {
+        vetRepository.deleteVet(id);
     }
 }

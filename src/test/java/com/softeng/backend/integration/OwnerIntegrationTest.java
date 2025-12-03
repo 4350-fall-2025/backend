@@ -178,7 +178,7 @@ public class OwnerIntegrationTest {
     }
 
     @AfterAll
-    void tearDown() {
+    void tearDown() throws Exception {
         ownerRepository.deleteOwner(ownerToGetId);
         ownerRepository.deleteOwner(ownerToUpdateId);
     }

@@ -101,15 +101,13 @@ public class VetRepository implements IVetRepository {
      * DELETE
      ******************************************************************************/
     // https://firebase.google.com/docs/firestore/manage-data/delete-data
-    public boolean deleteVet(String id) {
+    public void deleteVet(String id) throws ExecutionException, InterruptedException {
         try {
             ApiFuture<WriteResult> future = firestore.collection(collectionName).document(id).delete();
             WriteResult result = future.get(); // waits for completion
             logger.info("DEBUG LOG: Delete successfully at{}", result.getUpdateTime());
-            return true;
         } catch (Exception e) {
             logger.error("ERROR LOG: vet deleteVet failed for id {} with error: {}", id, e.getMessage());
-            return false;
         }
     }
 }
