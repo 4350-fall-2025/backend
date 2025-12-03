@@ -16,10 +16,7 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
-import org.springframework.messaging.simp.stomp.StompFrameHandler;
-import org.springframework.messaging.simp.stomp.StompHeaders;
-import org.springframework.messaging.simp.stomp.StompSession;
-import org.springframework.messaging.simp.stomp.StompSessionHandlerAdapter;
+import org.springframework.messaging.simp.stomp.*;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.web.socket.WebSocketHttpHeaders;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
@@ -68,9 +65,6 @@ public class SocketIntegrationTest {
         AtomicInteger stage = new AtomicInteger(0);
         AtomicReference<Throwable> failure = new AtomicReference<>();
 
-        ownerClient1 = stompClient();
-        StompSession ownerSession = connect(ownerClient1, "owner");
-
         StompFrameHandler handler = new StompFrameHandler() {
             @Override
             public Type getPayloadType(StompHeaders headers) {
@@ -103,17 +97,18 @@ public class SocketIntegrationTest {
                     Set<String> current = Set.copyOf(vets);
                     int currentStage = stage.get();
 
-                    // Ignore unexpected sizes before sequence start; only advance on exact match
-                    if (current.equals(expectedProgression.get(currentStage))) {
-                        progressionLatches.get(currentStage).countDown();
-                        stage.incrementAndGet();
-                    }
+                    assertEquals(expectedProgression.get(currentStage), current, "Progression must equal expected set");
+                    progressionLatches.get(currentStage).countDown();
+                    stage.incrementAndGet();
                 } catch (Throwable t) {
                     failure.set(t);
                     progressionLatches.forEach(CountDownLatch::countDown);
                 }
             }
         };
+
+        ownerClient1 = stompClient();
+        StompSession ownerSession = connect(ownerClient1, "owner");
 
         // Subscribe init and broadcast
         ownerSession.subscribe("/user/queue/online-init", handler);
@@ -166,11 +161,6 @@ public class SocketIntegrationTest {
         CountDownLatch vetAcceptedSeenLatch = new CountDownLatch(2);
         AtomicReference<Throwable> failure = new AtomicReference<>();
 
-        ownerClient1 = stompClient();
-        StompSession ownerSession = connect(ownerClient1, "owner");
-        vetClient1 = stompClient();
-        StompSession vetSession = connect(vetClient1, "vet");
-
         StompFrameHandler handlerOwner = new StompFrameHandler() {
             @Override
             public Type getPayloadType(StompHeaders headers) {
@@ -217,6 +207,11 @@ public class SocketIntegrationTest {
             }
         };
 
+        ownerClient1 = stompClient();
+        StompSession ownerSession = connect(ownerClient1, "owner");
+        vetClient1 = stompClient();
+        StompSession vetSession = connect(vetClient1, "vet");
+
         //subscribe to request queues
         ownerSession.subscribe("/user/queue/requests", handlerOwner);
         vetSession.subscribe("/user/queue/requests", handlerVet);
@@ -236,6 +231,155 @@ public class SocketIntegrationTest {
 
         vetSession.disconnect();
         ownerSession.disconnect();
+    }
+
+    @Test
+    void testClientMessaging() throws Exception {
+        CountDownLatch vetOnlineSeen = new CountDownLatch(1);
+        CountDownLatch ownerRequestSeenByVet = new CountDownLatch(1);
+        CountDownLatch vetAcceptSeenByOwner = new CountDownLatch(1);
+        List<Map<String, Object>> expectedProgression = List.of(
+                Map.of("from", "vet", "to", "owner", "message", "content1"),
+                Map.of("from", "owner", "to", "vet", "message", "content1"),
+                Map.of("from", "vet", "to", "owner", "message", "content2"),
+                Map.of("from", "owner", "to", "vet", "message", "content2")
+        );
+
+        List<CountDownLatch> progressionLatches = List.of(
+                new CountDownLatch(1),
+                new CountDownLatch(1),
+                new CountDownLatch(1),
+                new CountDownLatch(1)
+        );
+        AtomicInteger stage = new AtomicInteger(0);
+        AtomicReference<Throwable> failure = new AtomicReference<>();
+
+        StompFrameHandler onlineHandler = new StompFrameHandler() {
+            @Override public Type getPayloadType(StompHeaders h) {
+                return List.class;
+            }
+            @Override public void handleFrame(StompHeaders h, Object p) {
+                try {
+                    // Any online list update after vet sends online is sufficient to proceed
+                    vetOnlineSeen.countDown();
+                } catch (Throwable t) {
+                    failure.set(t);
+                    vetOnlineSeen.countDown();
+                }
+            }
+        };
+
+        StompFrameHandler ownerRequestsHandler = new StompFrameHandler() {
+            @Override public Type getPayloadType(StompHeaders h) {
+                return Map.class;
+            }
+            @SuppressWarnings("unchecked")
+            @Override public void handleFrame(StompHeaders h, Object p) {
+                try {
+                    Map<String, Object> m = (Map<String, Object>) p;
+                    if ("ACCEPTED".equals(m.get("status"))
+                            && "vet".equals(m.get("from"))
+                            && "owner".equals(m.get("to"))
+                            && "mockPetId".equals(m.get("petId"))) {
+                        vetAcceptSeenByOwner.countDown();
+                    }
+                } catch (Throwable t) {
+                    failure.set(t);
+                    vetAcceptSeenByOwner.countDown();
+                }
+            }
+        };
+
+        StompFrameHandler vetRequestsHandler = new StompFrameHandler() {
+            @Override public Type getPayloadType(StompHeaders h) {
+                return Map.class;
+            }
+            @SuppressWarnings("unchecked")
+            @Override public void handleFrame(StompHeaders h, Object p) {
+                try {
+                    Map<String, Object> m = (Map<String, Object>) p;
+                    if ("PENDING".equals(m.get("status"))
+                            && "owner".equals(m.get("from"))
+                            && "vet".equals(m.get("to"))
+                            && "mockPetId".equals(m.get("petId"))) {
+                        ownerRequestSeenByVet.countDown();
+                    }
+                } catch (Throwable t) {
+                    failure.set(t);
+                    ownerRequestSeenByVet.countDown();
+                }
+            }
+        };
+
+        StompFrameHandler messageHandler = new StompFrameHandler() {
+            @Override
+            public Type getPayloadType(StompHeaders headers) {
+                return Map.class;
+            }
+            @SuppressWarnings("unchecked")
+            @Override
+            public void handleFrame(StompHeaders headers, Object payload) {
+                try {
+                    Map<String, Object> current = (Map<String, Object>) payload;
+                    int currentStage = stage.get();
+
+                    assertEquals(expectedProgression.get(currentStage), current, "Progression must equal expected map");
+                    progressionLatches.get(currentStage).countDown();
+                    stage.incrementAndGet();
+                } catch (Throwable t) {
+                    failure.set(t);
+                    progressionLatches.forEach(CountDownLatch::countDown);
+                }
+            }
+        };
+
+        ownerClient1 = stompClient();
+        StompSession ownerSession = connect(ownerClient1, "owner");
+        vetClient1 = stompClient();
+        StompSession vetSession = connect(vetClient1, "vet");
+
+        // Subscriptions
+        ownerSession.subscribe("/user/queue/requests", ownerRequestsHandler);
+        ownerSession.subscribe("/topic/online", onlineHandler);
+        vetSession.subscribe("/user/queue/requests", vetRequestsHandler);
+        ownerSession.subscribe("/user/queue/message", messageHandler);
+        vetSession.subscribe("/user/queue/message", messageHandler);
+
+        // 1) Vet announces online, wait until observed
+        vetSession.send("/app/vet/online", new byte[0]);
+        assertTrue(vetOnlineSeen.await(5, TimeUnit.SECONDS), "Online not observed");
+
+        // 2) Owner sends request, wait until vet observes it
+        Map<String, Object> pending = Map.of("from","owner","to","vet","petId","mockPetId","status","PENDING");
+        ownerSession.send("/app/vet/request", pending);
+        assertTrue(ownerRequestSeenByVet.await(5, TimeUnit.SECONDS), "Vet did not observe PENDING request");
+
+        // 3) Vet accepts, wait until owner observes it
+        Map<String, Object> accepted = Map.of("from","vet","to","owner","petId","mockPetId","status","ACCEPTED");
+        vetSession.send("/app/vet/accept", accepted);
+        assertTrue(vetAcceptSeenByOwner.await(5, TimeUnit.SECONDS), "Owner did not observe ACCEPTED reply");
+
+        // 4) Message exchange
+        // Vet to Owner
+        Map<String, Object> msg1 = Map.of("from","vet","to","owner","message","content1");
+        vetSession.send("/app/message", msg1);
+        assertTrue(progressionLatches.getFirst().await(5, TimeUnit.SECONDS), "Owner did not observe first message");
+        // Owner to Vet
+        Map<String, Object> msg2 = Map.of("from","owner","to","vet","message","content1");
+        ownerSession.send("/app/message", msg2);
+        assertTrue(progressionLatches.get(1).await(5, TimeUnit.SECONDS), "Vet did not observe first message");
+        // Vet to Owner
+        Map<String, Object> msg3 = Map.of("from","vet","to","owner","message","content2");
+        vetSession.send("/app/message", msg3);
+        assertTrue(progressionLatches.get(2).await(5, TimeUnit.SECONDS), "Owner did not observe second message");
+        // Owner to Vet
+        Map<String, Object> msg4 = Map.of("from","owner","to","vet","message","content2");
+        ownerSession.send("/app/message", msg4);
+        assertTrue(progressionLatches.getLast().await(5, TimeUnit.SECONDS), "Vet did not observe second message");
+
+        if (failure.get() != null) {
+            throw new AssertionError("Progression failed", failure.get());
+        }
     }
 
     private WebSocketStompClient stompClient() {
