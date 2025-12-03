@@ -118,7 +118,7 @@ public class AuthIntegrationTest {
     }
 
     @AfterEach
-    void tearDown() {
+    void tearDown() throws Exception {
         ownerRepository.deleteOwner(ownerId);
         vetRepository.deleteVet(vetId);
     }

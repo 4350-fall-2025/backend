@@ -151,12 +151,12 @@ public class OwnerController implements IOwnerController {
             return ResponseEntity.notFound().build();
         }
 
-        boolean deleted = ownerService.deleteOwner(id);
-        if (deleted) {
-            return ResponseEntity.noContent().build();
-        } else {
+        try {
+            ownerService.deleteOwner(id);
+        } catch (ExecutionException | InterruptedException | DocumentNotFoundException e) {
             logger.debug("DEBUG LOG: Owner delete /id endpoint not found for id: {}", id);
             return ResponseEntity.internalServerError().build();
         }
+        return ResponseEntity.noContent().build();
     }
 }

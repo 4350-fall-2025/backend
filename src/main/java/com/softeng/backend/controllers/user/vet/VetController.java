@@ -111,22 +111,25 @@ public class VetController implements IVetController {
      ******************************************************************************/
     @DeleteMapping("/{id}")
     public ResponseEntity<Map<String, Object>> deleteVet(@PathVariable String id) {
-        VetDTO dto;
+        VetDTO dto = null;
         try {
             dto = vetService.getVetById(id);
         } catch (ExecutionException | InterruptedException e) {
             return ResponseEntity.internalServerError().build();
         }
+
         if (dto == null || dto.isEmpty()) {
+            logger.debug("DEBUG LOG: Vet delete /id endpoint not found for id: {}", id);
             return ResponseEntity.notFound().build();
         }
 
-        boolean deleted = vetService.deleteVet(id);
-        if (deleted) {
-            return ResponseEntity.noContent().build();
-        } else {
-            logger.debug("DEBUG LOG: Vet delete /id endpoint not found for id: {}", id);
+        try {
+            vetService.deleteVet(id);
+        } catch (ExecutionException | InterruptedException e) {
+            logger.debug("DEBUG LOG: delete /id endpoint failed for id: {}", id);
             return ResponseEntity.internalServerError().build();
         }
+
+        return ResponseEntity.noContent().build();
     }
 }

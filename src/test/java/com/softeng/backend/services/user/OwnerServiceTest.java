@@ -197,22 +197,14 @@ public class OwnerServiceTest {
     }
 
     @Test
-    void deleteOwnerShouldHandleValidId() {
-        when(ownerRepository.deleteOwner(mockDocId)).thenReturn(true);
-
-        boolean result = ownerService.deleteOwner(mockDocId);
-
-        assert(result);
+    void deleteOwnerShouldHandleValidId() throws Exception {
+       ownerService.deleteOwner(mockDocId);
         verify(ownerRepository).deleteOwner(mockDocId);
     }
 
     @Test
-    void deleteOwnerShouldHandleInvalidId() {
-        when(ownerRepository.deleteOwner(mockDocId)).thenReturn(false);
-
-        boolean result = ownerService.deleteOwner(mockDocId);
-
-        assert(!result);
+    void deleteOwnerShouldHandleInvalidId() throws Exception {
+        ownerService.deleteOwner(mockDocId);
         verify(ownerRepository).deleteOwner(mockDocId);
     }
 }

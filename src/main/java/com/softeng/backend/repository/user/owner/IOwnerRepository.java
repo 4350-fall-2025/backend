@@ -33,5 +33,5 @@ public interface IOwnerRepository {
     /*****************************************************************************
      * DELETE
      ******************************************************************************/
-     boolean deleteOwner(String id);
+    void deleteOwner(String id) throws ExecutionException, InterruptedException;
 }

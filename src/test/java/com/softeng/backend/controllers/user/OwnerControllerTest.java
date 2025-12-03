@@ -285,8 +285,6 @@ public class OwnerControllerTest {
         Owner owner = new Owner("NewName", "NewName", "new@name.com", "VerySecure123");
         when(ownerService.getOwnerById(any(String.class)))
                 .thenReturn(new OwnerDTO(mockDocId, owner));
-        when(ownerService.deleteOwner(any(String.class)))
-                .thenReturn(true);
 
         this.mockMvc.perform(delete("/api/v1/owners/{id}", mockDocId)
                         .contentType(MediaType.APPLICATION_JSON)

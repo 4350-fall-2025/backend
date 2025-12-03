@@ -1,6 +1,7 @@
 package com.softeng.backend.services.user.owner;
 
 import com.softeng.backend.dto.OwnerDTO;
+import com.softeng.backend.exception.repository.DocumentNotFoundException;
 import com.softeng.backend.models.pet.PetLite;
 import com.softeng.backend.models.user.owner.Owner;
 
@@ -38,6 +39,6 @@ public interface IOwnerService {
     /*****************************************************************************
      * DELETE
      ******************************************************************************/
-    boolean deleteOwner(String id);
+    void deleteOwner(String id) throws ExecutionException, InterruptedException;
 
 }

@@ -197,15 +197,13 @@ public class OwnerRepository implements IOwnerRepository {
      * DELETE
      ******************************************************************************/
     // https://firebase.google.com/docs/firestore/manage-data/delete-data
-    public boolean deleteOwner(String id) {
+    public void deleteOwner(String id) throws ExecutionException, InterruptedException {
         try {
             ApiFuture<WriteResult> future = firestore.collection(collectionName).document(id).delete();
             WriteResult result = future.get(); // waits for completion
             logger.info("DEBUG LOG: Delete successfully at{}", result.getUpdateTime());
-            return true;
         } catch (Exception e) {
             logger.error("ERROR LOG: Owner deleteOwner failed for id {} with error: {}", id, e.getMessage());
-            return false;
         }
     }
 }

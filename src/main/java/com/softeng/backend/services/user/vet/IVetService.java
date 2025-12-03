@@ -26,5 +26,5 @@ public interface IVetService {
     /*****************************************************************************
      * DELETE
      ******************************************************************************/
-    boolean deleteVet(String id);
+    void deleteVet(String id) throws ExecutionException, InterruptedException;
 }
