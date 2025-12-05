@@ -107,6 +107,10 @@ You can run the emulators with `--import ../../../../../test/data` to import the
 Run the application by running the emulators (step 12), and then executing BackendApplication.java by clicking the "Run Appplication" button in IntelliJ:
 <img width="482" height="77" alt="build-run" src="https://github.com/user-attachments/assets/dbaad99a-ee1b-4703-aac5-a25df9590b5d" />
 
+### Running test suites locally
+
+Run the emulators as described above, then right click on the `test` folder in IntelliJ and select "Run All Tests".
+
 ## Sources
 
 Some portions of this project, particularly containerization and connecting to Firebase, were informed by OpenAI’s ChatGPT (GPT-5) and Anthropic Claude 4.5.
