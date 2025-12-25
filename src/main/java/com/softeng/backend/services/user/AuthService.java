@@ -2,17 +2,15 @@ package com.softeng.backend.services.user;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 @Service
 public class AuthService {
-    private static final Logger logger = LoggerFactory.getLogger(AuthService.class);
-
 
     /**
      * example code was used from firebase docs for authentication:
@@ -24,7 +22,7 @@ public class AuthService {
             additionalClaims.put("role", role);
             return FirebaseAuth.getInstance().createCustomToken(uid, additionalClaims);
         } catch (FirebaseAuthException e) {
-            logger.error(e.getMessage());
+            log.error(e.getMessage());
             return null;
         }
     }

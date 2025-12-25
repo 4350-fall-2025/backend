@@ -6,8 +6,7 @@ import com.softeng.backend.dto.OwnerDTO;
 import com.softeng.backend.exception.repository.DocumentNotFoundException;
 import com.softeng.backend.models.pet.PetLite;
 import com.softeng.backend.models.user.owner.Owner;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -29,12 +28,12 @@ import java.util.concurrent.ExecutionException;
  * Autocomplete was used to create boilerplate and/or duplicate code across methods.
  */
 
+@Slf4j
 @Repository
 public class OwnerRepository implements IOwnerRepository {
 
     private final Firestore firestore;
     private final String collectionName = "owners";
-    private static final Logger logger = LoggerFactory.getLogger(OwnerRepository.class);
 
     @Autowired
     public OwnerRepository(Firestore firestore) {
@@ -61,7 +60,7 @@ public class OwnerRepository implements IOwnerRepository {
             Owner owner = documents.getFirst().toObject(Owner.class);
             return new OwnerDTO(documents.getFirst().getId(), owner);
         } else {
-            logger.info("DEBUG LOG: No documents found for email {}", email);
+            log.info("DEBUG LOG: No documents found for email {}", email);
             return new OwnerDTO();
         }
     }
@@ -105,7 +104,7 @@ public class OwnerRepository implements IOwnerRepository {
         DocumentReference docRef = firestore.collection(collectionName).document(ownerId);
         DocumentSnapshot snapshot = docRef.get().get();
         if (!snapshot.exists()) {
-            logger.info("DEBUG LOG: Owner not found for id {} during add pet", ownerId);
+            log.info("DEBUG LOG: Owner not found for id {} during add pet", ownerId);
             throw new DocumentNotFoundException("Owner not found for id " + ownerId);
         }
 
@@ -131,14 +130,14 @@ public class OwnerRepository implements IOwnerRepository {
         DocumentReference docRef = firestore.collection(collectionName).document(ownerId);
         DocumentSnapshot snapshot = docRef.get().get();
         if (!snapshot.exists()) {
-            logger.info("DEBUG LOG: Owner not found for id {} during update pet", ownerId);
+            log.info("DEBUG LOG: Owner not found for id {} during update pet", ownerId);
             throw new DocumentNotFoundException("Owner not found");
         }
 
         // Get current pets array
         List<Map<String, Object>> pets = (List<Map<String, Object>>) snapshot.get("pets");
         if (pets == null) {
-            logger.info("DEBUG LOG: No pets found for owner id {} during update pet", ownerId);
+            log.info("DEBUG LOG: No pets found for owner id {} during update pet", ownerId);
             throw new DocumentNotFoundException("No pets found");
         }
 
@@ -157,7 +156,7 @@ public class OwnerRepository implements IOwnerRepository {
         }
 
         if (!updated) {
-            logger.info("DEBUG LOG: Pet with id {} not found for owner id {} during update pet", subdocument.getId(), ownerId);
+            log.info("DEBUG LOG: Pet with id {} not found for owner id {} during update pet", subdocument.getId(), ownerId);
             throw new DocumentNotFoundException("Pet with id " + subdocument.getId() + " not found");
         }
 
@@ -170,14 +169,14 @@ public class OwnerRepository implements IOwnerRepository {
         DocumentReference docRef = firestore.collection(collectionName).document(ownerId);
         DocumentSnapshot snapshot = docRef.get().get();
         if (!snapshot.exists()) {
-            logger.info("DEBUG LOG: Owner not found for id {} during remove pet", ownerId);
+            log.info("DEBUG LOG: Owner not found for id {} during remove pet", ownerId);
             throw new DocumentNotFoundException("Owner not found");
         }
 
         // Get current pets array
         List<Map<String, Object>> pets = (List<Map<String, Object>>) snapshot.get("pets");
         if (pets == null) {
-            logger.info("DEBUG LOG: No pets found for owner id {} during remove pet", ownerId);
+            log.info("DEBUG LOG: No pets found for owner id {} during remove pet", ownerId);
             throw new DocumentNotFoundException("No pets found");
         }
 
@@ -185,7 +184,7 @@ public class OwnerRepository implements IOwnerRepository {
         boolean removed = pets.removeIf(petMap -> petMap != null && petId.equals(petMap.get("id")));
 
         if (!removed) {
-            logger.info("DEBUG LOG: Pet with id {} not found for owner id {} during remove pet", petId, ownerId);
+            log.info("DEBUG LOG: Pet with id {} not found for owner id {} during remove pet", petId, ownerId);
             throw new DocumentNotFoundException("Pet with id " + petId + " not found");
         }
 
@@ -201,9 +200,9 @@ public class OwnerRepository implements IOwnerRepository {
         try {
             ApiFuture<WriteResult> future = firestore.collection(collectionName).document(id).delete();
             WriteResult result = future.get(); // waits for completion
-            logger.info("DEBUG LOG: Delete successfully at{}", result.getUpdateTime());
+            log.info("DEBUG LOG: Delete successfully at {}", result.getUpdateTime());
         } catch (Exception e) {
-            logger.error("ERROR LOG: Owner deleteOwner failed for id {} with error: {}", id, e.getMessage());
+            log.error("ERROR LOG: Owner deleteOwner failed for id {} with error: {}", id, e.getMessage());
         }
     }
 }
