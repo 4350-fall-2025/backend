@@ -1,12 +1,10 @@
 package com.softeng.backend.services.user.owner;
 
 import com.softeng.backend.dto.OwnerDTO;
-import com.softeng.backend.exception.repository.DocumentNotFoundException;
 import com.softeng.backend.models.pet.PetLite;
 import com.softeng.backend.models.user.owner.Owner;
 import com.softeng.backend.repository.user.owner.OwnerRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -16,11 +14,11 @@ import java.util.concurrent.ExecutionException;
 // Portions of the following CRUD methods were guided by OpenAI's ChatGPT (GPT-5), Oct. 12, 2025.
 // The implementation and adaptation were done by the author.
 
+@Slf4j
 @Service
 public class OwnerService implements IOwnerService {
 
     private final OwnerRepository ownerRepository;
-    private static final Logger logger = LoggerFactory.getLogger(OwnerService.class);
 
     public OwnerService(OwnerRepository ownerRepository) {
         this.ownerRepository = ownerRepository;
@@ -32,12 +30,12 @@ public class OwnerService implements IOwnerService {
     public OwnerDTO createOwner(Owner owner) throws ExecutionException, InterruptedException {
         OwnerDTO dto;
         if (owner == null || owner.checkInvalidUser()) {
-            logger.debug("DEBUG LOG: Owner service detected invalid user for creation: {}", owner == null ? null : owner.getEmail());
+            log.debug("DEBUG LOG: Owner service detected invalid user for creation: {}", owner == null ? null : owner.getEmail());
             dto = new OwnerDTO();
         } else {
             OwnerDTO existingOwner = getOwnerByEmail(owner.getEmail());
             if (existingOwner != null && existingOwner.getOwner() != null && !existingOwner.getOwner().checkEmptyUser()) {
-                logger.debug("DEBUG LOG: Owner service detected user that already exists: {}", owner.getEmail());
+                log.debug("DEBUG LOG: Owner service detected user that already exists: {}", owner.getEmail());
                 dto = new OwnerDTO();
             } else {
                 dto = ownerRepository.createOwner(owner);

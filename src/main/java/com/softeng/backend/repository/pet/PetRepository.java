@@ -13,8 +13,6 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -34,7 +32,6 @@ public class PetRepository implements IPetRepository {
 
     private final Firestore firestore;
     private final OwnerRepository ownerRepository;
-    private static final Logger logger = LoggerFactory.getLogger(PetRepository.class);
 
     private final String PET_COLLECTION = "pets";
 
@@ -213,7 +210,7 @@ public class PetRepository implements IPetRepository {
         DocumentReference docRef = firestore.collection(PET_COLLECTION).document(petId);
         DocumentSnapshot snapshot = docRef.get().get();
         if (!snapshot.exists()) {
-            logger.info("DEBUG LOG: Pet not found for id {} in add diary entry operation", petId);
+            log.info("DEBUG LOG: Pet not found for id {} in add diary entry operation", petId);
             throw new DocumentNotFoundException("Pet not found for id " + petId);
         }
 
@@ -238,7 +235,7 @@ public class PetRepository implements IPetRepository {
         DocumentSnapshot docSnapshot = petRef.get().get();
 
         if (!docSnapshot.exists()) {
-            logger.info("DEBUG LOG: Pet not found for id {} in get diary entry in range operation", petId);
+            log.info("DEBUG LOG: Pet not found for id {} in get diary entry in range operation", petId);
             throw new DocumentNotFoundException("Pet not found for id " + petId); // or throw exception
         }
 

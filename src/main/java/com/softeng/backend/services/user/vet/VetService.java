@@ -3,8 +3,7 @@ package com.softeng.backend.services.user.vet;
 import com.softeng.backend.dto.VetDTO;
 import com.softeng.backend.models.user.vet.Vet;
 import com.softeng.backend.repository.user.vet.VetRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -14,11 +13,11 @@ import java.util.concurrent.ExecutionException;
 // // The following code was copied with guidance from OpenAI's ChatGPT (https://chat.openai.com)
 // Reference: was asking ChatGPT for basic Service setup (for testing) when making this
 
+@Slf4j
 @Service
 public class VetService implements IVetService {
 
     private final VetRepository vetRepository;
-    private static final Logger logger = LoggerFactory.getLogger(VetService.class);
 
     public VetService(VetRepository vetRepository) {
         this.vetRepository = vetRepository;
@@ -30,12 +29,12 @@ public class VetService implements IVetService {
     public VetDTO createVet(Vet vet) throws ExecutionException, InterruptedException {
         VetDTO dto;
         if (vet == null || vet.checkInvalidUser()) {
-            logger.debug("DEBUG LOG: Vet service detected invalid user for creation: {}", vet == null ? null : vet.getEmail());
+            log.debug("DEBUG LOG: Vet service detected invalid user for creation: {}", vet == null ? null : vet.getEmail());
             dto = new VetDTO();
         } else {
             VetDTO existingVet = getVetByEmail(vet.getEmail());
             if (existingVet != null && existingVet.getVet() != null && !existingVet.getVet().checkEmptyUser()) {
-                logger.debug("DEBUG LOG: Vet service detected user that already exists: {}", vet.getEmail());
+                log.debug("DEBUG LOG: Vet service detected user that already exists: {}", vet.getEmail());
                 dto = new VetDTO();
             } else {
                 dto = vetRepository.createVet(vet);

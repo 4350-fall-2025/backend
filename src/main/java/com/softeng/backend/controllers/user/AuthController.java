@@ -5,8 +5,7 @@ import com.softeng.backend.dto.VetDTO;
 import com.softeng.backend.services.user.AuthService;
 import com.softeng.backend.services.user.owner.OwnerService;
 import com.softeng.backend.services.user.vet.VetService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,10 +20,10 @@ import java.util.Map;
 /**
  * Auth Endpoint
  */
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/auth")
 public class AuthController implements IAuthController {
-    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
     private final OwnerService ownerService;
     private final VetService vetService;
     private final AuthService authService;
@@ -68,10 +67,10 @@ public class AuthController implements IAuthController {
                     return ResponseEntity.ok().body(ownerDTO.toMap());
                 }
             }
-            logger.debug("DEBUG LOG: auth/login endpoint not found for email: {}", email);
+            log.debug("DEBUG LOG: auth/login endpoint not found for email: {}", email);
             return ResponseEntity.badRequest().body(Map.of("error", "Incorrect Credential", "detail", "Email does not exist"));
         } catch (Exception e) {
-            logger.debug("DEBUG LOG: Auth /login endpoint error for email: {}/n stack trace: {}", email, Arrays.toString(e.getStackTrace()));
+            log.debug("DEBUG LOG: Auth /login endpoint error for email: {}\n stack trace: {}", email, Arrays.toString(e.getStackTrace()));
             return ResponseEntity.internalServerError().body(Map.of("error", "Internal server error"));
         }
     }

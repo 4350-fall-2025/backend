@@ -6,19 +6,18 @@ import com.softeng.backend.services.socket.OnlineVetService;
 import com.softeng.backend.services.socket.RequestVetService;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
+@Slf4j
 @Controller
 public class RequestVetController implements IRequestVetController {
 
     private static final String REQUEST_DESTINATION = "/queue/requests";
-    private static final Logger logger = LoggerFactory.getLogger(RequestVetController.class);
     private final RequestVetService requestVetService;
     private final OnlineVetService onlineVetService;
     private final SimpMessagingTemplate template;
@@ -42,12 +41,12 @@ public class RequestVetController implements IRequestVetController {
             RequestMessage response = new RequestMessage(sourceOwnerId, targetVetId, petId, RequestStatus.PENDING);
             // send incoming request to the target vet personal queue
             template.convertAndSendToUser(targetVetId, REQUEST_DESTINATION, response);
-            logger.info("Connection request sent from {} to {}", sourceOwnerId, targetVetId);
+            log.info("Connection request sent from {} to {}", sourceOwnerId, targetVetId);
         } else {
             // inform requester that target is offline
             RequestMessage error = new RequestMessage(sourceOwnerId, targetVetId, petId, RequestStatus.REJECTED);
             template.convertAndSendToUser(sourceOwnerId, REQUEST_DESTINATION, error);
-            logger.info("Connection request sent from {} failed because {} is offline", sourceOwnerId, targetVetId);
+            log.info("Connection request sent from {} failed because {} is offline", sourceOwnerId, targetVetId);
         }
     }
 
@@ -62,7 +61,7 @@ public class RequestVetController implements IRequestVetController {
         RequestMessage acceptMessage = new RequestMessage(sourceVetId, targetOwnerId, petId, RequestStatus.ACCEPTED);
         template.convertAndSendToUser(targetOwnerId, REQUEST_DESTINATION, acceptMessage);
         template.convertAndSendToUser(sourceVetId, REQUEST_DESTINATION, acceptMessage);
-        logger.info("Connection request from {} to {} accepted", targetOwnerId, sourceVetId);
+        log.info("Connection request from {} to {} accepted", targetOwnerId, sourceVetId);
     }
 
     @Override
@@ -75,7 +74,7 @@ public class RequestVetController implements IRequestVetController {
         // notify the owner that the vet has canceled the request
         RequestMessage rejectMessage = new RequestMessage(sourceVetId, targetOwnerId, petId, RequestStatus.REJECTED);
         template.convertAndSendToUser(targetOwnerId, REQUEST_DESTINATION, rejectMessage);
-        logger.info("Connection request from {} to {} rejected", targetOwnerId, sourceVetId);
+        log.info("Connection request from {} to {} rejected", targetOwnerId, sourceVetId);
     }
 
     @Override
@@ -88,6 +87,6 @@ public class RequestVetController implements IRequestVetController {
         // notify the vet that the owner has canceled the request
         RequestMessage cancelMessage = new RequestMessage(sourceOwnerId, targetVetId, petId, RequestStatus.CANCELED);
         template.convertAndSendToUser(targetVetId, REQUEST_DESTINATION, cancelMessage);
-        logger.info("Connection request from {} to {} cancelled", sourceOwnerId, targetVetId);
+        log.info("Connection request from {} to {} cancelled", sourceOwnerId, targetVetId);
     }
 }

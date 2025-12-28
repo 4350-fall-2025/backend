@@ -4,8 +4,7 @@ import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.*;
 import com.softeng.backend.dto.VetDTO;
 import com.softeng.backend.models.user.vet.Vet;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -25,12 +24,12 @@ import java.util.concurrent.ExecutionException;
  * class/method worked.
  */
 
+@Slf4j
 @Repository
 public class VetRepository implements IVetRepository {
 
     private final Firestore firestore;
     private final String collectionName = "vets";
-    private static final Logger logger = LoggerFactory.getLogger(VetRepository.class);
 
     @Autowired
     public VetRepository(Firestore firestore) {
@@ -57,7 +56,7 @@ public class VetRepository implements IVetRepository {
             Vet vet = documents.getFirst().toObject(Vet.class);
             return new VetDTO(documents.getFirst().getId(), vet);
         } else {
-            logger.info("DEBUG LOG: No documents found for email {}", email);
+            log.info("DEBUG LOG: No documents found for email {}", email);
             return new VetDTO();
         }
     }
@@ -105,9 +104,9 @@ public class VetRepository implements IVetRepository {
         try {
             ApiFuture<WriteResult> future = firestore.collection(collectionName).document(id).delete();
             WriteResult result = future.get(); // waits for completion
-            logger.info("DEBUG LOG: Delete successfully at{}", result.getUpdateTime());
+            log.info("DEBUG LOG: Delete successfully at{}", result.getUpdateTime());
         } catch (Exception e) {
-            logger.error("ERROR LOG: vet deleteVet failed for id {} with error: {}", id, e.getMessage());
+            log.error("ERROR LOG: vet deleteVet failed for id {} with error: {}", id, e.getMessage());
         }
     }
 }
