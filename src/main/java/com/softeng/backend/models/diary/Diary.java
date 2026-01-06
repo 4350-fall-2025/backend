@@ -16,7 +16,7 @@ import java.util.Date;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Diary implements IDiary{
+public class Diary {
     @NotNull(message = "contentType is required") @NotBlank
     private String contentType; //implement enum later if needed
     @NotNull(message = "contentBody is required") @NotBlank

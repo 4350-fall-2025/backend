@@ -16,7 +16,7 @@ import java.util.concurrent.ExecutionException;
 
 @Slf4j
 @Service
-public class OwnerService implements IOwnerService {
+public class OwnerService {
 
     private final OwnerRepository ownerRepository;
 
@@ -78,17 +78,14 @@ public class OwnerService implements IOwnerService {
         return ownerRepository.updateOwner(id, updateFields);
     }
 
-    @Override
     public void addPet(String ownerId, PetLite pet) throws ExecutionException, InterruptedException {
         ownerRepository.addPet(ownerId, pet);
     }
 
-    @Override
     public void updatePet(String ownerId, PetLite pet) throws ExecutionException, InterruptedException {
         ownerRepository.updatePet(ownerId, pet);
     }
 
-    @Override
     public void removePet(String ownerId, String petId) throws ExecutionException, InterruptedException {
         ownerRepository.removePet(ownerId, petId);
     }

@@ -11,19 +11,17 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
-public class RequestVetService implements IRequestVetService {
+public class RequestVetService {
     private final ConcurrentHashMap<String, RequestStatus> userIdsToRequestStatus = new ConcurrentHashMap<>();
 
     private String key(String userIdA, String userIdB) {
         return (userIdA.compareTo(userIdB) <= 0) ? (userIdA + ":" + userIdB) : (userIdB + ":" + userIdA);
     }
 
-    @Override
     public void requestVet(@NotNull @NotBlank String ownerId, @NotNull @NotBlank String vetId) {
         userIdsToRequestStatus.put(key(ownerId, vetId), RequestStatus.PENDING);
     }
 
-    @Override
     public void acceptRequest(@NotNull @NotBlank String ownerId, @NotNull @NotBlank String vetId) {
         String k = key(ownerId, vetId);
         if (userIdsToRequestStatus.containsKey(k)) {
@@ -31,12 +29,10 @@ public class RequestVetService implements IRequestVetService {
         }
     }
 
-    @Override
     public void removeRequest(@NotNull @NotBlank String userIdA, @NotNull @NotBlank String userIdB) {
         userIdsToRequestStatus.remove(key(userIdA, userIdB));
     }
 
-    @Override
     public boolean isAccepted(@NotNull @NotBlank String userIdA, @NotNull @NotBlank String userIdB) {
         String k = key(userIdA, userIdB);
         if (userIdsToRequestStatus.containsKey(k)) {
@@ -46,7 +42,6 @@ public class RequestVetService implements IRequestVetService {
         return false;
     }
 
-    @Override
     public List<String> removeAllRequestsByUserId(@NotNull @NotBlank String userId) {
         List<String> counterparts = new ArrayList<>();
         Iterator<String> it = userIdsToRequestStatus.keySet().iterator();

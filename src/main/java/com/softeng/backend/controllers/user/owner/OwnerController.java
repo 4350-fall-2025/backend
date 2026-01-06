@@ -29,7 +29,7 @@ import java.util.concurrent.ExecutionException;
 @Slf4j
 @RestController
 @RequestMapping("/api/v1/owners")
-public class OwnerController implements IOwnerController {
+public class OwnerController {
 
     private final OwnerService ownerService;
     private final PetService petService;

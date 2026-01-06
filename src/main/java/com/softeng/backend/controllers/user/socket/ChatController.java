@@ -10,7 +10,7 @@ import org.springframework.stereotype.Controller;
 
 @Slf4j
 @Controller
-public class ChatController implements IChatController {
+public class ChatController {
 
     private static final String MESSAGE_DESTINATION = "/queue/message";
     private final SimpMessagingTemplate template;
@@ -22,7 +22,6 @@ public class ChatController implements IChatController {
         this.requestVetService = requestVetService;
     }
 
-    @Override
     @MessageMapping("/message")
     public void sendMessage(ChatMessage message) {
         // deliver to recipient's personal queue

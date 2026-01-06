@@ -6,7 +6,7 @@ import com.softeng.backend.exception.repository.DocumentNotFoundException;
 import com.softeng.backend.models.diary.Diary;
 import com.softeng.backend.models.pet.Pet;
 import com.softeng.backend.models.pet.PetLite;
-import com.softeng.backend.repository.pet.IPetRepository;
+import com.softeng.backend.repository.pet.PetRepository;
 import com.softeng.backend.services.user.owner.OwnerService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -19,13 +19,13 @@ import java.util.concurrent.ExecutionException;
 
 @Slf4j
 @Service
-public class PetService implements IPetService {
+public class PetService {
 
-    private final IPetRepository petRepository;
+    private final PetRepository petRepository;
     private final OwnerService ownerService;
 
     @Autowired
-    public PetService(IPetRepository petRepository, OwnerService ownerService) {
+    public PetService(PetRepository petRepository, OwnerService ownerService) {
         this.petRepository = petRepository;
         this.ownerService = ownerService;
     }
@@ -33,7 +33,6 @@ public class PetService implements IPetService {
     // =========================
     // CREATE
     // =========================
-    @Override
     public PetDTO createPet(@Valid Pet pet) throws ExecutionException, InterruptedException, DocumentNotFoundException {
         PetDTO created= petRepository.createPet(pet);
         ownerService.addPet(pet.getOwnerId(), new PetLite(created.getId(), pet.getName(), pet.getBreed()));
@@ -43,12 +42,10 @@ public class PetService implements IPetService {
     // =========================
     // READ
     // =========================
-    @Override
     public PetDTO getPetById(String petId) throws ExecutionException, InterruptedException, DocumentNotFoundException {
         return petRepository.getPetById(petId);
     }
 
-    @Override
     public List<PetDTO> getPetsByOwnerId(String ownerId) throws ExecutionException, InterruptedException, DocumentNotFoundException {
         return petRepository.getPetsByOwnerId(ownerId);
     }
@@ -56,7 +53,6 @@ public class PetService implements IPetService {
     // =========================
     // UPDATE
     // =========================
-    @Override
     public PetDTO updatePet(String petId, @Valid Pet pet) throws ExecutionException, InterruptedException, DocumentNotFoundException {
 
         PetDTO result = petRepository.updatePet(petId, pet);
@@ -69,7 +65,6 @@ public class PetService implements IPetService {
     // =========================
     // DELETE
     // =========================
-    @Override
     public PetDTO deletePet(String petId) throws ExecutionException, InterruptedException {
         PetDTO deleted = petRepository.deletePet(petId);
         String ownerId = deleted.getPet().getOwnerId();
@@ -80,7 +75,6 @@ public class PetService implements IPetService {
     // =========================
     // ADD DIARY ENTRY OPERATION
     // =========================
-    @Override
     public DiaryDTO addDiaryEntry(String petId, Diary diary) throws ExecutionException, InterruptedException, DocumentNotFoundException {
         return petRepository.addDiaryEntry(petId, diary);
     }
@@ -88,7 +82,6 @@ public class PetService implements IPetService {
     // =========================
     // GET DIARY ENTRY IN RANGE OPERATION
     // =========================
-    @Override
     public List<DiaryDTO> getDiaryEntryInRange(String petId,
                                              Date from,
                                              Date to,

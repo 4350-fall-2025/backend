@@ -23,7 +23,7 @@ import java.util.Map;
 @Slf4j
 @RestController
 @RequestMapping("/api/v1/auth")
-public class AuthController implements IAuthController {
+public class AuthController {
     private final OwnerService ownerService;
     private final VetService vetService;
     private final AuthService authService;

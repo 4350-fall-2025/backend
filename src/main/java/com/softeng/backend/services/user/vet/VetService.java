@@ -15,7 +15,7 @@ import java.util.concurrent.ExecutionException;
 
 @Slf4j
 @Service
-public class VetService implements IVetService {
+public class VetService {
 
     private final VetRepository vetRepository;
 

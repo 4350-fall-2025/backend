@@ -21,7 +21,7 @@ import java.util.concurrent.ExecutionException;
 @Slf4j
 @RestController
 @RequestMapping("/api/v1/vets")
-public class VetController implements IVetController {
+public class VetController {
     private final VetService vetService;
 
     @Autowired

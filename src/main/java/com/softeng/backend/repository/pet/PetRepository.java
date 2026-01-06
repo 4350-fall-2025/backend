@@ -28,7 +28,7 @@ import java.util.concurrent.ExecutionException;
 
 @Slf4j
 @Repository
-public class PetRepository implements IPetRepository {
+public class PetRepository {
 
     private final Firestore firestore;
     private final OwnerRepository ownerRepository;
@@ -55,7 +55,6 @@ public class PetRepository implements IPetRepository {
      * @throws InterruptedException if the current thread was interrupted
      * @throws DocumentNotFoundException if owner does not exist
      */
-    @Override
     public PetDTO createPet(@Valid Pet pet) throws ExecutionException, InterruptedException, DocumentNotFoundException {
         OwnerDTO owner = ownerRepository.getOwnerById(pet.getOwnerId());
         if (owner.isEmpty())
@@ -82,7 +81,6 @@ public class PetRepository implements IPetRepository {
      * @throws InterruptedException if the current thread was interrupted
      * @throws DocumentNotFoundException if the pet is not found for provided id
      */
-    @Override
     public PetDTO getPetById(String petId) throws ExecutionException, InterruptedException, DocumentNotFoundException {
 
         ApiFuture<DocumentSnapshot> future = firestore.collection(PET_COLLECTION).document(petId).get();
@@ -104,7 +102,6 @@ public class PetRepository implements IPetRepository {
      * @throws ExecutionException   if computation threw an exception
      * @throws InterruptedException if the current thread was interrupted
      */
-    @Override
     public List<PetDTO> getPetsByOwnerId(String ownerId) throws ExecutionException, InterruptedException, DocumentNotFoundException {
         List<PetDTO> result = new ArrayList<>();
 
@@ -140,7 +137,6 @@ public class PetRepository implements IPetRepository {
      * @throws InterruptedException if the current thread was interrupted
      * @throws DocumentNotFoundException if the pet is not found for provided id
      */
-    @Override
     public PetDTO updatePet(String petId, @Valid Pet pet) throws ExecutionException, InterruptedException, DocumentNotFoundException {
         OwnerDTO owner = ownerRepository.getOwnerById(pet.getOwnerId());
         if (owner.isEmpty())
@@ -174,7 +170,6 @@ public class PetRepository implements IPetRepository {
      * @throws InterruptedException if the current thread was interrupted
      * @throws DocumentNotFoundException if the pet is not found for provided id
      */
-    @Override
     public PetDTO deletePet(String petId) throws ExecutionException, InterruptedException, DocumentNotFoundException {
 
         ApiFuture<DocumentSnapshot> future = firestore.collection(PET_COLLECTION).document(petId).get();
@@ -204,7 +199,6 @@ public class PetRepository implements IPetRepository {
      * @throws InterruptedException if the current thread was interrupted
      * @throws DocumentNotFoundException if no pet with <code>petId</code> exists,
      */
-    @Override
     public DiaryDTO addDiaryEntry(@NotNull @NotBlank String petId, @NotNull Diary diary) throws ExecutionException, InterruptedException, DocumentNotFoundException
     {
         DocumentReference docRef = firestore.collection(PET_COLLECTION).document(petId);

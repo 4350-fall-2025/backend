@@ -26,7 +26,7 @@ import java.util.concurrent.ExecutionException;
 
 @Slf4j
 @Repository
-public class VetRepository implements IVetRepository {
+public class VetRepository {
 
     private final Firestore firestore;
     private final String collectionName = "vets";

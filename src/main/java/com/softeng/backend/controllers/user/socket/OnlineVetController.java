@@ -13,7 +13,7 @@ import java.security.Principal;
 
 @Slf4j
 @Controller
-public class OnlineVetController implements IOnlineVetController{
+public class OnlineVetController{
 
     private final OnlineVetService onlineVetService;
     private final SimpMessagingTemplate template;
@@ -24,7 +24,6 @@ public class OnlineVetController implements IOnlineVetController{
         this.template = template;
     }
 
-    @Override
     @MessageMapping("/vet/online")
     public void Online(@NotNull SimpMessageHeaderAccessor headerAccessor) {
         String sessionId = headerAccessor.getSessionId();

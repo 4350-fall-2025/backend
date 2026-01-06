@@ -5,7 +5,7 @@ import com.softeng.backend.dto.PetDTO;
 import com.softeng.backend.exception.repository.DocumentNotFoundException;
 import com.softeng.backend.models.diary.Diary;
 import com.softeng.backend. models.pet.Pet;
-import com.softeng.backend.services.pet.IPetService;
+import com.softeng.backend.services.pet.PetService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -24,13 +24,13 @@ import java.util.concurrent.ExecutionException;
 @Slf4j
 @RestController
 @RequestMapping("/api/v1/pets")
-public class PetController implements IPetController {
+public class PetController {
 
-    private final IPetService petService;
+    private final PetService petService;
 
 
     @Autowired
-    public PetController(IPetService petService) {
+    public PetController(PetService petService) {
         this.petService = petService;
     }
 
@@ -38,7 +38,6 @@ public class PetController implements IPetController {
      * CREATE
      ******************************************************************************/
     @PostMapping()
-    @Override
     public ResponseEntity<Map<String, Object>> createPet(@NotNull @Valid @RequestBody Pet pet) {
 
         try {
@@ -55,7 +54,6 @@ public class PetController implements IPetController {
      * READ
      ******************************************************************************/
     @GetMapping("/{petId}")
-    @Override
     public ResponseEntity<Map<String, Object>> getPet(@NotNull @NotBlank @PathVariable String petId) {
 
         try {
@@ -72,7 +70,6 @@ public class PetController implements IPetController {
      * UPDATE
      ******************************************************************************/
     @PutMapping("/{petId}")
-    @Override
     public ResponseEntity<Map<String, Object>> updatePet(@NotNull @NotBlank @PathVariable String petId, @NotNull @Valid @RequestBody Pet pet) {
         PetDTO updated;
 
@@ -91,7 +88,6 @@ public class PetController implements IPetController {
      * DELETE
      ******************************************************************************/
     @DeleteMapping("/{petId}")
-    @Override
     public ResponseEntity<Map<String, Object>> removePet(@NotNull @NotBlank @PathVariable String petId) {
         try {
             petService.deletePet(petId);
@@ -108,7 +104,6 @@ public class PetController implements IPetController {
      * CREATE PET DIARY ENTRY
      ******************************************************************************/
     @PostMapping("/{petId}/diaries")
-    @Override
     public ResponseEntity<Map<String, Object>> addDiaryEntry(@NotNull @NotBlank @PathVariable String petId, @NotNull @Valid @RequestBody Diary diary) {
         DiaryDTO createdDiary;
         try {
