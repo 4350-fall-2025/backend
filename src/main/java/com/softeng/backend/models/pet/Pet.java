@@ -16,7 +16,7 @@ import java.util.Date;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Pet implements IPet {
+public class Pet {
 
     @NotNull @NotBlank @Pattern(regexp = "^[A-Za-z\\s\\-]+$", message = "Name must contain only letters, spaces, or hyphens")
     private String name;

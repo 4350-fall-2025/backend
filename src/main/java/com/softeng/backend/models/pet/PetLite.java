@@ -11,7 +11,7 @@ import org.springframework.data.annotation.Id;
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
-public class PetLite implements IPet {
+public class PetLite {
 
     @Id @NotNull @NotEmpty
     private String id;

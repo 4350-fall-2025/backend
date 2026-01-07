@@ -30,7 +30,7 @@ import java.util.concurrent.ExecutionException;
 
 @Slf4j
 @Repository
-public class OwnerRepository implements IOwnerRepository {
+public class OwnerRepository {
 
     private final Firestore firestore;
     private final String collectionName = "owners";
@@ -99,7 +99,6 @@ public class OwnerRepository implements IOwnerRepository {
         return new OwnerDTO(snapshot.getId(), owner);
     }
 
-    @Override
     public void addPet(String ownerId, PetLite pet) throws ExecutionException, InterruptedException, DocumentNotFoundException {
         DocumentReference docRef = firestore.collection(collectionName).document(ownerId);
         DocumentSnapshot snapshot = docRef.get().get();
@@ -125,7 +124,6 @@ public class OwnerRepository implements IOwnerRepository {
         docRef.update("pets", pets).get();
     }
 
-    @Override
     public void updatePet(String ownerId, PetLite subdocument) throws ExecutionException, InterruptedException, DocumentNotFoundException {
         DocumentReference docRef = firestore.collection(collectionName).document(ownerId);
         DocumentSnapshot snapshot = docRef.get().get();
@@ -164,7 +162,6 @@ public class OwnerRepository implements IOwnerRepository {
         docRef.update("pets", pets).get();
     }
 
-    @Override
     public void removePet(String ownerId, String petId) throws ExecutionException, InterruptedException, DocumentNotFoundException {
         DocumentReference docRef = firestore.collection(collectionName).document(ownerId);
         DocumentSnapshot snapshot = docRef.get().get();

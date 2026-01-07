@@ -3,7 +3,7 @@ package com.softeng.backend.models.user;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
-public abstract class User implements IUser {
+public abstract class User {
 
     protected String email = "";
     protected String firstName = "";

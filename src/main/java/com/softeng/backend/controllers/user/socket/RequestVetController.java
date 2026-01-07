@@ -15,7 +15,7 @@ import org.springframework.stereotype.Controller;
 
 @Slf4j
 @Controller
-public class RequestVetController implements IRequestVetController {
+public class RequestVetController {
 
     private static final String REQUEST_DESTINATION = "/queue/requests";
     private final RequestVetService requestVetService;
@@ -29,7 +29,6 @@ public class RequestVetController implements IRequestVetController {
         this.template = template;
     }
 
-    @Override
     @MessageMapping("/vet/request")
     public void requestVet(@NotNull @NotBlank RequestMessage requestMessage, @NotNull SimpMessageHeaderAccessor headerAccessor) {
         String targetVetId = requestMessage.getTo();
@@ -50,7 +49,6 @@ public class RequestVetController implements IRequestVetController {
         }
     }
 
-    @Override
     @MessageMapping("/vet/accept")
     public void acceptRequest(@NotNull @NotBlank RequestMessage requestMessage, @NotNull SimpMessageHeaderAccessor headerAccessor) {
         String targetOwnerId = requestMessage.getTo();
@@ -64,7 +62,6 @@ public class RequestVetController implements IRequestVetController {
         log.info("Connection request from {} to {} accepted", targetOwnerId, sourceVetId);
     }
 
-    @Override
     @MessageMapping("/vet/reject")
     public void cancelRequestFromVet(@NotNull @NotBlank RequestMessage requestMessage, @NotNull SimpMessageHeaderAccessor headerAccessor) {
         String targetOwnerId = requestMessage.getTo();
@@ -77,7 +74,6 @@ public class RequestVetController implements IRequestVetController {
         log.info("Connection request from {} to {} rejected", targetOwnerId, sourceVetId);
     }
 
-    @Override
     @MessageMapping("/owner/cancel")
     public void cancelRequestFromOwner(@NotNull @NotBlank RequestMessage requestMessage, @NotNull SimpMessageHeaderAccessor headerAccessor) {
         String targetVetId = requestMessage.getTo();

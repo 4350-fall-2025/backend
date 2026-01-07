@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @Document(collectionName = "vets")
-public class Vet extends User implements IVet {
+public class Vet extends User {
     private String certification;
 
     public Vet(String firstName, String lastName, String email, String password, String certification) {
